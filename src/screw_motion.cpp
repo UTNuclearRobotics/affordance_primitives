@@ -153,4 +153,4 @@ Eigen::Isometry3d ScrewAxis::getTF(double delta_theta) const
 
   return output;
 }
-}  // namespace moveit_studio_affordances
+}  // namespace affordance_primitives

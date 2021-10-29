@@ -139,8 +139,7 @@ TEST(AffordanceUtils, convertPoseToNewFrame)
   // First make sure we throw if the frames do not match
   grasp_pose.header.frame_id = ROOT_FRAME_NAME;
   screw_origin_pose.header.frame_id = PLANNING_FRAME_NAME;
-  EXPECT_THROW(result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose),
-               std::runtime_error);
+  EXPECT_THROW(result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose), std::runtime_error);
 
   // If the new base is identity, we should get back what we put in
   screw_origin_pose.header.frame_id = ROOT_FRAME_NAME;

@@ -100,4 +100,4 @@ Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::msg::PoseStamped& n
   return tf_root_to_new_base_frame.inverse() * tf_root_to_transformed_pose;
 }
 
-}  // namespace moveit_studio_affordances
+}  // namespace affordance_primitives
