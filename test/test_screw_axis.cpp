@@ -39,7 +39,7 @@ void checkVector(const Eigen::Vector3d& vec, const double x, const double y, con
   EXPECT_NEAR(vec.y(), y, EPSILON);
   EXPECT_NEAR(vec.z(), z, EPSILON);
 }
-void checkVector(const geometry_msgs::msg::Vector3& vec, const double x, const double y, const double z)
+void checkVector(const geometry_msgs::Vector3& vec, const double x, const double y, const double z)
 {
   EXPECT_NEAR(vec.x, x, EPSILON);
   EXPECT_NEAR(vec.y, y, EPSILON);
@@ -84,7 +84,7 @@ TEST(ScrewAxis, two_pose_setter_rotation)
 {
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME, false);
 
-  geometry_msgs::msg::Pose first_pose, second_pose;
+  geometry_msgs::Pose first_pose, second_pose;
 
   // Expect a false return if the poses are on top of each other (axis length 0)
   EXPECT_FALSE(screw_axis.setScrewAxis(first_pose, second_pose));
@@ -122,7 +122,7 @@ TEST(ScrewAxis, two_pose_setter_linear)
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME, true);
 
   // Origin at [1,0,0], axis of [0,0,1]
-  geometry_msgs::msg::Pose first_pose, second_pose;
+  geometry_msgs::Pose first_pose, second_pose;
   first_pose.position.x = 1.0;
   second_pose.position.x = 1.0;
   second_pose.position.z = 2.0;
@@ -138,7 +138,7 @@ TEST(ScrewAxis, pose_axis_setter_rotation)
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME, false);
 
   // Origin at [1,0,0], axis of [0,0,1]
-  geometry_msgs::msg::Pose first_pose;
+  geometry_msgs::Pose first_pose;
   first_pose.position.x = 1.0;
   Eigen::Vector3d z_axis(0, 0, 2);
 
@@ -173,7 +173,7 @@ TEST(ScrewAxis, pose_axis_setter_linear)
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME, true);
 
   // Origin at [1,0,0], axis of [0,0,1]
-  geometry_msgs::msg::Pose first_pose;
+  geometry_msgs::Pose first_pose;
   first_pose.position.x = 1.0;
   Eigen::Vector3d wonky_axis(2, 0, 2);
   first_pose.position.x = 1.0;
@@ -192,7 +192,7 @@ TEST(ScrewAxis, get_twist)
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME);
 
   // Origin at [1,0,0], axis of [1,1,0]
-  geometry_msgs::msg::Pose first_pose;
+  geometry_msgs::Pose first_pose;
   first_pose.position.x = 1.0;
   Eigen::Vector3d wonky_axis(1, 1, 0);
 
@@ -221,7 +221,7 @@ TEST(ScrewAxis, get_transform)
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME);
 
   // Origin at [1,0,0], axis of [0, 0, 1]
-  geometry_msgs::msg::Pose first_pose;
+  geometry_msgs::Pose first_pose;
   first_pose.position.x = 1.0;
   Eigen::Vector3d z_axis(0, 0, 1);
 
@@ -249,8 +249,6 @@ TEST(ScrewAxis, get_transform)
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv);
-
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

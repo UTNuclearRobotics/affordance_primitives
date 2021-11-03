@@ -33,8 +33,8 @@
 
 #pragma once
 
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 
 #include <affordance_primitives/screw_conversions.hpp>
 
@@ -65,8 +65,7 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const geometry_msgs::msg::Pose& origin_pose, const geometry_msgs::msg::Pose& axis_pose,
-                    double pitch = 0);
+  bool setScrewAxis(const geometry_msgs::Pose& origin_pose, const geometry_msgs::Pose& axis_pose, double pitch = 0);
   bool setScrewAxis(const Eigen::Isometry3d& origin_pose, const Eigen::Isometry3d& axis_pose, double pitch = 0)
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), Eigen::toMsg(axis_pose), pitch);
@@ -80,7 +79,7 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const geometry_msgs::msg::Pose& origin_pose, const Eigen::Vector3d& axis, double pitch = 0);
+  bool setScrewAxis(const geometry_msgs::Pose& origin_pose, const Eigen::Vector3d& axis, double pitch = 0);
   bool setScrewAxis(const Eigen::Isometry3d& origin_pose, const Eigen::Vector3d& axis, double pitch = 0)
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), axis, pitch);
@@ -100,7 +99,7 @@ public:
    * @param theta_dot The "velocity" (linear or rotational) to move
    * @return The calculated twist, defined with respect to the frame of the Screw Axis
    */
-  geometry_msgs::msg::TwistStamped getTwist(double theta_dot) const;
+  geometry_msgs::TwistStamped getTwist(double theta_dot) const;
 
   /**
    * @brief Gets the transform corresponding to moving along this screw axis for a given displacement
