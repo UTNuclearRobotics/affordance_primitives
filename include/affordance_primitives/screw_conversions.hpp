@@ -33,6 +33,7 @@
 
 #pragma once
 
+#include <affordance_primitive_msgs/ScrewStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <tf2_eigen/tf2_eigen.h>
@@ -74,6 +75,17 @@ inline std::string poseToStr(const geometry_msgs::PoseStamped& pose)
          << "\nZ: " << pose.pose.position.z << "\nQX: " << pose.pose.orientation.x
          << "\nQY: " << pose.pose.orientation.y << "\nQZ: " << pose.pose.orientation.z
          << "\nQW: " << pose.pose.orientation.w;
+  return stream.str();
+}
+
+inline std::string screwMsgToStr(const affordance_primitive_msgs::ScrewStamped& screw)
+{
+  std::stringstream stream;
+  stream << "\nHeader: " << screw.header.frame_id << "\nOrigin X: " << screw.origin.x
+         << "\nOrigin Y: " << screw.origin.y << "\nOrigin Z: " << screw.origin.z << "\nAxis X: " << screw.axis.x
+         << "\nAxis Y: " << screw.axis.y << "\nAxis Z: " << screw.axis.z << "\nPitch: " << screw.is_pure_translation ?
+      "Infinity" :
+      std::to_string(screw.pitch);
   return stream.str();
 }
 

@@ -9,11 +9,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Winline)
 
 find_package(catkin REQUIRED COMPONENTS
+  affordance_primitive_msgs
   geometry_msgs
   tf2_eigen
 )
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
+    affordance_primitive_msgs
     geometry_msgs
     tf2_eigen
 )
