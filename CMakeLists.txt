@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(affordance_primitives)
 
-add_compile_options(-std=c++14)
 if(NOT "${CMAKE_CXX_STANDARD}")
   set(CMAKE_CXX_STANDARD 14)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_compile_options(-Winline)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
