@@ -1,47 +1,66 @@
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(affordance_primitives)
 
-find_package(ament_cmake REQUIRED)
-ament_package_xml()
-
 if(NOT "${CMAKE_CXX_STANDARD}")
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(ament_cmake REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(tf2_eigen REQUIRED)
+add_compile_options(-Winline)
+
+find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
+  tf2_eigen
+)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     geometry_msgs
     tf2_eigen
 )
 
+catkin_package(
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    ${PROJECT_NAME}
+)
+
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+)
+
 add_library(${PROJECT_NAME} SHARED
   src/screw_motion.cpp
   src/affordance_utils.cpp)
-ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
-target_include_directories(${PROJECT_NAME}
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  PUBLIC $<INSTALL_INTERFACE:include>)
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(
   TARGETS ${PROJECT_NAME}
   EXPORT export_${PROJECT_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  add_subdirectory(test)
-  ament_lint_auto_find_test_dependencies()
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+#############
+## TESTING ##
+#############
+
+if(CATKIN_ENABLE_TESTING)
+  # find_package(rostest REQUIRED)
+
+  catkin_add_gtest(test_affordance_utils test/test_affordance_utils.cpp)
+  target_link_libraries(test_affordance_utils ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
+  target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
-
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
-ament_package()

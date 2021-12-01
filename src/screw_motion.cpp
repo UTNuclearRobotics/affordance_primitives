@@ -50,8 +50,7 @@ ScrewAxis::ScrewAxis(const std::string moving_frame_name, bool is_pure_translati
   translation_component_.setZero();
 }
 
-bool ScrewAxis::setScrewAxis(const geometry_msgs::msg::Pose& origin_pose, const geometry_msgs::msg::Pose& axis_pose,
-                             double pitch)
+bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const geometry_msgs::Pose& axis_pose, double pitch)
 {
   // Set the pitch and origin
   pitch_ = pitch;
@@ -79,7 +78,7 @@ bool ScrewAxis::setScrewAxis(const geometry_msgs::msg::Pose& origin_pose, const 
   return true;
 }
 
-bool ScrewAxis::setScrewAxis(const geometry_msgs::msg::Pose& origin_pose, const Eigen::Vector3d& axis, double pitch)
+bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const Eigen::Vector3d& axis, double pitch)
 {
   // Set all components
   pitch_ = pitch;
@@ -102,9 +101,9 @@ bool ScrewAxis::setScrewAxis(const geometry_msgs::msg::Pose& origin_pose, const 
   return true;
 }
 
-geometry_msgs::msg::TwistStamped ScrewAxis::getTwist(double theta_dot) const
+geometry_msgs::TwistStamped ScrewAxis::getTwist(double theta_dot) const
 {
-  geometry_msgs::msg::TwistStamped output;
+  geometry_msgs::TwistStamped output;
   output.header.frame_id = moving_frame_name_;
 
   // All we need is to multiply the theta_dot by motion vectors

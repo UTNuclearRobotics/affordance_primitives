@@ -33,9 +33,9 @@
 
 #pragma once
 
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
-#include <tf2_eigen/tf2_eigen.hpp>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
+#include <tf2_eigen/tf2_eigen.h>
 
 #include <sstream>
 
@@ -58,7 +58,7 @@ inline Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec)
   return output;
 }
 
-inline std::string twistToStr(const geometry_msgs::msg::TwistStamped& twist)
+inline std::string twistToStr(const geometry_msgs::TwistStamped& twist)
 {
   std::stringstream stream;
   stream << "\nHeader: " << twist.header.frame_id << "\nX: " << twist.twist.linear.x << "\nY: " << twist.twist.linear.y
@@ -67,7 +67,7 @@ inline std::string twistToStr(const geometry_msgs::msg::TwistStamped& twist)
   return stream.str();
 }
 
-inline std::string poseToStr(const geometry_msgs::msg::PoseStamped& pose)
+inline std::string poseToStr(const geometry_msgs::PoseStamped& pose)
 {
   std::stringstream stream;
   stream << "\nHeader: " << pose.header.frame_id << "\nX: " << pose.pose.position.x << "\nY: " << pose.pose.position.y
