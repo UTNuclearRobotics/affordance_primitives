@@ -36,6 +36,7 @@
 #include <affordance_primitive_msgs/ScrewStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Transform.h>
 #include <tf2_eigen/tf2_eigen.h>
 
 #include <sstream>
@@ -55,6 +56,73 @@ inline Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec)
   output(2, 0) = -vec(1);
   output(1, 2) = -vec(0);
   output(2, 1) = vec(0);
+
+  return output;
+}
+
+/**
+ * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
+ *
+ * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ *
+ * When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen
+ * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
+ * between these data types
+ */
+inline Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
+{
+  Eigen::MatrixXd adjoint(6, 6);
+
+  // Block matrix with
+  // |R     0|
+  // |[p]R  R|
+  adjoint.block<3, 3>(0, 0) = transform.linear();
+  adjoint.block<3, 3>(0, 3).setZero();
+  adjoint.block<3, 3>(3, 0) = getSkewSymmetricMatrix(transform.translation()) * transform.linear();
+  adjoint.block<3, 3>(3, 3) = transform.linear();
+
+  return adjoint;
+}
+
+/**
+ * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
+ *
+ * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ *
+ * When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen
+ * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
+ * between these data types
+ */
+inline Eigen::MatrixXd getAdjointMatrix(const geometry_msgs::Transform& transform)
+{
+  return getAdjointMatrix(tf2::transformToEigen(transform));
+}
+
+/**
+ * @brief Converts a twist message to a 6x1 vector with [angular ; linear]
+ */
+inline Eigen::VectorXd twistToVector(const geometry_msgs::Twist& twist)
+{
+  Eigen::Vector3d angular, linear;
+  tf2::fromMsg(twist.angular, angular);
+  tf2::fromMsg(twist.linear, linear);
+
+  Eigen::VectorXd output(6);
+  output.head(3) = angular;
+  output.tail(3) = linear;
+
+  return output;
+}
+
+/**
+ * @brief Converts a 6x1 vector with [angular ; linear] to a twist message
+ */
+inline geometry_msgs::Twist vectorToTwist(const Eigen::VectorXd& vec)
+{
+  geometry_msgs::Twist output;
+
+  tf2::toMsg(vec.head(3), output.angular);
+  tf2::toMsg(vec.tail(3), output.linear);
 
   return output;
 }
