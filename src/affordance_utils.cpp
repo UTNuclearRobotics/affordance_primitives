@@ -101,7 +101,7 @@ Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_ba
 }
 
 affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitive_msgs::ScrewStamped& input_screw,
-                                        const geometry_msgs::TransformStamped& transform)
+                                                       const geometry_msgs::TransformStamped& transform)
 {
   if (input_screw.header.frame_id == transform.child_frame_id)
   {

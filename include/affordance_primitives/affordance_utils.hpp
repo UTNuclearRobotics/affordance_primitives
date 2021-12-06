@@ -86,6 +86,6 @@ Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_ba
  * @exception Throws a std::runtime_error if the transform cannot be completed
  */
 affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitive_msgs::ScrewStamped& input_screw,
-                                        const geometry_msgs::TransformStamped& transform);
+                                                       const geometry_msgs::TransformStamped& transform);
 
 }  // namespace affordance_primitives
