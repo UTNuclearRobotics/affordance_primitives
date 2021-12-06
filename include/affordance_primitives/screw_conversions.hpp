@@ -80,12 +80,16 @@ inline std::string poseToStr(const geometry_msgs::PoseStamped& pose)
 
 inline std::string screwMsgToStr(const affordance_primitive_msgs::ScrewStamped& screw)
 {
+  std::string pitch;
+  if (screw.is_pure_translation)
+    pitch = "Infinity";
+  else
+    pitch = std::to_string(screw.pitch);
+
   std::stringstream stream;
   stream << "\nHeader: " << screw.header.frame_id << "\nOrigin X: " << screw.origin.x
          << "\nOrigin Y: " << screw.origin.y << "\nOrigin Z: " << screw.origin.z << "\nAxis X: " << screw.axis.x
-         << "\nAxis Y: " << screw.axis.y << "\nAxis Z: " << screw.axis.z << "\nPitch: " << screw.is_pure_translation ?
-      "Infinity" :
-      std::to_string(screw.pitch);
+         << "\nAxis Y: " << screw.axis.y << "\nAxis Z: " << screw.axis.z << "\nPitch: " << pitch;
   return stream.str();
 }
 
