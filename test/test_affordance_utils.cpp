@@ -169,6 +169,46 @@ TEST(AffordanceUtils, convertPoseToNewFrame)
   checkQuaternion(Eigen::Quaterniond(result.linear()), 0, 0, 0.5 * sqrt(2), 0.5 * sqrt(2));
 }
 
+TEST(AffordanceUtils, transformScrew)
+{
+  affordance_primitive_msgs::ScrewStamped input_screw_msg, output_screw_msg;
+  geometry_msgs::TransformStamped tf_msg;
+
+  // Set up TF: translate +3 on X axis, rotate +90 on Z
+  tf_msg.header.frame_id = PLANNING_FRAME_NAME;
+  tf_msg.child_frame_id = "new_screw_frame";
+  tf_msg.transform.translation.x = 3.0;
+  tf_msg.transform.rotation.x = 0;
+  tf_msg.transform.rotation.y = 0;
+  tf_msg.transform.rotation.z = 0.5 * sqrt(2);
+  tf_msg.transform.rotation.w = 0.5 * sqrt(2);
+
+  // Set up screw axis
+  input_screw_msg.origin.y = 2.0;
+  input_screw_msg.axis.x = 1.0;
+  input_screw_msg.is_pure_translation = false;
+
+  // If the screw is already in new frame, no transforms should happen
+  input_screw_msg.header.frame_id = "new_screw_frame";
+  ASSERT_NO_THROW(output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg));
+  checkVector(output_screw_msg.axis, 1, 0, 0);
+  checkPoint(output_screw_msg.origin, 0, 2, 0);
+  EXPECT_EQ(output_screw_msg.header.frame_id, input_screw_msg.header.frame_id);
+
+  // If the TF doesn't have the frames we need, we can't do the TF
+  input_screw_msg.header.frame_id = "some_random_frame";
+  ASSERT_THROW(output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg), std::runtime_error);
+
+  // Otherwise, the transform should work
+  input_screw_msg.header.frame_id = PLANNING_FRAME_NAME;
+  ASSERT_NO_THROW(output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg));
+
+  // From the new frame, the axis should be -y and the origin should be (2, 3, 0)
+  EXPECT_EQ(output_screw_msg.header.frame_id, tf_msg.child_frame_id);
+  checkPoint(output_screw_msg.origin, 2, 3, 0);
+  checkVector(output_screw_msg.axis, 0, -1, 0);
+}
+
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);

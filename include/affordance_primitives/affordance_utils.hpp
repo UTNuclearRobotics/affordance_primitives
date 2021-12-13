@@ -35,7 +35,9 @@
 
 #include <optional>
 
+#include <affordance_primitive_msgs/ScrewStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 
 #include <affordance_primitives/screw_conversions.hpp>
@@ -75,4 +77,15 @@ geometry_msgs::TwistStamped getTwistFromPoses(const geometry_msgs::PoseStamped& 
  */
 Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_base_frame,
                                         const geometry_msgs::PoseStamped& transformed_pose);
+
+/**
+ * @brief Transforms a ScrewStamped msg by the prescribed Transform
+ * @param input_screw Screw message to transform
+ * @param transform The transform to perform. The frame_id should match in the input screw
+ * @return The transformed ScrewStamped
+ * @exception Throws a std::runtime_error if the transform cannot be completed
+ */
+affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitive_msgs::ScrewStamped& input_screw,
+                                                       const geometry_msgs::TransformStamped& transform);
+
 }  // namespace affordance_primitives

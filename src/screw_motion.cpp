@@ -42,6 +42,13 @@ Eigen::Vector3d calculateLinearVelocity(const Eigen::Vector3d& axis, const Eigen
   return pitch_component - rotation_component;
 }
 
+ScrewAxis::ScrewAxis()
+{
+  axis_.setZero();
+  origin_.setZero();
+  translation_component_.setZero();
+}
+
 ScrewAxis::ScrewAxis(const std::string moving_frame_name, bool is_pure_translation)
   : moving_frame_name_(moving_frame_name), is_pure_translation_(is_pure_translation)
 {
@@ -99,6 +106,22 @@ bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const Eigen
     translation_component_ = calculateLinearVelocity(axis_, origin_, pitch_);
   }
   return true;
+}
+
+bool ScrewAxis::setScrewAxis(const affordance_primitive_msgs::ScrewStamped& screw_msg)
+{
+  // Override moving frame and translation information
+  moving_frame_name_ = screw_msg.header.frame_id;
+  is_pure_translation_ = screw_msg.is_pure_translation;
+
+  // Convert message types
+  geometry_msgs::Pose origin_pose;
+  origin_pose.position = screw_msg.origin;
+  Eigen::Vector3d eigen_axis;
+  tf2::fromMsg(screw_msg.axis, eigen_axis);
+
+  // Set up screw axis using origin-axis formulation
+  return setScrewAxis(origin_pose, eigen_axis, screw_msg.pitch);
 }
 
 geometry_msgs::TwistStamped ScrewAxis::getTwist(double theta_dot) const

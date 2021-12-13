@@ -53,6 +53,12 @@ TEST(ScrewAxis, test_constructor)
   EXPECT_TRUE(screw_axis.getQVector().isZero());
   EXPECT_TRUE(screw_axis.getAxis().isZero());
   EXPECT_TRUE(screw_axis.getLinearVector().isZero());
+
+  affordance_primitives::ScrewAxis screw_axis2;
+  EXPECT_EQ(screw_axis2.getFrame(), "");
+  EXPECT_TRUE(screw_axis2.getQVector().isZero());
+  EXPECT_TRUE(screw_axis2.getAxis().isZero());
+  EXPECT_TRUE(screw_axis2.getLinearVector().isZero());
 }
 
 TEST(ScrewAxis, calculate_linear_component)
@@ -172,7 +178,7 @@ TEST(ScrewAxis, pose_axis_setter_linear)
 {
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME, true);
 
-  // Origin at [1,0,0], axis of [0,0,1]
+  // Origin at [1,0,0], axis of [2, 0, 2]
   geometry_msgs::Pose first_pose;
   first_pose.position.x = 1.0;
   Eigen::Vector3d wonky_axis(2, 0, 2);
@@ -185,6 +191,57 @@ TEST(ScrewAxis, pose_axis_setter_linear)
 
   // Setting the pitch doesn't matter internally, but shouldn't cause problems
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, wonky_axis, 42));
+}
+
+TEST(ScrewAxis, screw_msg_setter_rotation)
+{
+  affordance_primitives::ScrewAxis screw_axis;
+
+  affordance_primitive_msgs::ScrewStamped screw_msg;
+  screw_msg.header.frame_id = MOVING_FRAME_NAME;
+  screw_msg.is_pure_translation = false;
+
+  // If the axis hasn't been set, should return false
+  EXPECT_FALSE(screw_axis.setScrewAxis(screw_msg));
+
+  // Origin at [1,0,0], axis of [0,0,2]
+  screw_msg.origin.x = 1.0;
+  screw_msg.axis.z = 2.0;
+
+  ASSERT_TRUE(screw_axis.setScrewAxis(screw_msg));
+  checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
+  checkVector(screw_axis.getAxis(), 0.0, 0.0, 1.0);
+  checkVector(screw_axis.getLinearVector(), 0.0, -1.0, 0.0);
+  EXPECT_NEAR(screw_axis.getPitch(), 0.0, EPSILON);
+
+  // Try a pitch
+  screw_msg.pitch = 0.5;
+  ASSERT_TRUE(screw_axis.setScrewAxis(screw_msg));
+  checkVector(screw_axis.getLinearVector(), 0.0, -1.0, 0.5);
+  EXPECT_NEAR(screw_axis.getPitch(), 0.5, EPSILON);
+}
+
+TEST(ScrewAxis, screw_msg_setter_linear)
+{
+  affordance_primitives::ScrewAxis screw_axis;
+
+  affordance_primitive_msgs::ScrewStamped screw_msg;
+  screw_msg.header.frame_id = MOVING_FRAME_NAME;
+  screw_msg.is_pure_translation = true;
+
+  // Origin at [1,0,0], axis of [2, 0, 2]
+  screw_msg.origin.x = 1.0;
+  screw_msg.axis.x = 2.0;
+  screw_msg.axis.z = 2.0;
+
+  ASSERT_TRUE(screw_axis.setScrewAxis(screw_msg));
+  checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
+  checkVector(screw_axis.getLinearVector(), 0.5 * sqrt(2), 0.0, 0.5 * sqrt(2));
+  EXPECT_TRUE(screw_axis.getAxis().isZero());
+
+  // Setting the pitch doesn't matter internally, but shouldn't cause problems
+  screw_msg.pitch = 42.0;
+  ASSERT_TRUE(screw_axis.setScrewAxis(screw_msg));
 }
 
 TEST(ScrewAxis, get_twist)

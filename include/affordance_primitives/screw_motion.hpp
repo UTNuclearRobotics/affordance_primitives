@@ -33,6 +33,7 @@
 
 #pragma once
 
+#include <affordance_primitive_msgs/ScrewStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 
@@ -53,6 +54,7 @@ Eigen::Vector3d calculateLinearVelocity(const Eigen::Vector3d& axis, const Eigen
 class ScrewAxis
 {
 public:
+  ScrewAxis();
   ScrewAxis(const std::string moving_frame_name, bool is_pure_translation = false);
 
   // Setup Screw Axis
@@ -84,6 +86,13 @@ public:
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), axis, pitch);
   };
+
+  /**
+   * @brief Sets up the Screw axis using a ScrewStamped message
+   * @param screw_msg The input message. The screw axis must be non-zero here
+   * @return True if the setup was successful, false otherwise
+   */
+  bool setScrewAxis(const affordance_primitive_msgs::ScrewStamped& screw_msg);
 
   /**
    * @brief Sets up the Screw axis, a twist message (TODO: implement)
