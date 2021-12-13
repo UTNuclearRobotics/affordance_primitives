@@ -117,14 +117,14 @@ affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitiv
   output.header.frame_id = transform.child_frame_id;
 
   // Convert to Eigen types
-  auto tf_old_to_new = tf2::transformToEigen(transform.transform);
+  auto tf_new_to_old = (tf2::transformToEigen(transform.transform)).inverse();
   Eigen::Vector3d screw_axis, screw_origin;
   tf2::fromMsg(input_screw.axis, screw_axis);
   tf2::fromMsg(input_screw.origin, screw_origin);
 
   // Perform the transform
-  Eigen::Vector3d rotated_axis = tf_old_to_new.linear() * screw_axis;
-  Eigen::Vector3d transformed_origin = tf_old_to_new.linear() * screw_origin + tf_old_to_new.translation();
+  Eigen::Vector3d rotated_axis = tf_new_to_old.linear() * screw_axis;
+  Eigen::Vector3d transformed_origin = tf_new_to_old.translation() + tf_new_to_old.linear() * screw_origin;
 
   // Convert back from Eigen types
   output.origin = tf2::toMsg(transformed_origin);
