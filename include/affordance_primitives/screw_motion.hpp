@@ -33,9 +33,7 @@
 
 #pragma once
 
-#include <affordance_primitive_msgs/ScrewStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
+#include <affordance_primitives/msg_types.hpp>
 
 #include <affordance_primitives/screw_conversions.hpp>
 
@@ -67,7 +65,7 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const geometry_msgs::Pose& origin_pose, const geometry_msgs::Pose& axis_pose, double pitch = 0);
+  bool setScrewAxis(const Pose& origin_pose, const Pose& axis_pose, double pitch = 0);
   bool setScrewAxis(const Eigen::Isometry3d& origin_pose, const Eigen::Isometry3d& axis_pose, double pitch = 0)
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), Eigen::toMsg(axis_pose), pitch);
@@ -81,7 +79,7 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const geometry_msgs::Pose& origin_pose, const Eigen::Vector3d& axis, double pitch = 0);
+  bool setScrewAxis(const Pose& origin_pose, const Eigen::Vector3d& axis, double pitch = 0);
   bool setScrewAxis(const Eigen::Isometry3d& origin_pose, const Eigen::Vector3d& axis, double pitch = 0)
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), axis, pitch);
@@ -92,7 +90,7 @@ public:
    * @param screw_msg The input message. The screw axis must be non-zero here
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const affordance_primitive_msgs::ScrewStamped& screw_msg);
+  bool setScrewAxis(const ScrewStamped& screw_msg);
 
   /**
    * @brief Sets up the Screw axis, a twist message (TODO: implement)
@@ -100,7 +98,7 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  // bool setScrewAxis(const geometry_msgs::msg::Twist& twist, const double pitch=0);
+  // bool setScrewAxis(const msg::Twist& twist, const double pitch=0);
 
   // Use the Screw to generate motion profiles
   /**
@@ -108,7 +106,7 @@ public:
    * @param theta_dot The "velocity" (linear or rotational) to move
    * @return The calculated twist, defined with respect to the frame of the Screw Axis
    */
-  geometry_msgs::TwistStamped getTwist(double theta_dot) const;
+  TwistStamped getTwist(double theta_dot) const;
 
   /**
    * @brief Gets the transform corresponding to moving along this screw axis for a given displacement

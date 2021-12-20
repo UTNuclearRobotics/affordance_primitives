@@ -33,10 +33,7 @@
 
 #pragma once
 
-#include <affordance_primitive_msgs/ScrewStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Transform.h>
+#include <affordance_primitives/msg_types.hpp>
 #include <tf2_eigen/tf2_eigen.h>
 
 #include <sstream>
@@ -93,7 +90,7 @@ inline Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
  * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
  * between these data types
  */
-inline Eigen::MatrixXd getAdjointMatrix(const geometry_msgs::Transform& transform)
+inline Eigen::MatrixXd getAdjointMatrix(const Transform& transform)
 {
   return getAdjointMatrix(tf2::transformToEigen(transform));
 }
@@ -101,7 +98,7 @@ inline Eigen::MatrixXd getAdjointMatrix(const geometry_msgs::Transform& transfor
 /**
  * @brief Converts a twist message to a 6x1 vector with [angular ; linear]
  */
-inline Eigen::VectorXd twistToVector(const geometry_msgs::Twist& twist)
+inline Eigen::VectorXd twistToVector(const Twist& twist)
 {
   Eigen::Vector3d angular, linear;
   tf2::fromMsg(twist.angular, angular);
@@ -117,9 +114,9 @@ inline Eigen::VectorXd twistToVector(const geometry_msgs::Twist& twist)
 /**
  * @brief Converts a 6x1 vector with [angular ; linear] to a twist message
  */
-inline geometry_msgs::Twist vectorToTwist(const Eigen::VectorXd& vec)
+inline Twist vectorToTwist(const Eigen::VectorXd& vec)
 {
-  geometry_msgs::Twist output;
+  Twist output;
 
   tf2::toMsg(vec.head(3), output.angular);
   tf2::toMsg(vec.tail(3), output.linear);
@@ -127,7 +124,7 @@ inline geometry_msgs::Twist vectorToTwist(const Eigen::VectorXd& vec)
   return output;
 }
 
-inline std::string twistToStr(const geometry_msgs::TwistStamped& twist)
+inline std::string twistToStr(const TwistStamped& twist)
 {
   std::stringstream stream;
   stream << "\nHeader: " << twist.header.frame_id << "\nX: " << twist.twist.linear.x << "\nY: " << twist.twist.linear.y
@@ -136,7 +133,7 @@ inline std::string twistToStr(const geometry_msgs::TwistStamped& twist)
   return stream.str();
 }
 
-inline std::string poseToStr(const geometry_msgs::PoseStamped& pose)
+inline std::string poseToStr(const PoseStamped& pose)
 {
   std::stringstream stream;
   stream << "\nHeader: " << pose.header.frame_id << "\nX: " << pose.pose.position.x << "\nY: " << pose.pose.position.y
@@ -146,7 +143,7 @@ inline std::string poseToStr(const geometry_msgs::PoseStamped& pose)
   return stream.str();
 }
 
-inline std::string screwMsgToStr(const affordance_primitive_msgs::ScrewStamped& screw)
+inline std::string screwMsgToStr(const ScrewStamped& screw)
 {
   std::string pitch;
   if (screw.is_pure_translation)

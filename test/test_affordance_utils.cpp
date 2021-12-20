@@ -34,7 +34,7 @@ const std::string ROOT_FRAME_NAME = "AT_frame_name";
 const std::string PLANNING_FRAME_NAME = "world";
 constexpr double EPSILON = 1e-4;
 
-inline void checkVector(const geometry_msgs::Vector3& vec, double x, double y, double z)
+inline void checkVector(const affordance_primitives::Vector3& vec, double x, double y, double z)
 {
   EXPECT_NEAR(vec.x, x, EPSILON);
   EXPECT_NEAR(vec.y, y, EPSILON);
@@ -46,13 +46,13 @@ inline void checkVector(const Eigen::Vector3d& vec, double x, double y, double z
   EXPECT_NEAR(vec.y(), y, EPSILON);
   EXPECT_NEAR(vec.z(), z, EPSILON);
 }
-inline void checkPoint(const geometry_msgs::Point& point, double x, double y, double z)
+inline void checkPoint(const affordance_primitives::Point& point, double x, double y, double z)
 {
   EXPECT_NEAR(point.x, x, EPSILON);
   EXPECT_NEAR(point.y, y, EPSILON);
   EXPECT_NEAR(point.z, z, EPSILON);
 }
-inline void checkQuaternion(const geometry_msgs::Quaternion& quat, double x, double y, double z, double w)
+inline void checkQuaternion(const affordance_primitives::Quaternion& quat, double x, double y, double z, double w)
 {
   EXPECT_NEAR(quat.x, x, EPSILON);
   EXPECT_NEAR(quat.y, y, EPSILON);
@@ -69,7 +69,7 @@ inline void checkQuaternion(const Eigen::Quaterniond& quat, double x, double y, 
 
 TEST(AffordanceUtils, getPoseInATFrame)
 {
-  geometry_msgs::PoseStamped AT_base_pose, other_pose, result;
+  affordance_primitives::PoseStamped AT_base_pose, other_pose, result;
 
   AT_base_pose.header.frame_id = PLANNING_FRAME_NAME;
   AT_base_pose.pose.position.x = 1;
@@ -104,7 +104,7 @@ TEST(AffordanceUtils, getPoseInATFrame)
 
 TEST(AffordanceUtils, getTwistFromPoses)
 {
-  geometry_msgs::PoseStamped start_pose, end_pose;
+  affordance_primitives::PoseStamped start_pose, end_pose;
 
   start_pose.header.frame_id = ROOT_FRAME_NAME;
   end_pose.header.frame_id = ROOT_FRAME_NAME;
@@ -120,7 +120,7 @@ TEST(AffordanceUtils, getTwistFromPoses)
   end_pose.pose.orientation.w = 0.5 * sqrt(2);
 
   // Check the calculated twist
-  geometry_msgs::TwistStamped result;
+  affordance_primitives::TwistStamped result;
   ASSERT_NO_THROW(result = affordance_primitives::getTwistFromPoses(start_pose, end_pose));
   EXPECT_EQ(result.header.frame_id, ROOT_FRAME_NAME);
   checkVector(result.twist.linear, 1, 1, 0);
@@ -133,7 +133,7 @@ TEST(AffordanceUtils, getTwistFromPoses)
 
 TEST(AffordanceUtils, convertPoseToNewFrame)
 {
-  geometry_msgs::PoseStamped grasp_pose, screw_origin_pose;
+  affordance_primitives::PoseStamped grasp_pose, screw_origin_pose;
   Eigen::Isometry3d result;
 
   // First make sure we throw if the frames do not match
@@ -171,8 +171,8 @@ TEST(AffordanceUtils, convertPoseToNewFrame)
 
 TEST(AffordanceUtils, transformScrew)
 {
-  affordance_primitive_msgs::ScrewStamped input_screw_msg, output_screw_msg;
-  geometry_msgs::TransformStamped tf_msg;
+  affordance_primitives::ScrewStamped input_screw_msg, output_screw_msg;
+  affordance_primitives::TransformStamped tf_msg;
 
   // Set up TF: translate +3 on X axis, rotate +90 on Z
   tf_msg.header.frame_id = PLANNING_FRAME_NAME;

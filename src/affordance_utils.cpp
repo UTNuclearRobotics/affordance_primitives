@@ -35,9 +35,8 @@
 
 namespace affordance_primitives
 {
-geometry_msgs::PoseStamped getPoseInATFrame(const std::string& root_frame_name,
-                                            const geometry_msgs::PoseStamped& root_frame_pose,
-                                            const geometry_msgs::PoseStamped& incoming_frame)
+PoseStamped getPoseInATFrame(const std::string& root_frame_name, const PoseStamped& root_frame_pose,
+                             const PoseStamped& incoming_frame)
 {
   // If the frame is already in the AT root, just return it
   if (incoming_frame.header.frame_id == root_frame_name)
@@ -48,14 +47,13 @@ geometry_msgs::PoseStamped getPoseInATFrame(const std::string& root_frame_name,
   // Otherwise, try to convert it to the AT root frame
   Eigen::Isometry3d tf_AT_root_to_pose = convertPoseToNewFrame(root_frame_pose, incoming_frame);
 
-  geometry_msgs::PoseStamped output;
+  PoseStamped output;
   output.header.frame_id = root_frame_name;
   output.pose = tf2::toMsg(tf_AT_root_to_pose);
   return output;
 }
 
-geometry_msgs::TwistStamped getTwistFromPoses(const geometry_msgs::PoseStamped& start_pose,
-                                              const geometry_msgs::PoseStamped& end_pose)
+TwistStamped getTwistFromPoses(const PoseStamped& start_pose, const PoseStamped& end_pose)
 {
   // Can't do it if they are in different frames
   if (start_pose.header.frame_id != end_pose.header.frame_id)
@@ -75,7 +73,7 @@ geometry_msgs::TwistStamped getTwistFromPoses(const geometry_msgs::PoseStamped& 
   Eigen::AngleAxisd axis_angle(diff_pose.linear());
 
   // Populate the output
-  geometry_msgs::TwistStamped output;
+  TwistStamped output;
   output.header.frame_id = start_pose.header.frame_id;
   tf2::toMsg(diff_pose.translation(), output.twist.linear);
   tf2::toMsg(axis_angle.angle() * axis_angle.axis(), output.twist.angular);
@@ -83,8 +81,7 @@ geometry_msgs::TwistStamped getTwistFromPoses(const geometry_msgs::PoseStamped& 
   return output;
 }
 
-Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_base_frame,
-                                        const geometry_msgs::PoseStamped& transformed_pose)
+Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const PoseStamped& transformed_pose)
 {
   if (new_base_frame.header.frame_id != transformed_pose.header.frame_id)
   {
@@ -100,8 +97,7 @@ Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_ba
   return tf_root_to_new_base_frame.inverse() * tf_root_to_transformed_pose;
 }
 
-affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitive_msgs::ScrewStamped& input_screw,
-                                                       const geometry_msgs::TransformStamped& transform)
+ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStamped& transform)
 {
   if (input_screw.header.frame_id == transform.child_frame_id)
   {
@@ -113,7 +109,7 @@ affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitiv
     throw std::runtime_error("Cannot transform screw: transform frame does not match incoming screw frame");
   }
 
-  affordance_primitive_msgs::ScrewStamped output;
+  ScrewStamped output;
   output.header.frame_id = transform.child_frame_id;
 
   // Convert to Eigen types
