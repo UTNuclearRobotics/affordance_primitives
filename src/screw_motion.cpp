@@ -57,7 +57,7 @@ ScrewAxis::ScrewAxis(const std::string moving_frame_name, bool is_pure_translati
   translation_component_.setZero();
 }
 
-bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const geometry_msgs::Pose& axis_pose, double pitch)
+bool ScrewAxis::setScrewAxis(const Pose& origin_pose, const Pose& axis_pose, double pitch)
 {
   // Set the pitch and origin
   pitch_ = pitch;
@@ -85,7 +85,7 @@ bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const geome
   return true;
 }
 
-bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const Eigen::Vector3d& axis, double pitch)
+bool ScrewAxis::setScrewAxis(const Pose& origin_pose, const Eigen::Vector3d& axis, double pitch)
 {
   // Set all components
   pitch_ = pitch;
@@ -108,14 +108,14 @@ bool ScrewAxis::setScrewAxis(const geometry_msgs::Pose& origin_pose, const Eigen
   return true;
 }
 
-bool ScrewAxis::setScrewAxis(const affordance_primitive_msgs::ScrewStamped& screw_msg)
+bool ScrewAxis::setScrewAxis(const ScrewStamped& screw_msg)
 {
   // Override moving frame and translation information
   moving_frame_name_ = screw_msg.header.frame_id;
   is_pure_translation_ = screw_msg.is_pure_translation;
 
   // Convert message types
-  geometry_msgs::Pose origin_pose;
+  Pose origin_pose;
   origin_pose.position = screw_msg.origin;
   Eigen::Vector3d eigen_axis;
   tf2::fromMsg(screw_msg.axis, eigen_axis);
@@ -124,9 +124,9 @@ bool ScrewAxis::setScrewAxis(const affordance_primitive_msgs::ScrewStamped& scre
   return setScrewAxis(origin_pose, eigen_axis, screw_msg.pitch);
 }
 
-geometry_msgs::TwistStamped ScrewAxis::getTwist(double theta_dot) const
+TwistStamped ScrewAxis::getTwist(double theta_dot) const
 {
-  geometry_msgs::TwistStamped output;
+  TwistStamped output;
   output.header.frame_id = moving_frame_name_;
 
   // All we need is to multiply the theta_dot by motion vectors

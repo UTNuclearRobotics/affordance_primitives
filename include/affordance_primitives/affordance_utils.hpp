@@ -35,10 +35,7 @@
 
 #include <optional>
 
-#include <affordance_primitive_msgs/ScrewStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/TransformStamped.h>
-#include <geometry_msgs/TwistStamped.h>
+#include <affordance_primitives/msg_types.hpp>
 
 #include <affordance_primitives/screw_conversions.hpp>
 
@@ -53,9 +50,8 @@ namespace affordance_primitives
  * @return The converted pose
  * @exception Throws a std::runtime_error if the pose could not be converted
  */
-geometry_msgs::PoseStamped getPoseInATFrame(const std::string& root_frame_name,
-                                            const geometry_msgs::PoseStamped& root_frame_pose,
-                                            const geometry_msgs::PoseStamped& incoming_frame);
+PoseStamped getPoseInATFrame(const std::string& root_frame_name, const PoseStamped& root_frame_pose,
+                             const PoseStamped& incoming_frame);
 
 /**
  * @brief Get the twist that represents moving from a start_pose to an end_pose
@@ -64,8 +60,7 @@ geometry_msgs::PoseStamped getPoseInATFrame(const std::string& root_frame_name,
  * @return The found twist
  * @exception Throws a std::runtime_error if the poses are not in the same frame
  */
-geometry_msgs::TwistStamped getTwistFromPoses(const geometry_msgs::PoseStamped& start_pose,
-                                              const geometry_msgs::PoseStamped& end_pose);
+TwistStamped getTwistFromPoses(const PoseStamped& start_pose, const PoseStamped& end_pose);
 
 /**
  * @brief Calculates the pose of a frame with respect to a new pose, given that all input frames are defined w.r.t. the
@@ -75,8 +70,7 @@ geometry_msgs::TwistStamped getTwistFromPoses(const geometry_msgs::PoseStamped& 
  * @return The new pose
  * @exception Throws a std::runtime_error if the poses are not in the same frame
  */
-Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_base_frame,
-                                        const geometry_msgs::PoseStamped& transformed_pose);
+Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const PoseStamped& transformed_pose);
 
 /**
  * @brief Transforms a ScrewStamped msg by the prescribed Transform
@@ -85,7 +79,6 @@ Eigen::Isometry3d convertPoseToNewFrame(const geometry_msgs::PoseStamped& new_ba
  * @return The transformed ScrewStamped
  * @exception Throws a std::runtime_error if the transform cannot be completed
  */
-affordance_primitive_msgs::ScrewStamped transformScrew(const affordance_primitive_msgs::ScrewStamped& input_screw,
-                                                       const geometry_msgs::TransformStamped& transform);
+ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStamped& transform);
 
 }  // namespace affordance_primitives
