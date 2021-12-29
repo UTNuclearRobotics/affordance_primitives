@@ -1,8 +1,7 @@
-
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : msg_types.h
+//      Title     : ap_screw_executor.h
 //      Project   : affordance_primitives
-//      Created   : 12/20/2021
+//      Created   : 10/07/2021
 //      Author    : Adam Pettinger
 //      Copyright : Copyright© The University of Texas at Austin, 2014-2021. All
 //      rights reserved.
@@ -33,36 +32,26 @@
 
 #pragma once
 
-/*
-    The intent of this file is to have one place all messages are included and
-   aliased. I understand this sort of type aliasing is not optimal. However,
-   while developping on ROS 1 and 2 at the same time this sort of hack makes
-   transfering code between versions much easier
-*/
-
-#include <affordance_primitive_msgs/AffordancePrimitive.h>
-#include <affordance_primitive_msgs/ScrewStamped.h>
-#include <geometry_msgs/PointStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/QuaternionStamped.h>
-#include <geometry_msgs/TransformStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Vector3Stamped.h>
+#include <ros/ros.h>
+#include <tf2_ros/transform_listener.h>
+#include <affordance_primitives/msg_types.hpp>
 
 namespace affordance_primitives
 {
-using AffordancePrimitive = affordance_primitive_msgs::AffordancePrimitive;
-using ScrewStamped = affordance_primitive_msgs::ScrewStamped;
-using PointStamped = geometry_msgs::PointStamped;
-using Point = geometry_msgs::Point;
-using PoseStamped = geometry_msgs::PoseStamped;
-using Pose = geometry_msgs::Pose;
-using QuaternionStamped = geometry_msgs::QuaternionStamped;
-using Quaternion = geometry_msgs::Quaternion;
-using TransformStamped = geometry_msgs::TransformStamped;
-using Transform = geometry_msgs::Transform;
-using TwistStamped = geometry_msgs::TwistStamped;
-using Twist = geometry_msgs::Twist;
-using Vector3Stamped = geometry_msgs::Vector3Stamped;
-using Vector3 = geometry_msgs::Vector3;
+class APScrewExecutor
+{
+public:
+  APScrewExecutor();
+  APScrewExecutor(ros::NodeHandle& nh, const std::string& server_name_);
+
+  ~APScrewExecutor(){};
+
+  bool getScrewTwist(AffordancePrimitive::Request& req, AffordancePrimitive::Response& res);
+
+private:
+  ros::ServiceServer screw_twist_server_;
+
+  tf2_ros::Buffer tfBuffer_;
+  tf2_ros::TransformListener tfListener_;
+};
 }  // namespace affordance_primitives

@@ -33,7 +33,8 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
-  src/screw_motion.cpp
+  src/screw_axis.cpp
+  src/screw_execution.cpp
   src/affordance_utils.cpp)
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
