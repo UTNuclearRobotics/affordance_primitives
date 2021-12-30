@@ -12,12 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   affordance_primitive_msgs
   geometry_msgs
   tf2_eigen
+	tf2_ros
 )
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     affordance_primitive_msgs
     geometry_msgs
     tf2_eigen
+		tf2_ros
 )
 
 catkin_package(
@@ -59,11 +61,14 @@ install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 #############
 
 if(CATKIN_ENABLE_TESTING)
-  # find_package(rostest REQUIRED)
+  find_package(rostest REQUIRED)
 
   catkin_add_gtest(test_affordance_utils test/test_affordance_utils.cpp)
   target_link_libraries(test_affordance_utils ${catkin_LIBRARIES} ${PROJECT_NAME})
 
   catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
   target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+	add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)
+	target_link_libraries(test_screw_execution ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
