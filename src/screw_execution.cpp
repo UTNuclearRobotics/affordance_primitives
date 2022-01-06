@@ -4,12 +4,11 @@
 
 namespace affordance_primitives
 {
-APScrewExecutor::APScrewExecutor() : tfBuffer_(), tfListener_(tfBuffer_)
+APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_)
 {
 }
 
-APScrewExecutor::APScrewExecutor(ros::NodeHandle& nh, const std::string& server_name_)
-  : tfBuffer_(), tfListener_(tfBuffer_)
+APScrewExecutor::APScrewExecutor(ros::NodeHandle& nh, const std::string& server_name_) : tfListener_(tfBuffer_)
 {
   screw_twist_server_ =
       nh.advertiseService(ros::names::append(nh.getNamespace(), server_name_), &APScrewExecutor::getScrewTwist, this);
