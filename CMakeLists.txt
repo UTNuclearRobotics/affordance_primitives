@@ -12,12 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   affordance_primitive_msgs
   geometry_msgs
   tf2_eigen
+  tf2_ros
 )
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     affordance_primitive_msgs
     geometry_msgs
     tf2_eigen
+    tf2_ros
 )
 
 catkin_package(
@@ -25,6 +27,9 @@ catkin_package(
     include
   LIBRARIES
     ${PROJECT_NAME}
+  CATKIN_DEPENDS
+    affordance_primitive_msgs
+    geometry_msgs
 )
 
 include_directories(
@@ -33,8 +38,9 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
-  src/screw_motion.cpp
-  src/affordance_utils.cpp)
+  src/affordance_utils.cpp
+  src/screw_axis.cpp
+  src/screw_execution.cpp)
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
@@ -50,19 +56,19 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
 #############
 ## TESTING ##
 #############
 
 if(CATKIN_ENABLE_TESTING)
-  # find_package(rostest REQUIRED)
+  find_package(rostest REQUIRED)
 
   catkin_add_gtest(test_affordance_utils test/test_affordance_utils.cpp)
   target_link_libraries(test_affordance_utils ${catkin_LIBRARIES} ${PROJECT_NAME})
 
   catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
   target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)
+  target_link_libraries(test_screw_execution ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
