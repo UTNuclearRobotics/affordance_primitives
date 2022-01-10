@@ -1,0 +1,22 @@
+# Ask to lookup a known frame in the tf tree. "moving_to_task_frame" is ignored in this case
+byte LOOKUP=0
+
+# Provide a transform to the moving frame. "moving_frame_name" is ignored in this case
+# "moving_to_task_frame" is the transform from the moving frame (e.g. gripper) to the task frame (where the screw is defined)
+byte PROVIDED=1
+
+# Source of moving frame
+byte moving_frame_source
+
+# Moving frame input
+string moving_frame_name
+geometry_msgs/TransformStamped moving_to_task_frame
+
+# Screw axis to move about
+affordance_primitive_msgs/ScrewStamped screw
+
+# Velocity to move along the screw
+float64 theta_dot
+---
+# Resulting velocity of the moving frame
+geometry_msgs/TwistStamped moving_frame_twist
