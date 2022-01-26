@@ -11,6 +11,7 @@ add_compile_options(-Winline)
 find_package(catkin REQUIRED COMPONENTS
   affordance_primitive_msgs
   geometry_msgs
+  pluginlib
   tf2_eigen
   tf2_ros
 )
@@ -18,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     affordance_primitive_msgs
     geometry_msgs
+    pluginlib
     tf2_eigen
     tf2_ros
 )
@@ -38,7 +40,10 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
+  include/${PROJECT_NAME}/empty_parameter_manager.hpp
+  include/${PROJECT_NAME}/parameter_manager.hpp
   src/affordance_utils.cpp
+  src/parameter_manager_plugins.cpp
   src/screw_axis.cpp
   src/screw_execution.cpp)
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
@@ -56,6 +61,8 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
+install(FILES plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
 #############
 ## TESTING ##
 #############
@@ -71,4 +78,7 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)
   target_link_libraries(test_screw_execution ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  add_rostest_gtest(test_parameter_manager test/test_parameter_manager.test test/test_parameter_manager.cpp)
+  target_link_libraries(test_parameter_manager ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()

@@ -1,0 +1,5 @@
+<library path="lib/libaffordance_primitives">
+  <class type="affordance_primitives::EmptyParameterManager" base_class_type="affordance_primitives::ParameterManager">
+    <description>A trivial case for examples and default behavior</description>
+  </class>
+</library>

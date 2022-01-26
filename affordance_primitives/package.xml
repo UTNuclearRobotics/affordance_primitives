@@ -13,6 +13,7 @@
 
   <depend>affordance_primitive_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>pluginlib</depend>
   <depend>tf2_eigen</depend>
   <depend>tf2_ros</depend>
 
@@ -22,5 +23,6 @@
 
   <export>
     <build_type>catkin</build_type>
+    <affordance_primitives plugin="${prefix}/plugins.xml" />
   </export>
 </package>
