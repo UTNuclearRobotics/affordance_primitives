@@ -1,6 +1,7 @@
 #include <affordance_primitives/screw_execution.hpp>
 #include <affordance_primitives/affordance_utils.hpp>
 #include <affordance_primitives/screw_axis.hpp>
+#include <math.h>
 
 namespace affordance_primitives
 {
@@ -51,6 +52,16 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
     return false;
   }
 
+  if (last_tf_moving_to_task_frame_)
+  {
+    res.delta_theta_last_timestep = estimateDeltaTheta(*last_tf_moving_to_task_frame_, tfmsg_moving_to_task_frame);
+  }
+  else
+  {
+    res.delta_theta_last_timestep = 0;
+  }
+  last_tf_moving_to_task_frame_ = std::make_unique<affordance_primitives::TransformStamped>(tfmsg_moving_to_task_frame);
+
   // Calculate commanded twist in Task frame
   ScrewAxis screw_axis;
   screw_axis.setScrewAxis(req.screw);
@@ -65,5 +76,32 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   res.moving_frame_twist.twist = vectorToTwist(eigen_twist_moving_frame);
 
   return true;
+}
+
+double APScrewExecutor::estimateDeltaTheta(const affordance_primitives::TransformStamped& last_tf_moving_to_task,
+                                           const affordance_primitives::TransformStamped& current_tf_moving_to_task)
+{
+  // Convert to Eigen types
+  const Eigen::Isometry3d last_tf = tf2::transformToEigen(last_tf_moving_to_task);
+  const Eigen::Isometry3d current_tf = tf2::transformToEigen(current_tf_moving_to_task);
+
+  // Get TF: last to current
+  const Eigen::Isometry3d tf_last_to_current = last_tf * current_tf.inverse();
+  const auto rotation_matrix = tf_last_to_current.linear();
+
+  // Calculate angle change of tf_last_to_current
+  double output;
+  if (rotation_matrix.isIdentity(1e-8))
+  {
+    return 0;
+  }
+  else if (fabs(rotation_matrix.trace() + 1) < 1e-8)
+  {
+    return M_PI;
+  }
+  else
+  {
+    return acos(0.5 * (tf_last_to_current.linear().trace() - 1));
+  }
 }
 }  // namespace affordance_primitives

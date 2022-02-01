@@ -35,6 +35,7 @@
 #include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
 #include <affordance_primitives/msg_types.hpp>
+#include <memory>
 
 namespace affordance_primitives
 {
@@ -48,10 +49,15 @@ public:
 
   bool getScrewTwist(AffordancePrimitive::Request& req, AffordancePrimitive::Response& res);
 
+  double estimateDeltaTheta(const affordance_primitives::TransformStamped& last_tf_moving_to_task,
+                            const affordance_primitives::TransformStamped& current_tf_moving_to_task);
+
 private:
   ros::ServiceServer screw_twist_server_;
 
   tf2_ros::Buffer tfBuffer_;
   tf2_ros::TransformListener tfListener_;
+
+  std::unique_ptr<affordance_primitives::TransformStamped> last_tf_moving_to_task_frame_;
 };
 }  // namespace affordance_primitives

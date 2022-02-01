@@ -20,3 +20,6 @@ float64 theta_dot
 ---
 # Resulting velocity of the moving frame
 geometry_msgs/TwistStamped moving_frame_twist
+
+# Estimate of screw theta we moved since the last check
+float64 delta_theta_last_timestep
