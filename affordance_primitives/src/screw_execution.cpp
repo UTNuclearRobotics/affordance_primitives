@@ -71,9 +71,33 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   Eigen::VectorXd eigen_twist_moving_frame =
       getAdjointMatrix(tfmsg_moving_to_task_frame.transform) * twistToVector(twist_in_task_frame.twist);
 
+  // Figure out estimated wrench
+  Wrench wrench_in_task_frame;
+  wrench_in_task_frame.force.x = req.task_impedance.trans_x * twist_in_task_frame.twist.linear.x;
+  wrench_in_task_frame.force.y = req.task_impedance.trans_y * twist_in_task_frame.twist.linear.y;
+  wrench_in_task_frame.force.z = req.task_impedance.trans_z * twist_in_task_frame.twist.linear.z;
+  wrench_in_task_frame.torque.x = req.task_impedance.rot_x * twist_in_task_frame.twist.angular.x;
+  wrench_in_task_frame.torque.y = req.task_impedance.rot_y * twist_in_task_frame.twist.angular.y;
+  wrench_in_task_frame.torque.z = req.task_impedance.rot_z * twist_in_task_frame.twist.angular.z;
+
+  // Convert wrench to moving frame
+  Eigen::Isometry3d tf_eigen_moving_to_task_frame = tf2::transformToEigen(tfmsg_moving_to_task_frame);
+  Eigen::VectorXd eigen_wrench_moving_frame =
+      getAdjointMatrix(tf_eigen_moving_to_task_frame.inverse()).transpose() * wrenchToVector(wrench_in_task_frame);
+
+  Eigen::Vector3d moment = eigen_wrench_moving_frame.head(3);
+  Eigen::Vector3d screw_origin;
+  tf2::fromMsg(req.screw.origin, screw_origin);
+  Eigen::Vector3d radius = tf_eigen_moving_to_task_frame.translation() + tf_eigen_moving_to_task_frame.linear()*screw_origin;
+  Eigen::Vector3d force_in_moving_frame = radius.cross(moment);
+
   // Package for response
   res.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
   res.moving_frame_twist.twist = vectorToTwist(eigen_twist_moving_frame);
+  res.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
+  res.expected_wrench.wrench.force.x = force_in_moving_frame.x();
+  res.expected_wrench.wrench.force.y = force_in_moving_frame.y();
+  res.expected_wrench.wrench.force.z = force_in_moving_frame.z();
 
   return true;
 }

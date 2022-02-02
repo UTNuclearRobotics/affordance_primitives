@@ -124,6 +124,35 @@ inline Twist vectorToTwist(const Eigen::VectorXd& vec)
   return output;
 }
 
+/**
+ * @brief Converts a wrench message to a 6x1 vector with [torque ; force]
+ */
+inline Eigen::VectorXd wrenchToVector(const Wrench& wrench)
+{
+  Eigen::Vector3d torque, force;
+  tf2::fromMsg(wrench.torque, torque);
+  tf2::fromMsg(wrench.force, force);
+
+  Eigen::VectorXd output(6);
+  output.head(3) = torque;
+  output.tail(3) = force;
+
+  return output;
+}
+
+/**
+ * @brief Converts a 6x1 vector with [torque ; force] to a twist message
+ */
+inline Wrench vectorToWrench(const Eigen::VectorXd& vec)
+{
+  Wrench output;
+
+  tf2::toMsg(vec.head(3), output.torque);
+  tf2::toMsg(vec.tail(3), output.force);
+
+  return output;
+}
+
 inline std::string twistToStr(const TwistStamped& twist)
 {
   std::stringstream stream;

@@ -49,6 +49,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/WrenchStamped.h>
 
 namespace affordance_primitives
 {
@@ -67,4 +68,6 @@ using TwistStamped = geometry_msgs::TwistStamped;
 using Twist = geometry_msgs::Twist;
 using Vector3Stamped = geometry_msgs::Vector3Stamped;
 using Vector3 = geometry_msgs::Vector3;
+using WrenchStamped = geometry_msgs::WrenchStamped;
+using Wrench = geometry_msgs::Wrench;
 }  // namespace affordance_primitives
