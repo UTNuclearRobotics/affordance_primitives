@@ -1,7 +1,6 @@
 #include <affordance_primitives/screw_execution.hpp>
 #include <affordance_primitives/affordance_utils.hpp>
 #include <affordance_primitives/screw_axis.hpp>
-#include <math.h>
 
 namespace affordance_primitives
 {
@@ -92,5 +91,4 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
 
   return true;
 }
-
 }  // namespace affordance_primitives

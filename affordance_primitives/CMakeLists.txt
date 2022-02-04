@@ -84,4 +84,7 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_parameter_manager test/test_parameter_manager.test test/test_parameter_manager.cpp)
   target_link_libraries(test_parameter_manager ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  add_rostest_gtest(test_task_estimator test/test_task_estimator.test test/test_task_estimator.cpp)
+  target_link_libraries(test_task_estimator ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()

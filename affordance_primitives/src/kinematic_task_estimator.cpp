@@ -21,12 +21,6 @@ void KinematicTaskEstimator::resetTaskEstimation(double reset_val)
 std::optional<double>
 KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req)
 {
-  // Check if we HAVE a previous pose. If not, just return the current estimate
-  if (!last_tf_moving_to_task_frame_)
-  {
-    return current_estimation_;
-  }
-
   TransformStamped tfmsg_moving_to_task_frame;
 
   // Check if we can transform the Task frame to the Moving frame
@@ -60,6 +54,13 @@ KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::Affordanc
   {
     ROS_WARN_STREAM_THROTTLE(1, "Unexpected 'moving_frame_source' requested, ending...");
     return std::nullopt;
+  }
+
+  // Check if we HAVE a previous pose. If not, just return the current estimate
+  if (!last_tf_moving_to_task_frame_)
+  {
+    last_tf_moving_to_task_frame_ = tfmsg_moving_to_task_frame;
+    return current_estimation_;
   }
 
   // Calculate the delta: find the TF from last to current, then take the matrix log on this
