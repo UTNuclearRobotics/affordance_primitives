@@ -52,16 +52,6 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
     return false;
   }
 
-  if (last_tf_moving_to_task_frame_)
-  {
-    res.delta_theta_last_timestep = estimateDeltaTheta(*last_tf_moving_to_task_frame_, tfmsg_moving_to_task_frame);
-  }
-  else
-  {
-    res.delta_theta_last_timestep = 0;
-  }
-  last_tf_moving_to_task_frame_ = std::make_unique<affordance_primitives::TransformStamped>(tfmsg_moving_to_task_frame);
-
   // Calculate commanded twist in Task frame
   ScrewAxis screw_axis;
   screw_axis.setScrewAxis(req.screw);
@@ -88,7 +78,8 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   Eigen::Vector3d moment = eigen_wrench_moving_frame.head(3);
   Eigen::Vector3d screw_origin;
   tf2::fromMsg(req.screw.origin, screw_origin);
-  Eigen::Vector3d radius = tf_eigen_moving_to_task_frame.translation() + tf_eigen_moving_to_task_frame.linear()*screw_origin;
+  Eigen::Vector3d radius =
+      tf_eigen_moving_to_task_frame.translation() + tf_eigen_moving_to_task_frame.linear() * screw_origin;
   Eigen::Vector3d force_in_moving_frame = radius.cross(moment);
 
   // Package for response
@@ -102,30 +93,4 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   return true;
 }
 
-double APScrewExecutor::estimateDeltaTheta(const affordance_primitives::TransformStamped& last_tf_moving_to_task,
-                                           const affordance_primitives::TransformStamped& current_tf_moving_to_task)
-{
-  // Convert to Eigen types
-  const Eigen::Isometry3d last_tf = tf2::transformToEigen(last_tf_moving_to_task);
-  const Eigen::Isometry3d current_tf = tf2::transformToEigen(current_tf_moving_to_task);
-
-  // Get TF: last to current
-  const Eigen::Isometry3d tf_last_to_current = last_tf * current_tf.inverse();
-  const auto rotation_matrix = tf_last_to_current.linear();
-
-  // Calculate angle change of tf_last_to_current
-  double output;
-  if (rotation_matrix.isIdentity(1e-8))
-  {
-    return 0;
-  }
-  else if (fabs(rotation_matrix.trace() + 1) < 1e-8)
-  {
-    return M_PI;
-  }
-  else
-  {
-    return acos(0.5 * (tf_last_to_current.linear().trace() - 1));
-  }
-}
 }  // namespace affordance_primitives

@@ -64,12 +64,12 @@ public:
    *
    * @param reset_val The value to reset to
    */
-  void resetTaskEstimation(double reset_val=0);
+  void resetTaskEstimation(double reset_val = 0);
 
 private:
   double current_estimation_;
 
-  // Stores the previous pose so we can compare between subsequent updates  
+  // Stores the previous pose so we can compare between subsequent updates
   std::optional<affordance_primitives::TransformStamped> last_tf_moving_to_task_frame_;
 
   // Allows getting moving frame poses from tf tree

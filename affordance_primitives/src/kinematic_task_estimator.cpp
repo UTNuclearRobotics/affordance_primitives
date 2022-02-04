@@ -3,23 +3,30 @@
 
 namespace affordance_primitives
 {
-KinematicTaskEstimator::KinematicTaskEstimator() : tfListener_(tfBuffer_) {}
+KinematicTaskEstimator::KinematicTaskEstimator() : tfListener_(tfBuffer_)
+{
+}
 
-void KinematicTaskEstimator::initialize(const ros::NodeHandle& nh) {
+void KinematicTaskEstimator::initialize(const ros::NodeHandle& nh)
+{
   nh_ = nh;
 }
 
-void KinematicTaskEstimator::resetTaskEstimation(double reset_val) {
+void KinematicTaskEstimator::resetTaskEstimation(double reset_val)
+{
   current_estimation_ = reset_val;
+  last_tf_moving_to_task_frame_.reset();
 }
 
-std::optional<double> KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req) {
+std::optional<double>
+KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req)
+{
   // Check if we HAVE a previous pose. If not, just return the current estimate
   if (!last_tf_moving_to_task_frame_)
   {
     return current_estimation_;
   }
-  
+
   TransformStamped tfmsg_moving_to_task_frame;
 
   // Check if we can transform the Task frame to the Moving frame
@@ -74,4 +81,4 @@ std::optional<double> KinematicTaskEstimator::estimateTaskAngle(const affordance
   return current_estimation_;
 }
 
-} // namespace affordance_primitives
+}  // namespace affordance_primitives

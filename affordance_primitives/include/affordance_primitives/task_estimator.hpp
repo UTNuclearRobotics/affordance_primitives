@@ -58,7 +58,7 @@ public:
    *
    * @param reset_val The value to reset to
    */
-  virtual void resetTaskEstimation(double reset_val=0) = 0;
+  virtual void resetTaskEstimation(double reset_val = 0) = 0;
 
   virtual ~TaskEstimator(){};
 
