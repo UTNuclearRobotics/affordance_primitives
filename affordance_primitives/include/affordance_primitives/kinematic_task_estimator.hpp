@@ -1,10 +1,9 @@
-
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : msg_types.h
+//      Title     : kinematic_task_estimator.h
 //      Project   : affordance_primitives
-//      Created   : 12/20/2021
+//      Created   : 02/04/2022
 //      Author    : Adam Pettinger
-//      Copyright : Copyright© The University of Texas at Austin, 2014-2021. All
+//      Copyright : Copyright© The University of Texas at Austin, 2014-2022. All
 //      rights reserved.
 //
 //          All files within this directory are subject to the following, unless
@@ -33,41 +32,48 @@
 
 #pragma once
 
-/*
-    The intent of this file is to have one place all messages are included and
-   aliased. I understand this sort of type aliasing is not optimal. However,
-   while developping on ROS 1 and 2 at the same time this sort of hack makes
-   transfering code between versions much easier
-*/
+#include <memory>
 
-#include <affordance_primitive_msgs/AffordanceParameter.h>
-#include <affordance_primitive_msgs/AffordancePrimitive.h>
-#include <affordance_primitive_msgs/ScrewStamped.h>
-#include <geometry_msgs/PointStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/QuaternionStamped.h>
-#include <geometry_msgs/TransformStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Vector3Stamped.h>
-#include <geometry_msgs/WrenchStamped.h>
+#include <ros/ros.h>
+#include <affordance_primitives/msg_types.hpp>
+#include <affordance_primitives/task_estimator.hpp>
+#include <tf2_ros/transform_listener.h>
 
 namespace affordance_primitives
 {
-using AffordanceParameter = affordance_primitive_msgs::AffordanceParameter;
-using AffordancePrimitive = affordance_primitive_msgs::AffordancePrimitive;
-using ScrewStamped = affordance_primitive_msgs::ScrewStamped;
-using PointStamped = geometry_msgs::PointStamped;
-using Point = geometry_msgs::Point;
-using PoseStamped = geometry_msgs::PoseStamped;
-using Pose = geometry_msgs::Pose;
-using QuaternionStamped = geometry_msgs::QuaternionStamped;
-using Quaternion = geometry_msgs::Quaternion;
-using TransformStamped = geometry_msgs::TransformStamped;
-using Transform = geometry_msgs::Transform;
-using TwistStamped = geometry_msgs::TwistStamped;
-using Twist = geometry_msgs::Twist;
-using Vector3Stamped = geometry_msgs::Vector3Stamped;
-using Vector3 = geometry_msgs::Vector3;
-using WrenchStamped = geometry_msgs::WrenchStamped;
-using Wrench = geometry_msgs::Wrench;
+/**
+ * A task estimator that just uses subsequent moving frame poses to estimate the change in screw axis angle between poses
+ */
+class KinematicTaskEstimator : public affordance_primitives::TaskEstimator
+{
+public:
+  KinematicTaskEstimator();
+
+  ~KinematicTaskEstimator(){};
+
+  void initialize(const ros::NodeHandle& nh);
+
+  /** Returns the estimated angle of a task
+   *
+   * @param ap_req The affordance primitive being used for motion
+   * @return An estimation of the angle (theta) of a screw primitive. The optional is not filled if the input was invalid
+   */
+  std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req);
+
+  /** Resets the internal estimation
+   *
+   * @param reset_val The value to reset to
+   */
+  void resetTaskEstimation(double reset_val = 0);
+
+private:
+  double current_estimation_;
+
+  // Stores the previous pose so we can compare between subsequent updates
+  std::optional<affordance_primitives::TransformStamped> last_tf_moving_to_task_frame_;
+
+  // Allows getting moving frame poses from tf tree
+  tf2_ros::Buffer tfBuffer_;
+  tf2_ros::TransformListener tfListener_;
+};
 }  // namespace affordance_primitives

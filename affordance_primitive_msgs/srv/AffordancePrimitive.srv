@@ -15,8 +15,14 @@ geometry_msgs/TransformStamped moving_to_task_frame
 # Screw axis to move about
 affordance_primitive_msgs/ScrewStamped screw
 
+# Task Impedance
+affordance_primitive_msgs/CartesianFloat task_impedance
+
 # Velocity to move along the screw
 float64 theta_dot
 ---
 # Resulting velocity of the moving frame
 geometry_msgs/TwistStamped moving_frame_twist
+
+# Wrench required in the EE frame (TODO: make this in the F/T frame)
+geometry_msgs/WrenchStamped expected_wrench

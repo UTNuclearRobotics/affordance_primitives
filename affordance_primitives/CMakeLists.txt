@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(affordance_primitives)
 
 if(NOT "${CMAKE_CXX_STANDARD}")
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -41,8 +41,11 @@ include_directories(
 
 add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/empty_parameter_manager.hpp
+  include/${PROJECT_NAME}/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/parameter_manager.hpp
+  include/${PROJECT_NAME}/task_estimator.hpp
   src/affordance_utils.cpp
+  src/kinematic_task_estimator.cpp
   src/parameter_manager_plugins.cpp
   src/screw_axis.cpp
   src/screw_execution.cpp)
@@ -81,4 +84,7 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_parameter_manager test/test_parameter_manager.test test/test_parameter_manager.cpp)
   target_link_libraries(test_parameter_manager ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  add_rostest_gtest(test_task_estimator test/test_task_estimator.test test/test_task_estimator.cpp)
+  target_link_libraries(test_task_estimator ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
