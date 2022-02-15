@@ -12,10 +12,11 @@ void KinematicTaskEstimator::initialize(const ros::NodeHandle& nh)
   nh_ = nh;
 }
 
-void KinematicTaskEstimator::resetTaskEstimation(double reset_val)
+bool KinematicTaskEstimator::resetTaskEstimation(double reset_val)
 {
   current_estimation_ = reset_val;
   last_tf_moving_to_task_frame_.reset();
+  return true;
 }
 
 std::optional<double>
