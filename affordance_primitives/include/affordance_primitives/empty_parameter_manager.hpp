@@ -33,9 +33,9 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <affordance_primitives/parameter_manager.hpp>
+#include <affordance_primitives/parameter_manager.hpp> 
 
-#include <utility>
+#include <pluginlib/class_list_macros.h>
 
 namespace affordance_primitives
 {
@@ -45,11 +45,11 @@ namespace affordance_primitives
 class EmptyParameterManager : public affordance_primitives::ParameterManager
 {
 public:
-  EmptyParameterManager(){};
-  void initialize(const ros::NodeHandle& nh)
-  {
-    nh_ = ros::NodeHandle(nh);
-  }
+  EmptyParameterManager();
+
+  ~EmptyParameterManager(){};
+
+  void initialize(const ros::NodeHandle& nh); 
 
   /** Tries to set a robot's parameters
    *
@@ -57,11 +57,6 @@ public:
    * @return The first value is true if everything was set correctly, second
    * value is a string that provides logging messages
    */
-  std::pair<bool, std::string> setParameters(const affordance_primitives::AffordanceParameter& params)
-  {
-    return std::make_pair(true, "");
-  };
-
-  ~EmptyParameterManager(){};
+  std::pair<bool, std::string> setParameters(const affordance_primitives::AffordanceParameter& params);
 };
 }  // namespace affordance_primitives
