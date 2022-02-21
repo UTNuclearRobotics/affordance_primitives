@@ -39,6 +39,8 @@
 #include <affordance_primitives/task_estimator.hpp>
 #include <tf2_ros/transform_listener.h>
 
+#include <pluginlib/class_list_macros.h>
+
 namespace affordance_primitives
 {
 /**

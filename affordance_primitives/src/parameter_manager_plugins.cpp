@@ -1,8 +1,8 @@
 #include <pluginlib/class_list_macros.h>
 
 // Parameter manager
-#include <affordance_primitives/empty_parameter_manager.hpp>
-#include <affordance_primitives/parameter_manager.hpp>
+#include <affordance_primitives/empty_parameter_manager.hpp> //d
+#include <affordance_primitives/parameter_manager.hpp> //d
 PLUGINLIB_EXPORT_CLASS(affordance_primitives::EmptyParameterManager, affordance_primitives::ParameterManager)
 
 // Task estimator
