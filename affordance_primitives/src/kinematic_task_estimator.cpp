@@ -91,3 +91,5 @@ KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::Affordanc
 }
 
 }  // namespace affordance_primitives
+
+PLUGINLIB_EXPORT_CLASS(affordance_primitives::KinematicTaskEstimator, affordance_primitives::TaskEstimator);

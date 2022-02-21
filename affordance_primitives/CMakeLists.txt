@@ -45,8 +45,8 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/parameter_manager.hpp
   include/${PROJECT_NAME}/task_estimator.hpp
   src/affordance_utils.cpp
+  src/empty_parameter_manager.cpp
   src/kinematic_task_estimator.cpp
-  src/parameter_manager_plugins.cpp
   src/screw_axis.cpp
   src/screw_execution.cpp)
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
