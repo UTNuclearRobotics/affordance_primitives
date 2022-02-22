@@ -33,7 +33,7 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <affordance_primitives/parameter_manager.hpp> 
+#include <affordance_primitives/parameter_manager.hpp>
 
 #include <pluginlib/class_list_macros.h>
 
@@ -49,7 +49,7 @@ public:
 
   ~EmptyParameterManager(){};
 
-  void initialize(const ros::NodeHandle& nh); 
+  void initialize(const ros::NodeHandle& nh);
 
   /** Tries to set a robot's parameters
    *
