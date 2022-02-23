@@ -35,8 +35,6 @@
 #include <ros/ros.h>
 #include <affordance_primitives/parameter_manager.hpp>
 
-#include <pluginlib/class_list_macros.h>
-
 namespace affordance_primitives
 {
 /**

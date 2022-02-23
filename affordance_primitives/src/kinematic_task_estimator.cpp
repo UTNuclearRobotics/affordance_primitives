@@ -1,5 +1,6 @@
 #include <affordance_primitives/kinematic_task_estimator.hpp>
 #include <tf2_eigen/tf2_eigen.h>
+#include <pluginlib/class_list_macros.h>
 
 namespace affordance_primitives
 {

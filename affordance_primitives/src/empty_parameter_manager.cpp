@@ -1,4 +1,5 @@
 #include <affordance_primitives/empty_parameter_manager.hpp>
+#include <pluginlib/class_list_macros.h>
 
 namespace affordance_primitives
 {
