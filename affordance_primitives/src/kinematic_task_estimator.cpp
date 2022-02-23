@@ -1,5 +1,6 @@
 #include <affordance_primitives/kinematic_task_estimator.hpp>
 #include <tf2_eigen/tf2_eigen.h>
+#include <pluginlib/class_list_macros.h>
 
 namespace affordance_primitives
 {
@@ -73,10 +74,12 @@ KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::Affordanc
   const Eigen::Isometry3d tf_last_to_current = last_tf * current_tf.inverse();
 
   // Translation case is much easier
-  if (ap_req.screw.is_pure_translation) {
+  if (ap_req.screw.is_pure_translation)
+  {
     current_estimation_ += tf_last_to_current.translation().norm();
   }
-  else {
+  else
+  {
     // Use Eigen to do the heavy math lifting
     Eigen::AngleAxisd rotation_se3(tf_last_to_current.linear());
 
@@ -91,3 +94,5 @@ KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::Affordanc
 }
 
 }  // namespace affordance_primitives
+
+PLUGINLIB_EXPORT_CLASS(affordance_primitives::KinematicTaskEstimator, affordance_primitives::TaskEstimator);
