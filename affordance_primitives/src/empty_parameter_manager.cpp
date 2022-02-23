@@ -9,7 +9,7 @@ EmptyParameterManager::EmptyParameterManager()
 
 void EmptyParameterManager::initialize(const ros::NodeHandle& nh)
 {
-  nh_ = ros::NodeHandle(nh);
+  nh_ = nh;
 }
 
 std::pair<bool, std::string>
