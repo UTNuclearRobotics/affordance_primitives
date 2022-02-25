@@ -31,7 +31,7 @@
    Desc: Utility functions for working with affordance templates and primitives
  */
 
-#include <affordance_primitives/affordance_utils.hpp>
+#include <affordance_primitives/screw_model/affordance_utils.hpp>
 
 namespace affordance_primitives
 {

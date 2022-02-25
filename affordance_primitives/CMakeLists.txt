@@ -40,15 +40,19 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
-  include/${PROJECT_NAME}/empty_parameter_manager.hpp
-  include/${PROJECT_NAME}/kinematic_task_estimator.hpp
-  include/${PROJECT_NAME}/parameter_manager.hpp
-  include/${PROJECT_NAME}/task_estimator.hpp
-  src/affordance_utils.cpp
-  src/empty_parameter_manager.cpp
-  src/kinematic_task_estimator.cpp
-  src/screw_axis.cpp
-  src/screw_execution.cpp)
+  include/${PROJECT_NAME}/configs_interface/empty_parameter_manager.hpp
+  include/${PROJECT_NAME}/configs_interface/parameter_manager.hpp
+  include/${PROJECT_NAME}/screw_model/screw_axis.hpp
+  include/${PROJECT_NAME}/screw_model/screw_conversions.hpp
+  include/${PROJECT_NAME}/screw_model/screw_execution.hpp
+  include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
+  include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
+  src/configs_interface/empty_parameter_manager.cpp
+  src/screw_model/affordance_utils.cpp
+  src/screw_model/screw_axis.cpp
+  src/screw_model/screw_execution.cpp
+  src/task_estimator/kinematic_task_estimator.cpp
+)
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 

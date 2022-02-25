@@ -31,7 +31,7 @@
    Desc: Defines a library used to calculate screw motion affordance parameters
  */
 
-#include <affordance_primitives/screw_axis.hpp>
+#include <affordance_primitives/screw_model/screw_axis.hpp>
 
 namespace affordance_primitives
 {

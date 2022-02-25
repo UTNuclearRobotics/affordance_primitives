@@ -33,7 +33,7 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <affordance_primitives/parameter_manager.hpp>
+#include <affordance_primitives/configs_interface/parameter_manager.hpp>
 
 namespace affordance_primitives
 {

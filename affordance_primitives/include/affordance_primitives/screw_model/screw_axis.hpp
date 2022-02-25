@@ -35,7 +35,7 @@
 
 #include <affordance_primitives/msg_types.hpp>
 
-#include <affordance_primitives/screw_conversions.hpp>
+#include <affordance_primitives/screw_model/screw_conversions.hpp>
 
 namespace affordance_primitives
 {

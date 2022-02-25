@@ -1,4 +1,4 @@
-#include <affordance_primitives/kinematic_task_estimator.hpp>
+#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
 #include <tf2_eigen/tf2_eigen.h>
 #include <pluginlib/class_list_macros.h>
 

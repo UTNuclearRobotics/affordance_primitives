@@ -32,7 +32,7 @@
 
 #include <gtest/gtest.h>
 
-#include <affordance_primitives/empty_parameter_manager.hpp>
+#include <affordance_primitives/configs_interface/empty_parameter_manager.hpp>
 #include <affordance_primitives/msg_types.hpp>
 #include <pluginlib/class_loader.h>
 

@@ -28,7 +28,7 @@
 
 #include <gtest/gtest.h>
 
-#include <affordance_primitives/screw_axis.hpp>
+#include <affordance_primitives/screw_model/screw_axis.hpp>
 
 const std::string MOVING_FRAME_NAME = "moving_frame_name";
 constexpr double EPSILON = 1e-4;

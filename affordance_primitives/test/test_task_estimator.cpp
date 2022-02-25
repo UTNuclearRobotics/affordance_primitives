@@ -32,7 +32,7 @@
 
 #include <gtest/gtest.h>
 
-#include <affordance_primitives/kinematic_task_estimator.hpp>
+#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
 #include <affordance_primitives/msg_types.hpp>
 #include <pluginlib/class_loader.h>
 

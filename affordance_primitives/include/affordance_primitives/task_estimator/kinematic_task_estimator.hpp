@@ -36,7 +36,7 @@
 
 #include <ros/ros.h>
 #include <affordance_primitives/msg_types.hpp>
-#include <affordance_primitives/task_estimator.hpp>
+#include <affordance_primitives/task_estimator/task_estimator.hpp>
 #include <tf2_ros/transform_listener.h>
 
 namespace affordance_primitives
