@@ -10,10 +10,6 @@ TaskMonitor::TaskMonitor(const ros::NodeHandle& nh, const std::string ft_topic_n
 TaskMonitor::~TaskMonitor()
 {
   stopMonitor();
-  if (thread_.joinable())
-  {
-    thread_.join();
-  };
 }
 
 void TaskMonitor::startMonitor(const AffordanceParameter& parameters, const double timeout)
@@ -79,8 +75,12 @@ std::optional<ExecutionResult> TaskMonitor::getResult()
 
 void TaskMonitor::stopMonitor()
 {
-  // Just request a stop and leave
+  // Request a stop and wait for it to happen
   continue_monitoring_ = false;
+  if (thread_.joinable())
+  {
+    thread_.join();
+  }
 }
 
 void TaskMonitor::ftCB(const WrenchStamped& msg)
