@@ -65,7 +65,7 @@ public:
    * @param reset_val The value to reset to
    * @return True if successful, false otherwise
    */
-  bool resetTaskEstimation(double reset_val = 0);
+  bool resetTaskEstimation(double reset_val = 0.0);
 
 private:
   double current_estimation_;
