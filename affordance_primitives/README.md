@@ -4,4 +4,4 @@ Affordance Primitives (APs) use screw theory to model contact-task affordances. 
 
 # AP Framework
 This repository includes a library for performing AP moves with a generic manipulator. See the paper (TODO: link when public) for more details. The major components of the framework are given below. Red nodes are plugins that allow customization
-![ap_framework](/doc/AP_Framework.png "Affordance Primitive Framework")
+![ap_framework](doc/AP_Framework.png "Affordance Primitive Framework")
