@@ -1,6 +1,6 @@
-#include <affordance_primitives/screw_execution.hpp>
-#include <affordance_primitives/affordance_utils.hpp>
-#include <affordance_primitives/screw_axis.hpp>
+#include <affordance_primitives/screw_model/screw_execution.hpp>
+#include <affordance_primitives/screw_model/affordance_utils.hpp>
+#include <affordance_primitives/screw_model/screw_axis.hpp>
 
 namespace affordance_primitives
 {

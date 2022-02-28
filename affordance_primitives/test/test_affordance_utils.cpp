@@ -28,7 +28,7 @@
 
 #include <gtest/gtest.h>
 
-#include <affordance_primitives/affordance_utils.hpp>
+#include <affordance_primitives/screw_model/affordance_utils.hpp>
 
 const std::string ROOT_FRAME_NAME = "AT_frame_name";
 const std::string PLANNING_FRAME_NAME = "world";

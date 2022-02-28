@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : kinematic_task_estimator.h
+//      Title     : task_estimator.hpp
 //      Project   : affordance_primitives
 //      Created   : 02/04/2022
 //      Author    : Adam Pettinger
@@ -32,48 +32,39 @@
 
 #pragma once
 
-#include <memory>
-
 #include <ros/ros.h>
 #include <affordance_primitives/msg_types.hpp>
-#include <affordance_primitives/task_estimator.hpp>
-#include <tf2_ros/transform_listener.h>
+
+#include <optional>
 
 namespace affordance_primitives
 {
 /**
- * A task estimator that just uses subsequent moving frame poses to estimate the change in screw axis angle between poses
+ * Estimates the state of a task
  */
-class KinematicTaskEstimator : public affordance_primitives::TaskEstimator
+class TaskEstimator
 {
 public:
-  KinematicTaskEstimator();
-
-  ~KinematicTaskEstimator(){};
-
-  void initialize(const ros::NodeHandle& nh);
+  virtual void initialize(const ros::NodeHandle& nh) = 0;
 
   /** Returns the estimated angle of a task
    *
    * @param ap_req The affordance primitive being used for motion
    * @return An estimation of the angle (theta) of a screw primitive. The optional is not filled if the input was invalid
    */
-  std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req);
+  virtual std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req) = 0;
 
   /** Resets the internal estimation
    *
    * @param reset_val The value to reset to
+   * @return True if successful, false otherwise
    */
-  void resetTaskEstimation(double reset_val = 0);
+  virtual bool resetTaskEstimation(double reset_val = 0.0) = 0;
 
-private:
-  double current_estimation_;
+  virtual ~TaskEstimator(){};
 
-  // Stores the previous pose so we can compare between subsequent updates
-  std::optional<affordance_primitives::TransformStamped> last_tf_moving_to_task_frame_;
-
-  // Allows getting moving frame poses from tf tree
-  tf2_ros::Buffer tfBuffer_;
-  tf2_ros::TransformListener tfListener_;
+protected:
+  TaskEstimator(){};
+  ros::NodeHandle nh_;
 };
 }  // namespace affordance_primitives

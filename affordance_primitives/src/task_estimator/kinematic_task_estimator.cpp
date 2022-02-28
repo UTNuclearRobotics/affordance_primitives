@@ -1,5 +1,6 @@
-#include <affordance_primitives/kinematic_task_estimator.hpp>
+#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
 #include <tf2_eigen/tf2_eigen.h>
+#include <pluginlib/class_list_macros.h>
 
 namespace affordance_primitives
 {
@@ -12,10 +13,11 @@ void KinematicTaskEstimator::initialize(const ros::NodeHandle& nh)
   nh_ = nh;
 }
 
-void KinematicTaskEstimator::resetTaskEstimation(double reset_val)
+bool KinematicTaskEstimator::resetTaskEstimation(double reset_val)
 {
   current_estimation_ = reset_val;
   last_tf_moving_to_task_frame_.reset();
+  return true;
 }
 
 std::optional<double>
@@ -71,15 +73,26 @@ KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::Affordanc
   // Get TF: last to current
   const Eigen::Isometry3d tf_last_to_current = last_tf * current_tf.inverse();
 
-  // Use Eigen to do the heavy math lifting
-  Eigen::AngleAxisd rotation_se3(tf_last_to_current.linear());
+  // Translation case is much easier
+  if (ap_req.screw.is_pure_translation)
+  {
+    current_estimation_ += tf_last_to_current.translation().norm();
+  }
+  else
+  {
+    // Use Eigen to do the heavy math lifting
+    Eigen::AngleAxisd rotation_se3(tf_last_to_current.linear());
+
+    // Update the estimate and return
+    current_estimation_ += rotation_se3.angle();
+  }
 
   // Save last pose
   last_tf_moving_to_task_frame_ = tfmsg_moving_to_task_frame;
 
-  // Update the estimate and return
-  current_estimation_ += rotation_se3.angle();
   return current_estimation_;
 }
 
 }  // namespace affordance_primitives
+
+PLUGINLIB_EXPORT_CLASS(affordance_primitives::KinematicTaskEstimator, affordance_primitives::TaskEstimator);

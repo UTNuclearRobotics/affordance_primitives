@@ -33,9 +33,9 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
-#include <affordance_primitives/affordance_utils.hpp>
+#include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/msg_types.hpp>
-#include <affordance_primitives/screw_execution.hpp>
+#include <affordance_primitives/screw_model/screw_execution.hpp>
 
 const std::string TASK_FRAME_NAME = "task_frame";
 const std::string MOVING_FRAME_NAME = "moving_frame";
