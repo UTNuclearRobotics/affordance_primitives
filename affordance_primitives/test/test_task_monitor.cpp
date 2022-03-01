@@ -53,7 +53,7 @@ TEST(TaskMonitor, start_stop_monitor)
   affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
   ASSERT_NO_THROW(monitor.startMonitor(params));
 
-  // Wait a sec, then stop monitor
+  // Wait some time, then stop monitor
   ros::Duration(0.25).sleep();
   ASSERT_NO_THROW(monitor.stopMonitor());
 
@@ -78,7 +78,7 @@ TEST(TaskMonitor, monitor_timing)
   // Default parameters
   affordance_primitives::AffordanceParameter params;
 
-  // Create and start monitor with no timeout
+  // Create and start monitor with timeout
   affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
 
