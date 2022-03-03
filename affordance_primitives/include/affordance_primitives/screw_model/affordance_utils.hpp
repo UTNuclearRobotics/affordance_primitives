@@ -34,10 +34,10 @@
 #pragma once
 
 #include <optional>
+#include <sstream>
 
 #include <affordance_primitives/msg_types.hpp>
-
-#include <affordance_primitives/screw_model/screw_conversions.hpp>
+#include <tf2_eigen/tf2_eigen.h>
 
 namespace affordance_primitives
 {
@@ -80,5 +80,57 @@ Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const
  * @exception Throws a std::runtime_error if the transform cannot be completed
  */
 ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStamped& transform);
+
+/**
+ * @brief Converts an axis vector to 3x3 skew symmetric matrix, for math
+ */
+Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec);
+
+/**
+ * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
+ *
+ * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ *
+ * When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen
+ * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
+ * between these data types
+ */
+Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform);
+
+/**
+ * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
+ *
+ * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ *
+ * When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen
+ * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
+ * between these data types
+ */
+Eigen::MatrixXd getAdjointMatrix(const Transform& transform);
+
+/**
+ * @brief Converts a twist message to a 6x1 vector with [angular ; linear]
+ */
+Eigen::VectorXd twistToVector(const Twist& twist);
+
+/**
+ * @brief Converts a 6x1 vector with [angular ; linear] to a twist message
+ */
+Twist vectorToTwist(const Eigen::VectorXd& vec);
+
+/**
+ * @brief Gets the pretty string format for a TwistStamped message
+ */
+std::string twistToStr(const TwistStamped& twist);
+
+/**
+ * @brief Gets the pretty string format for a PoseStamped message
+ */
+std::string poseToStr(const PoseStamped& pose);
+
+/**
+ * @brief Gets the pretty string format for a ScrewStamped message
+ */
+std::string screwMsgToStr(const ScrewStamped& screw);
 
 }  // namespace affordance_primitives

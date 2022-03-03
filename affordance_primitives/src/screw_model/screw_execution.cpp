@@ -1,6 +1,6 @@
-#include <affordance_primitives/screw_model/screw_execution.hpp>
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_axis.hpp>
+#include <affordance_primitives/screw_model/screw_execution.hpp>
 
 namespace affordance_primitives
 {
@@ -69,10 +69,19 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   wrench_in_task_frame.torque.y = req.task_impedance.rot_y * twist_in_task_frame.twist.angular.y;
   wrench_in_task_frame.torque.z = req.task_impedance.rot_z * twist_in_task_frame.twist.angular.z;
 
+  // Convert to Eigen type
+  Eigen::Vector3d eig_torque, eig_force;
+  tf2::fromMsg(wrench_in_task_frame.torque, eig_torque);
+  tf2::fromMsg(wrench_in_task_frame.force, eig_force);
+
+  Eigen::VectorXd eig_wrench_in_task_frame(6);
+  eig_wrench_in_task_frame.head(3) = eig_torque;
+  eig_wrench_in_task_frame.tail(3) = eig_force;
+
   // Convert wrench to moving frame
   Eigen::Isometry3d tf_eigen_moving_to_task_frame = tf2::transformToEigen(tfmsg_moving_to_task_frame);
   Eigen::VectorXd eigen_wrench_moving_frame =
-      getAdjointMatrix(tf_eigen_moving_to_task_frame.inverse()).transpose() * wrenchToVector(wrench_in_task_frame);
+      getAdjointMatrix(tf_eigen_moving_to_task_frame.inverse()).transpose() * eig_wrench_in_task_frame;
 
   Eigen::Vector3d moment = eigen_wrench_moving_frame.head(3);
   Eigen::Vector3d screw_origin;

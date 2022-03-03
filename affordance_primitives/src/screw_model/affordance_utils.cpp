@@ -127,4 +127,95 @@ ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStam
   tf2::toMsg(rotated_axis, output.axis);
   return output;
 }
+
+Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec)
+{
+  Eigen::Matrix3d output;
+  output.setZero();
+  output(0, 1) = -vec(2);
+  output(1, 0) = vec(2);
+  output(0, 2) = vec(1);
+  output(2, 0) = -vec(1);
+  output(1, 2) = -vec(0);
+  output(2, 1) = vec(0);
+
+  return output;
+}
+
+Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
+{
+  Eigen::MatrixXd adjoint(6, 6);
+
+  // Block matrix with
+  // |R     0|
+  // |[p]R  R|
+  adjoint.block<3, 3>(0, 0) = transform.linear();
+  adjoint.block<3, 3>(0, 3).setZero();
+  adjoint.block<3, 3>(3, 0) = getSkewSymmetricMatrix(transform.translation()) * transform.linear();
+  adjoint.block<3, 3>(3, 3) = transform.linear();
+
+  return adjoint;
+}
+
+Eigen::MatrixXd getAdjointMatrix(const Transform& transform)
+{
+  return getAdjointMatrix(tf2::transformToEigen(transform));
+}
+
+Eigen::VectorXd twistToVector(const Twist& twist)
+{
+  Eigen::Vector3d angular, linear;
+  tf2::fromMsg(twist.angular, angular);
+  tf2::fromMsg(twist.linear, linear);
+
+  Eigen::VectorXd output(6);
+  output.head(3) = angular;
+  output.tail(3) = linear;
+
+  return output;
+}
+
+Twist vectorToTwist(const Eigen::VectorXd& vec)
+{
+  Twist output;
+
+  tf2::toMsg(vec.head(3), output.angular);
+  tf2::toMsg(vec.tail(3), output.linear);
+
+  return output;
+}
+
+std::string twistToStr(const TwistStamped& twist)
+{
+  std::stringstream stream;
+  stream << "\nHeader: " << twist.header.frame_id << "\nX: " << twist.twist.linear.x << "\nY: " << twist.twist.linear.y
+         << "\nZ: " << twist.twist.linear.z << "\nRoll: " << twist.twist.angular.x
+         << "\nPitch: " << twist.twist.angular.y << "\nYaw: " << twist.twist.angular.z;
+  return stream.str();
+}
+
+std::string poseToStr(const PoseStamped& pose)
+{
+  std::stringstream stream;
+  stream << "\nHeader: " << pose.header.frame_id << "\nX: " << pose.pose.position.x << "\nY: " << pose.pose.position.y
+         << "\nZ: " << pose.pose.position.z << "\nQX: " << pose.pose.orientation.x
+         << "\nQY: " << pose.pose.orientation.y << "\nQZ: " << pose.pose.orientation.z
+         << "\nQW: " << pose.pose.orientation.w;
+  return stream.str();
+}
+
+std::string screwMsgToStr(const ScrewStamped& screw)
+{
+  std::string pitch;
+  if (screw.is_pure_translation)
+    pitch = "Infinity";
+  else
+    pitch = std::to_string(screw.pitch);
+
+  std::stringstream stream;
+  stream << "\nHeader: " << screw.header.frame_id << "\nOrigin X: " << screw.origin.x
+         << "\nOrigin Y: " << screw.origin.y << "\nOrigin Z: " << screw.origin.z << "\nAxis X: " << screw.axis.x
+         << "\nAxis Y: " << screw.axis.y << "\nAxis Z: " << screw.axis.z << "\nPitch: " << pitch;
+  return stream.str();
+}
 }  // namespace affordance_primitives
