@@ -47,11 +47,13 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/screw_model/screw_execution.hpp
   include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
+  include/${PROJECT_NAME}/task_monitor/task_monitor.hpp
   src/configs_interface/empty_parameter_manager.cpp
   src/screw_model/affordance_utils.cpp
   src/screw_model/screw_axis.cpp
   src/screw_model/screw_execution.cpp
   src/task_estimator/kinematic_task_estimator.cpp
+  src/task_monitor/task_monitor.cpp
 )
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
@@ -91,4 +93,7 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_task_estimator test/test_task_estimator.test test/test_task_estimator.cpp)
   target_link_libraries(test_task_estimator ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  add_rostest_gtest(test_task_monitor test/test_task_monitor.test test/test_task_monitor.cpp)
+  target_link_libraries(test_task_monitor ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
