@@ -57,8 +57,10 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   TwistStamped twist_in_task_frame = screw_axis.getTwist(req.theta_dot);
 
   // Convert twist to EE frame using the adjoint
-  Eigen::VectorXd eigen_twist_moving_frame =
-      getAdjointMatrix(tfmsg_moving_to_task_frame.transform) * twistToVector(twist_in_task_frame.twist);
+  Eigen::Matrix<double, 6, 1> eigen_twist_task_frame;
+  tf2::fromMsg(twist_in_task_frame.twist, eigen_twist_task_frame);
+  Eigen::Matrix<double, 6, 1> eigen_twist_moving_frame =
+      getAdjointMatrix(tfmsg_moving_to_task_frame.transform) * eigen_twist_task_frame;
 
   // Figure out estimated wrench
   Wrench wrench_in_task_frame;
@@ -75,8 +77,8 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
   tf2::fromMsg(wrench_in_task_frame.force, eig_force);
 
   Eigen::VectorXd eig_wrench_in_task_frame(6);
-  eig_wrench_in_task_frame.head(3) = eig_torque;
-  eig_wrench_in_task_frame.tail(3) = eig_force;
+  eig_wrench_in_task_frame.tail(3) = eig_torque;
+  eig_wrench_in_task_frame.head(3) = eig_force;
 
   // Convert wrench to moving frame
   Eigen::Isometry3d tf_eigen_moving_to_task_frame = tf2::transformToEigen(tfmsg_moving_to_task_frame);
@@ -92,7 +94,7 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
 
   // Package for response
   res.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  res.moving_frame_twist.twist = vectorToTwist(eigen_twist_moving_frame);
+  res.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
   res.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
   res.expected_wrench.wrench.force.x = force_in_moving_frame.x();
   res.expected_wrench.wrench.force.y = force_in_moving_frame.y();

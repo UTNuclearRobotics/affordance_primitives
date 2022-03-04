@@ -6,8 +6,6 @@ if(NOT "${CMAKE_CXX_STANDARD}")
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# add_compile_options(-Winline)
-
 find_package(catkin REQUIRED COMPONENTS
   affordance_primitive_msgs
   geometry_msgs

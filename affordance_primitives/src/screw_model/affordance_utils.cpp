@@ -147,11 +147,11 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
   Eigen::MatrixXd adjoint(6, 6);
 
   // Block matrix with
-  // |R     0|
-  // |[p]R  R|
+  // |R    [p]R|
+  // |0      R |
   adjoint.block<3, 3>(0, 0) = transform.linear();
-  adjoint.block<3, 3>(0, 3).setZero();
-  adjoint.block<3, 3>(3, 0) = getSkewSymmetricMatrix(transform.translation()) * transform.linear();
+  adjoint.block<3, 3>(3, 0).setZero();
+  adjoint.block<3, 3>(0, 3) = getSkewSymmetricMatrix(transform.translation()) * transform.linear();
   adjoint.block<3, 3>(3, 3) = transform.linear();
 
   return adjoint;
@@ -160,29 +160,6 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
 Eigen::MatrixXd getAdjointMatrix(const Transform& transform)
 {
   return getAdjointMatrix(tf2::transformToEigen(transform));
-}
-
-Eigen::VectorXd twistToVector(const Twist& twist)
-{
-  Eigen::Vector3d angular, linear;
-  tf2::fromMsg(twist.angular, angular);
-  tf2::fromMsg(twist.linear, linear);
-
-  Eigen::VectorXd output(6);
-  output.head(3) = angular;
-  output.tail(3) = linear;
-
-  return output;
-}
-
-Twist vectorToTwist(const Eigen::VectorXd& vec)
-{
-  Twist output;
-
-  tf2::toMsg(vec.head(3), output.angular);
-  tf2::toMsg(vec.tail(3), output.linear);
-
-  return output;
 }
 
 std::string twistToStr(const TwistStamped& twist)

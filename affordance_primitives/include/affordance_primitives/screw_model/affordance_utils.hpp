@@ -91,9 +91,8 @@ Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec);
  *
  * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
  *
- * When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen
- * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
- * between these data types
+ * When using this adjoint, it assumes the twist is a 6x1 vector with linear on top [linear ; angular]. This follows
+ * from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation
  */
 Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform);
 
@@ -102,21 +101,10 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform);
  *
  * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
  *
- * When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen
- * library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting
- * between these data types
+ * When using this adjoint, it assumes the twist is a 6x1 vector with linear on top [linear ; angular]. This follows
+ * from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation
  */
 Eigen::MatrixXd getAdjointMatrix(const Transform& transform);
-
-/**
- * @brief Converts a twist message to a 6x1 vector with [angular ; linear]
- */
-Eigen::VectorXd twistToVector(const Twist& twist);
-
-/**
- * @brief Converts a 6x1 vector with [angular ; linear] to a twist message
- */
-Twist vectorToTwist(const Eigen::VectorXd& vec);
 
 /**
  * @brief Gets the pretty string format for a TwistStamped message
