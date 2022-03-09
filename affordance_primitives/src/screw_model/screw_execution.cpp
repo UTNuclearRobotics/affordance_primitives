@@ -63,42 +63,39 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
       getAdjointMatrix(tfmsg_moving_to_task_frame.transform) * eigen_twist_task_frame;
 
   // Figure out estimated wrench
-  Wrench wrench_in_task_frame;
-  wrench_in_task_frame.force.x = req.task_impedance.trans_x * twist_in_task_frame.twist.linear.x;
-  wrench_in_task_frame.force.y = req.task_impedance.trans_y * twist_in_task_frame.twist.linear.y;
-  wrench_in_task_frame.force.z = req.task_impedance.trans_z * twist_in_task_frame.twist.linear.z;
-  wrench_in_task_frame.torque.x = req.task_impedance.rot_x * twist_in_task_frame.twist.angular.x;
-  wrench_in_task_frame.torque.y = req.task_impedance.rot_y * twist_in_task_frame.twist.angular.y;
-  wrench_in_task_frame.torque.z = req.task_impedance.rot_z * twist_in_task_frame.twist.angular.z;
-
-  // Convert to Eigen type
-  Eigen::Vector3d eig_torque, eig_force;
-  tf2::fromMsg(wrench_in_task_frame.torque, eig_torque);
-  tf2::fromMsg(wrench_in_task_frame.force, eig_force);
-
-  Eigen::VectorXd eig_wrench_in_task_frame(6);
-  eig_wrench_in_task_frame.tail(3) = eig_torque;
-  eig_wrench_in_task_frame.head(3) = eig_force;
+  Eigen::Matrix<double, 6, 1> eigen_wrench_task_frame;
+  if (req.screw.is_pure_translation)
+  {
+    eigen_wrench_task_frame.head(3) = req.task_impedance_translation * eigen_twist_task_frame.head(3);
+    eigen_wrench_task_frame.tail(3).setZero();
+  }
+  else
+  {
+    eigen_wrench_task_frame.head(3) = req.task_impedance_translation * req.screw.pitch * eigen_twist_task_frame.tail(3);
+    eigen_wrench_task_frame.tail(3) = req.task_impedance_rotation * eigen_twist_task_frame.tail(3);
+  }
 
   // Convert wrench to moving frame
   Eigen::Isometry3d tf_eigen_moving_to_task_frame = tf2::transformToEigen(tfmsg_moving_to_task_frame);
-  Eigen::VectorXd eigen_wrench_moving_frame =
-      getAdjointMatrix(tf_eigen_moving_to_task_frame.inverse()).transpose() * eig_wrench_in_task_frame;
+  Eigen::Matrix<double, 6, 1> eigen_wrench_moving_frame =
+      getAdjointMatrix(tf_eigen_moving_to_task_frame.inverse()).transpose() * eigen_wrench_task_frame;
 
-  Eigen::Vector3d moment = eigen_wrench_moving_frame.head(3);
+  // Calculate wrench to apply
+  Eigen::Matrix<double, 6, 1> wrench_to_apply;
+  wrench_to_apply.tail(3) = eigen_wrench_moving_frame.tail(3);
   Eigen::Vector3d screw_origin;
   tf2::fromMsg(req.screw.origin, screw_origin);
   Eigen::Vector3d radius =
       tf_eigen_moving_to_task_frame.translation() + tf_eigen_moving_to_task_frame.linear() * screw_origin;
-  Eigen::Vector3d force_in_moving_frame = radius.cross(moment);
+  wrench_to_apply.head(3) =
+      eigen_wrench_moving_frame.head(3) + radius.cross(Eigen::Vector3d(eigen_wrench_moving_frame.tail(3)));
 
   // Package for response
   res.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
   res.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
   res.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  res.expected_wrench.wrench.force.x = force_in_moving_frame.x();
-  res.expected_wrench.wrench.force.y = force_in_moving_frame.y();
-  res.expected_wrench.wrench.force.z = force_in_moving_frame.z();
+  tf2::toMsg(wrench_to_apply.head(3), res.expected_wrench.wrench.force);
+  tf2::toMsg(wrench_to_apply.tail(3), res.expected_wrench.wrench.torque);
 
   return true;
 }
