@@ -49,7 +49,7 @@ TEST(ParameterManager, test_empty_parameter_manager)
   ASSERT_NO_THROW(param_manager->initialize(nh));
 
   // Test basic functionality
-  affordance_primitives::AffordanceParameter parameters;
+  affordance_primitives::APRobotParameter parameters;
   std::pair<bool, std::string> out;
   ASSERT_NO_THROW(out = param_manager->setParameters(parameters));
   EXPECT_TRUE(out.first);

@@ -64,7 +64,7 @@ public:
    * @param timeout Timeout to wait, a non-positive number is infinite timeout.
    * Timing out is considered a SUCCESS from the TaskMonitor's perspective
    */
-  void startMonitor(const AffordanceParameter& parameters, const double timeout = 0.0);
+  void startMonitor(const APRobotParameter& parameters, const double timeout = 0.0);
 
   /**
    * Blocks until a result is found
@@ -103,7 +103,7 @@ private:
   ExecutionResult result_;
 
   // Hold onto parameters during a monitor session
-  AffordanceParameter parameters_;
+  APRobotParameter parameters_;
 
   // Track monitor status and if a stop has been requested
   std::atomic<bool> active_monitor_{ false };
@@ -123,6 +123,6 @@ private:
   std::queue<WrenchStamped> last_wrench_msgs_;
 
   // Check if AP is violated
-  std::optional<ExecutionResult> checkForViolaton(const AffordanceParameter& params);
+  std::optional<ExecutionResult> checkForViolaton(const APRobotParameter& params);
 };
 }  // namespace affordance_primitives

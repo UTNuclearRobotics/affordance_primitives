@@ -19,8 +19,14 @@ affordance_primitive_msgs/ScrewStamped screw
 float64 task_impedance_translation
 float64 task_impedance_rotation
 
-# Velocity to move along the screw
+# Maximum velocity to move along the screw
 float64 theta_dot
+
+# The distance to move along the screw. Meters (pure translation case), Radians (otherwise)
+float64 screw_distance
+
+# The robot configs/parameters to use during this AP move
+affordance_primitive_msgs/APRobotParameter robot_params
 ---
 # Resulting velocity of the moving frame
 geometry_msgs/TwistStamped moving_frame_twist

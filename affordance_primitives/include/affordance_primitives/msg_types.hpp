@@ -40,7 +40,7 @@
    transfering code between versions much easier
 */
 
-#include <affordance_primitive_msgs/AffordanceParameter.h>
+#include <affordance_primitive_msgs/APRobotParameter.h>
 #include <affordance_primitive_msgs/AffordancePrimitive.h>
 #include <affordance_primitive_msgs/ScrewStamped.h>
 #include <geometry_msgs/PointStamped.h>
@@ -53,7 +53,7 @@
 
 namespace affordance_primitives
 {
-using AffordanceParameter = affordance_primitive_msgs::AffordanceParameter;
+using APRobotParameter = affordance_primitive_msgs::APRobotParameter;
 using AffordancePrimitive = affordance_primitive_msgs::AffordancePrimitive;
 using ScrewStamped = affordance_primitive_msgs::ScrewStamped;
 using PointStamped = geometry_msgs::PointStamped;

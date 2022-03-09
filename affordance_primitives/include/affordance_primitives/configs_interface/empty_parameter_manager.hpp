@@ -55,6 +55,6 @@ public:
    * @return The first value is true if everything was set correctly, second
    * value is a string that provides logging messages
    */
-  std::pair<bool, std::string> setParameters(const affordance_primitives::AffordanceParameter& params);
+  std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params);
 };
 }  // namespace affordance_primitives
