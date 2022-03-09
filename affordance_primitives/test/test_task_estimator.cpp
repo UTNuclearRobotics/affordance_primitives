@@ -67,6 +67,7 @@ TEST(ParameterManager, test_kinematic_task_estimator)
   ap.moving_to_task_frame.child_frame_id = "not Screw frame";
   ASSERT_NO_THROW(task_estimator->resetTaskEstimation(0));
   ASSERT_NO_THROW(task_estimator->estimateTaskAngle(ap));
+  output.reset();
   ASSERT_NO_THROW(output = task_estimator->estimateTaskAngle(ap));
   EXPECT_FALSE(output.has_value());
 
@@ -75,9 +76,22 @@ TEST(ParameterManager, test_kinematic_task_estimator)
   ASSERT_NO_THROW(task_estimator->estimateTaskAngle(ap));
   ap.moving_to_task_frame.transform.rotation.x = 0.2588;
   ap.moving_to_task_frame.transform.rotation.w = 0.9659;
+  output.reset();
   ASSERT_NO_THROW(output = task_estimator->estimateTaskAngle(ap));
   ASSERT_TRUE(output.has_value());
   EXPECT_NEAR(output.value(), 0.5235, EPSILON);  // Radians
+
+  // Try with a linear screw
+  ASSERT_NO_THROW(task_estimator->resetTaskEstimation(0));
+  ap.moving_to_task_frame.transform = affordance_primitives::Transform();
+  ap.screw.is_pure_translation = true;
+  ASSERT_NO_THROW(output = task_estimator->estimateTaskAngle(ap));
+  ap.moving_to_task_frame.transform.translation.x = 0.5;
+  ap.moving_to_task_frame.transform.translation.y = 0.75;
+  output.reset();
+  ASSERT_NO_THROW(output = task_estimator->estimateTaskAngle(ap));
+  ASSERT_TRUE(output.has_value());
+  EXPECT_NEAR(output.value(), sqrt(0.5 * 0.5 + 0.75 * 0.75), EPSILON);  // Meters
 }
 
 int main(int argc, char** argv)
