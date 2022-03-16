@@ -45,7 +45,7 @@ public:
 
   ~APScrewExecutor(){};
 
-  bool getScrewTwist(AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback);
+  bool getScrewTwist(const AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback);
 
 private:
   tf2_ros::Buffer tfBuffer_;

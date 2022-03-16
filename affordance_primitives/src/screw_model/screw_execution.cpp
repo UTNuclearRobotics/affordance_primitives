@@ -8,7 +8,7 @@ APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_)
 {
 }
 
-bool APScrewExecutor::getScrewTwist(AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback)
+bool APScrewExecutor::getScrewTwist(const AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback)
 {
   TransformStamped tfmsg_moving_to_task_frame;
 
