@@ -16,7 +16,8 @@ geometry_msgs/TransformStamped moving_to_task_frame
 affordance_primitive_msgs/ScrewStamped screw
 
 # Task Impedance
-affordance_primitive_msgs/CartesianFloat task_impedance
+float64 task_impedance_translation
+float64 task_impedance_rotation
 
 # Velocity to move along the screw
 float64 theta_dot
