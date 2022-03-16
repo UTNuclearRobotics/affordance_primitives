@@ -8,13 +8,7 @@ APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_)
 {
 }
 
-APScrewExecutor::APScrewExecutor(ros::NodeHandle& nh, const std::string& server_name_) : tfListener_(tfBuffer_)
-{
-  screw_twist_server_ =
-      nh.advertiseService(ros::names::append(nh.getNamespace(), server_name_), &APScrewExecutor::getScrewTwist, this);
-}
-
-bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, AffordancePrimitive::Response& res)
+bool APScrewExecutor::getScrewTwist(AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback)
 {
   TransformStamped tfmsg_moving_to_task_frame;
 
@@ -91,11 +85,11 @@ bool APScrewExecutor::getScrewTwist(AffordancePrimitive::Request& req, Affordanc
       eigen_wrench_moving_frame.head(3) + radius.cross(Eigen::Vector3d(eigen_wrench_moving_frame.tail(3)));
 
   // Package for response
-  res.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  res.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
-  res.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  tf2::toMsg(wrench_to_apply.head(3), res.expected_wrench.wrench.force);
-  tf2::toMsg(wrench_to_apply.tail(3), res.expected_wrench.wrench.torque);
+  feedback.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
+  feedback.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
+  feedback.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
+  tf2::toMsg(wrench_to_apply.head(3), feedback.expected_wrench.wrench.force);
+  tf2::toMsg(wrench_to_apply.tail(3), feedback.expected_wrench.wrench.torque);
 
   return true;
 }

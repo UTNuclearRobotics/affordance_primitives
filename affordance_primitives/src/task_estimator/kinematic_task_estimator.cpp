@@ -20,8 +20,7 @@ bool KinematicTaskEstimator::resetTaskEstimation(double reset_val)
   return true;
 }
 
-std::optional<double>
-KinematicTaskEstimator::estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req)
+std::optional<double> KinematicTaskEstimator::estimateTaskAngle(const AffordancePrimitiveGoal& ap_req)
 {
   TransformStamped tfmsg_moving_to_task_frame;
 

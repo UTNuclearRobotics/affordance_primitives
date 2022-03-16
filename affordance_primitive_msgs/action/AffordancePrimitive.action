@@ -27,7 +27,21 @@ float64 screw_distance
 
 # The robot configs/parameters to use during this AP move
 affordance_primitive_msgs/APRobotParameter robot_params
+
 ---
+
+byte INVALID_RESULT=0
+byte SUCCESS=1
+byte STOP_REQUESTED=2
+byte PARAM_FAILURE=3
+byte FT_VIOLATION=4
+byte KIN_VIOLATION=5
+byte TIME_OUT=6
+
+byte result
+
+---
+
 # Resulting velocity of the moving frame
 geometry_msgs/TwistStamped moving_frame_twist
 

@@ -41,7 +41,7 @@
 */
 
 #include <affordance_primitive_msgs/APRobotParameter.h>
-#include <affordance_primitive_msgs/AffordancePrimitive.h>
+#include <affordance_primitive_msgs/AffordancePrimitiveAction.h>
 #include <affordance_primitive_msgs/ScrewStamped.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -54,7 +54,10 @@
 namespace affordance_primitives
 {
 using APRobotParameter = affordance_primitive_msgs::APRobotParameter;
-using AffordancePrimitive = affordance_primitive_msgs::AffordancePrimitive;
+using AffordancePrimitiveAction = affordance_primitive_msgs::AffordancePrimitiveAction;
+using AffordancePrimitiveGoal = affordance_primitive_msgs::AffordancePrimitiveGoal;
+using AffordancePrimitiveFeedback = affordance_primitive_msgs::AffordancePrimitiveFeedback;
+using AffordancePrimitiveResult = affordance_primitive_msgs::AffordancePrimitiveResult;
 using ScrewStamped = affordance_primitive_msgs::ScrewStamped;
 using PointStamped = geometry_msgs::PointStamped;
 using Point = geometry_msgs::Point;

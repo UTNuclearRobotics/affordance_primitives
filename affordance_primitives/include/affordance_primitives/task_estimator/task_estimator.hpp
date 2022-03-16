@@ -52,7 +52,7 @@ public:
    * @param ap_req The affordance primitive being used for motion
    * @return An estimation of the angle (theta) of a screw primitive. The optional is not filled if the input was invalid
    */
-  virtual std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitive::Request& ap_req) = 0;
+  virtual std::optional<double> estimateTaskAngle(const AffordancePrimitiveGoal& ap_req) = 0;
 
   /** Resets the internal estimation
    *
