@@ -112,6 +112,38 @@ Eigen::MatrixXd getAdjointMatrix(const Transform& transform);
 std::string twistToStr(const TwistStamped& twist);
 
 /**
+ * @brief Transforms CartesianFloat message to Eigen Vector
+ * Assumes the linear 3 values are first in the vector
+ * @param cart_float Message to transform
+ * @return A 6x1 Eigen Vector
+ */
+Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat& cart_float);
+
+/**
+ * @brief Transforms an Eigen Vector to CartesianFloat message
+ * Assumes the linear 3 values are first in the vector
+ * @param vector Vector to transform
+ * @return CartesianFloat message
+ */
+CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1>& vector);
+
+/**
+ * @brief Transforms Wrench message to Eigen Vector
+ * Assumes the linear 3 values are first in the vector
+ * @param wrench Message to transform
+ * @return A 6x1 Eigen Vector
+ */
+Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench& wrench);
+
+/**
+ * @brief Transforms an Eigen Vector to Wrench message
+ * Assumes the linear 3 values are first in the vector
+ * @param vector Vector to transform
+ * @return Wrench message
+ */
+Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1>& vector);
+
+/**
  * @brief Gets the pretty string format for a PoseStamped message
  */
 std::string poseToStr(const PoseStamped& pose);

@@ -45,5 +45,5 @@ byte result
 # Resulting velocity of the moving frame
 geometry_msgs/TwistStamped moving_frame_twist
 
-# Wrench required in the EE frame (TODO: make this in the F/T frame)
+# Wrench required in the EE frame
 geometry_msgs/WrenchStamped expected_wrench

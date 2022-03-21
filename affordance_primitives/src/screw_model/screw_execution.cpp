@@ -88,8 +88,7 @@ bool APScrewExecutor::getScrewTwist(const AffordancePrimitiveGoal& req, Affordan
   feedback.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
   feedback.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
   feedback.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  tf2::toMsg(wrench_to_apply.head(3), feedback.expected_wrench.wrench.force);
-  tf2::toMsg(wrench_to_apply.tail(3), feedback.expected_wrench.wrench.torque);
+  feedback.expected_wrench.wrench = VectorToWrench(wrench_to_apply);
 
   return true;
 }

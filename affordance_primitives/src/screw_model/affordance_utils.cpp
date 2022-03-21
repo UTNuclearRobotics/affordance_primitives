@@ -162,6 +162,54 @@ Eigen::MatrixXd getAdjointMatrix(const Transform& transform)
   return getAdjointMatrix(tf2::transformToEigen(transform));
 }
 
+Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat& cart_float)
+{
+  Eigen::Matrix<double, 6, 1> output;
+  output[0] = cart_float.trans_x;
+  output[1] = cart_float.trans_y;
+  output[2] = cart_float.trans_z;
+  output[3] = cart_float.rot_x;
+  output[4] = cart_float.rot_y;
+  output[5] = cart_float.rot_z;
+  return output;
+}
+
+CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1>& vector)
+{
+  CartesianFloat output;
+  output.trans_x = vector[0];
+  output.trans_y = vector[1];
+  output.trans_z = vector[2];
+  output.rot_x = vector[3];
+  output.rot_y = vector[4];
+  output.rot_z = vector[5];
+  return output;
+}
+
+Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench& wrench)
+{
+  Eigen::Matrix<double, 6, 1> output;
+  output[0] = wrench.force.x;
+  output[1] = wrench.force.y;
+  output[2] = wrench.force.z;
+  output[3] = wrench.torque.x;
+  output[4] = wrench.torque.y;
+  output[5] = wrench.torque.z;
+  return output;
+}
+
+Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1>& vector)
+{
+  Wrench output;
+  output.force.x = vector[0];
+  output.force.y = vector[1];
+  output.force.z = vector[2];
+  output.torque.x = vector[3];
+  output.torque.y = vector[4];
+  output.torque.z = vector[5];
+  return output;
+}
+
 std::string twistToStr(const TwistStamped& twist)
 {
   std::stringstream stream;
