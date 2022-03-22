@@ -63,10 +63,14 @@ inline void checkVector(const affordance_primitives::Vector3& vec, double x, dou
     Screw Motion (with pitch) results in:
       [0, -1*pitch*delta_theta, -2*delta_theta] translational velocity
       [0, -1*delta_theta, 0] rotational velocity
+      [0, -1*linear_impedance*pitch*delta_theta, -2*rotational_impedance*delta_theta] force to apply
+      [0, -1*rotational_impedance*delta_theta, 0] torque to apply
 
     Pure Translation results in:
       [0, -1*delta_theta, 0] translational velocity
       [0, 0, 0] rotational velocity
+      [0, -1*linear_impedance*delta_theta, 0] force to apply
+      [0, 0, 0] torque to apply
 */
 
 TEST(ScrewExecution, providedTF)
@@ -130,6 +134,51 @@ TEST(ScrewExecution, providedTF)
   EXPECT_TRUE(bool_result);
   checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, -1 * ap_goal.theta_dot, 0);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, 0, 0);
+}
+
+TEST(ScrewExecution, calculatedForces)
+{
+  // Screw executor, action request and result
+  affordance_primitives::APScrewExecutor exec;
+  affordance_primitives::AffordancePrimitiveGoal ap_goal;
+  affordance_primitives::AffordancePrimitiveFeedback ap_feedback;
+
+  // Set up Screw msg
+  ap_goal.moving_frame_source = ap_goal.PROVIDED;
+  affordance_primitives::ScrewStamped screw_msg;
+  screw_msg.header.frame_id = TASK_FRAME_NAME;
+  screw_msg.axis.z = 1;
+
+  // Set up transform msg
+  affordance_primitives::TransformStamped tf_msg;
+  tf_msg.header.frame_id = MOVING_FRAME_NAME;
+  tf_msg.child_frame_id = TASK_FRAME_NAME;
+  tf_msg.transform.translation.x = 2;
+  tf_msg.transform.rotation.x = 0.5 * sqrt(2);
+  tf_msg.transform.rotation.w = 0.5 * sqrt(2);
+  ap_goal.moving_to_task_frame = tf_msg;
+
+  // Test pure translation case
+  screw_msg.is_pure_translation = true;
+  // Set theta_dot and screw_distance
+  // Set task impedance
+  ap_goal.screw = screw_msg;
+
+  // Call the function to test
+  bool result = false;
+  ASSERT_NO_THROW(result = exec.getScrewTwist(ap_goal, ap_feedback));
+
+  // Check ap_feedback wrench for validity
+  // Check bool == true
+
+  // Test a rotation + translation case
+  screw_msg.is_pure_translation = false;
+  screw_msg.pitch = 0.1;
+  ap_goal.screw = screw_msg;
+
+  // Call the function to test
+  // Check ap_feedback wrench for validity
+  // Check bool == true
 }
 
 TEST(ScrewExecution, lookupTF)
