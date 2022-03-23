@@ -5,6 +5,7 @@ project(affordance_primitive_msgs)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
+  actionlib_msgs
   geometry_msgs
   message_generation
   std_msgs
@@ -13,27 +14,28 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  AffordanceParameter.msg
+  APRobotParameter.msg
   CartesianBool.msg
   CartesianFloat.msg
   ScrewStamped.msg
 )
 
-## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  AffordancePrimitive.srv
+add_action_files(
+  DIRECTORY action
+  FILES AffordancePrimitive.action
 )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
+  actionlib_msgs
   geometry_msgs
   std_msgs
 )
 
 catkin_package(
   CATKIN_DEPENDS
+    actionlib_msgs
     geometry_msgs
     message_runtime
     std_msgs

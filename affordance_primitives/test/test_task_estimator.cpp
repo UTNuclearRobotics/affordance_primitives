@@ -51,7 +51,7 @@ TEST(ParameterManager, test_kinematic_task_estimator)
   ASSERT_NO_THROW(task_estimator->initialize(nh));
 
   // Set up test AP
-  affordance_primitives::AffordancePrimitive::Request ap;
+  affordance_primitives::AffordancePrimitiveGoal ap;
   ap.moving_frame_source = ap.PROVIDED;
   ap.screw.header.frame_id = "Screw frame";
   ap.moving_to_task_frame.child_frame_id = "Screw frame";

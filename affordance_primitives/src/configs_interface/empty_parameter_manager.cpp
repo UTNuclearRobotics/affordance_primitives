@@ -12,8 +12,7 @@ void EmptyParameterManager::initialize(const ros::NodeHandle& nh)
   nh_ = nh;
 }
 
-std::pair<bool, std::string>
-EmptyParameterManager::setParameters(const affordance_primitives::AffordanceParameter& params)
+std::pair<bool, std::string> EmptyParameterManager::setParameters(const affordance_primitives::APRobotParameter& params)
 {
   return std::make_pair(true, "");
 };

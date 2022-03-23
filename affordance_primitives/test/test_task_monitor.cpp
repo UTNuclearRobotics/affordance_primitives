@@ -47,7 +47,7 @@ TEST(TaskMonitor, start_stop_monitor)
   ros::NodeHandle nh;
 
   // Default parameters
-  affordance_primitives::AffordanceParameter params;
+  affordance_primitives::APRobotParameter params;
 
   // Create and start monitor with no timeout
   affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
@@ -76,7 +76,7 @@ TEST(TaskMonitor, monitor_timing)
   const double test_duration = 0.25;
 
   // Default parameters
-  affordance_primitives::AffordanceParameter params;
+  affordance_primitives::APRobotParameter params;
 
   // Create and start monitor with timeout
   affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
@@ -111,7 +111,7 @@ TEST(TaskMonitor, monitor_ft_readings)
   const size_t num_publish = test_duration / ft_pub_period;
 
   // Set some force limits in parameter
-  affordance_primitives::AffordanceParameter params;
+  affordance_primitives::APRobotParameter params;
   params.max_wrench.rot_x = 10;
   params.max_wrench.rot_y = 10;
   params.max_wrench.rot_z = 10;

@@ -42,15 +42,12 @@ class APScrewExecutor
 {
 public:
   APScrewExecutor();
-  APScrewExecutor(ros::NodeHandle& nh, const std::string& server_name_);
 
   ~APScrewExecutor(){};
 
-  bool getScrewTwist(AffordancePrimitive::Request& req, AffordancePrimitive::Response& res);
+  bool getScrewTwist(const AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback);
 
 private:
-  ros::ServiceServer screw_twist_server_;
-
   tf2_ros::Buffer tfBuffer_;
   tf2_ros::TransformListener tfListener_;
 };

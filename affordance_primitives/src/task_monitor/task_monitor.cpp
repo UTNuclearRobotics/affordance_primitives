@@ -12,7 +12,7 @@ TaskMonitor::~TaskMonitor()
   stopMonitor();
 }
 
-void TaskMonitor::startMonitor(const AffordanceParameter& parameters, const double timeout)
+void TaskMonitor::startMonitor(const APRobotParameter& parameters, const double timeout)
 {
   {
     // Save variables for starting the move
@@ -88,7 +88,7 @@ void TaskMonitor::ftCB(const WrenchStamped& msg)
   last_wrench_msgs_.push(msg);
 }
 
-std::optional<ExecutionResult> TaskMonitor::checkForViolaton(const AffordanceParameter& params)
+std::optional<ExecutionResult> TaskMonitor::checkForViolaton(const APRobotParameter& params)
 {
   while (!last_wrench_msgs_.empty())
   {

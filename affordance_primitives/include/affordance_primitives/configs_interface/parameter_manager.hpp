@@ -53,7 +53,7 @@ public:
    * @return The first value is true if everything was set correctly, second
    * value is a string that provides logging messages
    */
-  virtual std::pair<bool, std::string> setParameters(const affordance_primitives::AffordanceParameter& params) = 0;
+  virtual std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params) = 0;
 
   virtual ~ParameterManager(){};
 
