@@ -179,6 +179,27 @@ TEST(TaskMonitor, monitor_ft_readings)
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
   EXPECT_EQ(monitor.waitForResult(), affordance_primitives::ExecutionResult::FT_VIOLATION);
   t.join();
+
+  // Now check to make sure NOT setting a limit results in no limit
+  params.max_force = 0;
+  t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
+    for (size_t i = 0; i < num_publish; ++i)
+    {
+      if (i == num_publish / 3)
+      {
+        pub_wrench.wrench.force.x = 99;
+        pub_wrench.wrench.force.y = 99;
+        pub_wrench.wrench.force.z = 99;
+      }
+      ft_pub.publish(pub_wrench);
+      ros::Duration(ft_pub_period).sleep();
+    }
+  });
+
+  // Start the monitor and verify it times out
+  ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
+  EXPECT_EQ(monitor.waitForResult(), affordance_primitives::ExecutionResult::TIME_OUT);
+  t.join();
 }
 
 int main(int argc, char** argv)

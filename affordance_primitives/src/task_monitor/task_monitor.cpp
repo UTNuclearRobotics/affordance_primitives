@@ -90,22 +90,47 @@ void TaskMonitor::ftCB(const WrenchStamped& msg)
 
 std::optional<ExecutionResult> TaskMonitor::checkForViolaton(const APRobotParameter& params)
 {
+  const double epsilon = 1e-8;
   while (!last_wrench_msgs_.empty())
   {
     auto wrench = last_wrench_msgs_.front().wrench;
     last_wrench_msgs_.pop();
+
+    // Check total Forces and Torques first. Only check if the maximum was set
+    // Max of 0 -> no maximum
     const double forces_sum_sqs = pow(wrench.force.x, 2) + pow(wrench.force.y, 2) + pow(wrench.force.z, 2);
     const double torques_sum_sqs = pow(wrench.torque.x, 2) + pow(wrench.torque.y, 2) + pow(wrench.torque.z, 2);
-    if (forces_sum_sqs > pow(params.max_force, 2) || torques_sum_sqs > pow(params.max_torque, 2))
+    if (fabs(params.max_force) > epsilon && forces_sum_sqs > pow(params.max_force, 2))
+    {
+      return FT_VIOLATION;
+    }
+    if (fabs(params.max_torque) > epsilon && torques_sum_sqs > pow(params.max_torque, 2))
     {
       return FT_VIOLATION;
     }
 
-    if (fabs(wrench.force.x) > fabs(params.max_wrench.trans_x) ||
-        fabs(wrench.force.y) > fabs(params.max_wrench.trans_y) ||
-        fabs(wrench.force.z) > fabs(params.max_wrench.trans_z) ||
-        fabs(wrench.torque.x) > fabs(params.max_wrench.rot_x) ||
-        fabs(wrench.torque.y) > fabs(params.max_wrench.rot_y) || fabs(wrench.torque.z) > fabs(params.max_wrench.rot_z))
+    // Now check individual directions, again only if the maximum was set
+    if (fabs(params.max_wrench.trans_x) > epsilon && fabs(wrench.force.x) > fabs(params.max_wrench.trans_x))
+    {
+      return FT_VIOLATION;
+    }
+    if (fabs(params.max_wrench.trans_y) > epsilon && fabs(wrench.force.y) > fabs(params.max_wrench.trans_y))
+    {
+      return FT_VIOLATION;
+    }
+    if (fabs(params.max_wrench.trans_z) > epsilon && fabs(wrench.force.z) > fabs(params.max_wrench.trans_z))
+    {
+      return FT_VIOLATION;
+    }
+    if (fabs(params.max_wrench.rot_x) > epsilon && fabs(wrench.torque.x) > fabs(params.max_wrench.rot_x))
+    {
+      return FT_VIOLATION;
+    }
+    if (fabs(params.max_wrench.rot_y) > epsilon && fabs(wrench.torque.y) > fabs(params.max_wrench.rot_y))
+    {
+      return FT_VIOLATION;
+    }
+    if (fabs(params.max_wrench.rot_z) > epsilon && fabs(wrench.torque.z) > fabs(params.max_wrench.rot_z))
     {
       return FT_VIOLATION;
     }
