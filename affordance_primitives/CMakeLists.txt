@@ -38,6 +38,7 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
+  include/${PROJECT_NAME}/ap_executor/ap_executor.hpp
   include/${PROJECT_NAME}/configs_interface/empty_parameter_manager.hpp
   include/${PROJECT_NAME}/configs_interface/parameter_manager.hpp
   include/${PROJECT_NAME}/screw_model/screw_axis.hpp
@@ -45,6 +46,7 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
   include/${PROJECT_NAME}/task_monitor/task_monitor.hpp
+  src/ap_executor/ap_executor.cpp
   src/configs_interface/empty_parameter_manager.cpp
   src/screw_model/affordance_utils.cpp
   src/screw_model/screw_axis.cpp

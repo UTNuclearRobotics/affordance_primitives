@@ -45,10 +45,13 @@ bool APScrewExecutor::getScrewTwist(const AffordancePrimitiveGoal& req, Affordan
     return false;
   }
 
+  // Set the sign of the velocity cmd to be same as requested delta
+  const double theta_dot = copysign(req.theta_dot, req.screw_distance);
+
   // Calculate commanded twist in Task frame
   ScrewAxis screw_axis;
   screw_axis.setScrewAxis(req.screw);
-  TwistStamped twist_in_task_frame = screw_axis.getTwist(req.theta_dot);
+  TwistStamped twist_in_task_frame = screw_axis.getTwist(theta_dot);
 
   // Convert twist to EE frame using the adjoint
   Eigen::Matrix<double, 6, 1> eigen_twist_task_frame;
