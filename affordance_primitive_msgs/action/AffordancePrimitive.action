@@ -1,12 +1,12 @@
 # Ask to lookup a known frame in the tf tree. "moving_to_task_frame" is ignored in this case
-byte LOOKUP=0
+int8 LOOKUP=0
 
 # Provide a transform to the moving frame. "moving_frame_name" is ignored in this case
 # "moving_to_task_frame" is the transform from the moving frame (e.g. gripper) to the task frame (where the screw is defined)
-byte PROVIDED=1
+int8 PROVIDED=1
 
 # Source of moving frame
-byte moving_frame_source
+int8 moving_frame_source
 
 # Moving frame input
 string moving_frame_name
@@ -30,15 +30,15 @@ affordance_primitive_msgs/APRobotParameter robot_params
 
 ---
 
-byte INVALID_RESULT=0
-byte SUCCESS=1
-byte STOP_REQUESTED=2
-byte PARAM_FAILURE=3
-byte FT_VIOLATION=4
-byte KIN_VIOLATION=5
-byte TIME_OUT=6
+int8 INVALID_RESULT=0
+int8 SUCCESS=1
+int8 STOP_REQUESTED=2
+int8 PARAM_FAILURE=3
+int8 FT_VIOLATION=4
+int8 KIN_VIOLATION=5
+int8 TIME_OUT=6
 
-byte result
+int8 result
 
 ---
 

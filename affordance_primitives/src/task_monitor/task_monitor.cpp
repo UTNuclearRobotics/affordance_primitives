@@ -2,9 +2,10 @@
 
 namespace affordance_primitives
 {
-TaskMonitor::TaskMonitor(const ros::NodeHandle& nh, const std::string ft_topic_name) : nh_(nh), result_(STOP_REQUESTED)
+TaskMonitor::TaskMonitor(const ros::NodeHandle& nh, const std::string ft_topic_name) : nh_(nh)
 {
   ft_sub_ = nh_.subscribe(ft_topic_name, 1, &TaskMonitor::ftCB, this);
+  result_.result = result_.STOP_REQUESTED;
 };
 
 TaskMonitor::~TaskMonitor()
@@ -21,7 +22,7 @@ void TaskMonitor::startMonitor(const APRobotParameter& parameters, const double 
     continue_monitoring_ = true;
 
     // Reset the result
-    result_ = INVALID_RESULT;
+    result_.result = result_.INVALID_RESULT;
 
     // Set end time if passed a timeout parameter
     if (timeout > 0)
@@ -50,7 +51,7 @@ void TaskMonitor::startMonitor(const APRobotParameter& parameters, const double 
   condition_variable_.wait(lk, [this] { return active_monitor_ == true; });
 }
 
-ExecutionResult TaskMonitor::waitForResult()
+AffordancePrimitiveResult TaskMonitor::waitForResult()
 {
   // All we really have to do is wait for the thread to finish
   if (thread_.joinable())
@@ -61,7 +62,7 @@ ExecutionResult TaskMonitor::waitForResult()
   return result_;
 }
 
-std::optional<ExecutionResult> TaskMonitor::getResult()
+std::optional<AffordancePrimitiveResult> TaskMonitor::getResult()
 {
   // If the monitor is still running, get outta here
   if (active_monitor_)
@@ -88,8 +89,10 @@ void TaskMonitor::ftCB(const WrenchStamped& msg)
   last_wrench_msgs_.push(msg);
 }
 
-std::optional<ExecutionResult> TaskMonitor::checkForViolaton(const APRobotParameter& params)
+std::optional<AffordancePrimitiveResult> TaskMonitor::checkForViolaton(const APRobotParameter& params)
 {
+  AffordancePrimitiveResult ft_violation;
+  ft_violation.result = ft_violation.FT_VIOLATION;
   const double epsilon = 1e-8;
   while (!last_wrench_msgs_.empty())
   {
@@ -102,37 +105,37 @@ std::optional<ExecutionResult> TaskMonitor::checkForViolaton(const APRobotParame
     const double torques_sum_sqs = pow(wrench.torque.x, 2) + pow(wrench.torque.y, 2) + pow(wrench.torque.z, 2);
     if (fabs(params.max_force) > epsilon && forces_sum_sqs > pow(params.max_force, 2))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
     if (fabs(params.max_torque) > epsilon && torques_sum_sqs > pow(params.max_torque, 2))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
 
     // Now check individual directions, again only if the maximum was set
     if (fabs(params.max_wrench.trans_x) > epsilon && fabs(wrench.force.x) > fabs(params.max_wrench.trans_x))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
     if (fabs(params.max_wrench.trans_y) > epsilon && fabs(wrench.force.y) > fabs(params.max_wrench.trans_y))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
     if (fabs(params.max_wrench.trans_z) > epsilon && fabs(wrench.force.z) > fabs(params.max_wrench.trans_z))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
     if (fabs(params.max_wrench.rot_x) > epsilon && fabs(wrench.torque.x) > fabs(params.max_wrench.rot_x))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
     if (fabs(params.max_wrench.rot_y) > epsilon && fabs(wrench.torque.y) > fabs(params.max_wrench.rot_y))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
     if (fabs(params.max_wrench.rot_z) > epsilon && fabs(wrench.torque.z) > fabs(params.max_wrench.rot_z))
     {
-      return FT_VIOLATION;
+      return ft_violation;
     }
   }
   return std::nullopt;
@@ -168,7 +171,7 @@ void TaskMonitor::mainLoop()
       // Check if we have passed the end time
       if (has_timeout_ && ros::Time::now() > end_time_)
       {
-        result_ = TIME_OUT;
+        result_.result = result_.TIME_OUT;
         break;
       }
     }
@@ -179,7 +182,7 @@ void TaskMonitor::mainLoop()
   if (!continue_monitoring_)
   {
     const std::lock_guard<std::mutex> lock(mutex_);
-    result_ = STOP_REQUESTED;
+    result_.result = result_.STOP_REQUESTED;
   }
 
   // Set flag saying result is ready

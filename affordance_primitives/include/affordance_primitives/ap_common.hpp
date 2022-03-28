@@ -36,27 +36,15 @@
 
 namespace affordance_primitives
 {
-enum ExecutionResult
-{
-  INVALID_RESULT,
-  SUCCESS,
-  STOP_REQUESTED,
-  PARAM_FAILURE,
-  FT_VIOLATION,
-  KIN_VIOLATION,
-  TIME_OUT
-};
+const std::unordered_map<int, std::string> EXECUTION_RESULT_MAP({ { 0, "INVALID RESULT" },
+                                                                  { 1, "SUCCESS" },
+                                                                  { 2, "STOP REQUESTED" },
+                                                                  { 3, "PARAMETER FAILURE" },
+                                                                  { 4, "FORCE TORQUE VIOLATION" },
+                                                                  { 5, "KINEMATIC VIOLATION" },
+                                                                  { 6, "TIMED OUT" } });
 
-const std::unordered_map<ExecutionResult, std::string>
-    EXECUTION_RESULT_MAP({ { ExecutionResult::INVALID_RESULT, "INVALID RESULT" },
-                           { ExecutionResult::SUCCESS, "SUCCESS" },
-                           { ExecutionResult::STOP_REQUESTED, "STOP REQUESTED" },
-                           { ExecutionResult::PARAM_FAILURE, "PARAMETER FAILURE" },
-                           { ExecutionResult::FT_VIOLATION, "FORCE TORQUE VIOLATION" },
-                           { ExecutionResult::KIN_VIOLATION, "KINEMATIC VIOLATION" },
-                           { ExecutionResult::TIME_OUT, "TIMED OUT" } });
-
-inline std::string to_string(const ExecutionResult input)
+inline std::string to_string(const int input)
 {
   return EXECUTION_RESULT_MAP.at(input);
 }
