@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="test_ap_executor" pkg="affordance_primitives" type="test_ap_executor" time-limit="15" />
+</launch>

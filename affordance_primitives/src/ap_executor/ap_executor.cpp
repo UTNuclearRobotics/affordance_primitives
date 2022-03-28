@@ -13,11 +13,15 @@ void enforceAPLimits(const APRobotParameter& params, AffordancePrimitiveFeedback
   tf2::fromMsg(feedback.moving_frame_twist.twist, twist_requested);
 
   // Apply twist limit
-  Eigen::Matrix<double, 6, 1> scale = twist_requested.cwiseQuotient(twist_limit).cwiseAbs();
-  if (scale.maxCoeff() > 1)
+  double scale = 1.0;
+  for (size_t i = 0; i < 6; i++)
   {
-    twist_requested /= scale.maxCoeff();
+    if (fabs(twist_limit[i]) > epsilon && fabs(twist_requested[i] / twist_limit[i]) > 1)
+    {
+      scale = std::max(scale, fabs(twist_requested[i] / twist_limit[i]));
+    }
   }
+  twist_requested /= scale;
 
   // Convert wrench and limits to Eigen
   Eigen::Matrix<double, 6, 1> wrench_limit = CartesianFloatToVector(params.max_wrench);
@@ -36,15 +40,21 @@ void enforceAPLimits(const APRobotParameter& params, AffordancePrimitiveFeedback
   }
 
   // Check for total magnitude
-  const double scale_force = wrench_requested.head(3).norm() / params.max_force;
-  if (scale_force > 1.0)
+  if (fabs(params.max_force) > epsilon)
   {
-    wrench_requested.head(3) /= scale_force;
+    const double scale_force = wrench_requested.head(3).norm() / params.max_force;
+    if (scale_force > 1.0)
+    {
+      wrench_requested.head(3) /= scale_force;
+    }
   }
-  const double scale_torque = wrench_requested.tail(3).norm() / params.max_torque;
-  if (scale_torque > 1.0)
+  if (fabs(params.max_torque) > epsilon)
   {
-    wrench_requested.tail(3) /= scale_torque;
+    const double scale_torque = wrench_requested.tail(3).norm() / params.max_torque;
+    if (scale_torque > 1.0)
+    {
+      wrench_requested.tail(3) /= scale_torque;
+    }
   }
 
   // Convert back to message

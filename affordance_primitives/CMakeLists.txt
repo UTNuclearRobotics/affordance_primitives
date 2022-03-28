@@ -95,4 +95,7 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_task_monitor test/test_task_monitor.test test/test_task_monitor.cpp)
   target_link_libraries(test_task_monitor ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  add_rostest_gtest(test_ap_executor test/test_ap_executor.test test/test_ap_executor.cpp)
+  target_link_libraries(test_ap_executor ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
