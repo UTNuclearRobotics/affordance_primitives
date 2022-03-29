@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['vectortotwist_163',['vectorToTwist',['../namespaceaffordance__primitives.html#a0fc813cbd85801c278dbc5f909c090f9',1,'affordance_primitives']]],
-  ['vectortowrench_164',['vectorToWrench',['../namespaceaffordance__primitives.html#aac8a983c5438b16d46785fd245888f5f',1,'affordance_primitives']]]
+  ['updateparams_232',['updateParams',['../classaffordance__primitives_1_1_a_p_executor.html#a30e05bc4f61564bb7cc6c2d261bbc25b',1,'affordance_primitives::APExecutor']]]
 ];

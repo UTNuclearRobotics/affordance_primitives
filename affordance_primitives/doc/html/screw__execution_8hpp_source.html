@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Affordance Primitives: /home/adamp/vaultbot_workspaces/ut_ws/src/at_work/affordance_primitives/affordance_primitives/include/affordance_primitives/screw_model/screw_execution.hpp Source File</title>
+<title>Affordance Primitives: /home/adamp/ws_ats/src/affordance_primitives/affordance_primitives/include/affordance_primitives/screw_model/screw_execution.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -111,26 +111,25 @@ $(function() {
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;{</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a9c051ad2d8a6144ad5d1d8b493d184cf">APScrewExecutor</a>();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a9c051ad2d8a6144ad5d1d8b493d184cf">APScrewExecutor</a>(ros::NodeHandle&amp; nh, <span class="keyword">const</span> std::string&amp; server_name_);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a55db3bc8367baf404138529890521001">   47</a></span>&#160;  <a class="code" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a55db3bc8367baf404138529890521001">~APScrewExecutor</a>(){};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a9f1e06428c6d49b372f77e0a3a1ea5ad">getScrewTwist</a>(AffordancePrimitive::Request&amp; req, AffordancePrimitive::Response&amp; res);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  ros::ServiceServer screw_twist_server_;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  tf2_ros::Buffer tfBuffer_;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  tf2_ros::TransformListener tfListener_;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}  <span class="comment">// namespace affordance_primitives</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a55db3bc8367baf404138529890521001">   46</a></span>&#160;  <a class="code" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a55db3bc8367baf404138529890521001">~APScrewExecutor</a>(){};</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classaffordance__primitives_1_1_a_p_screw_executor.html#a6395af51b151fdb162c8499438009274">getScrewTwist</a>(<span class="keyword">const</span> <a class="code" href="namespaceaffordance__primitives.html#ac8e7fff5e77d3ba69a46ab54f1d45c3a">AffordancePrimitiveGoal</a>&amp; req, <a class="code" href="namespaceaffordance__primitives.html#a06213a9272795c06fc185cd898bffa52">AffordancePrimitiveFeedback</a>&amp; feedback);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  tf2_ros::Buffer tfBuffer_;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  tf2_ros::TransformListener tfListener_;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;};</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;}  <span class="comment">// namespace affordance_primitives</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="anamespaceaffordance__primitives_html"><div class="ttname"><a href="namespaceaffordance__primitives.html">affordance_primitives</a></div><div class="ttdef"><b>Definition:</b> <a href="empty__parameter__manager_8hpp_source.html#l00038">empty_parameter_manager.hpp:38</a></div></div>
+<div class="ttc" id="anamespaceaffordance__primitives_html_ac8e7fff5e77d3ba69a46ab54f1d45c3a"><div class="ttname"><a href="namespaceaffordance__primitives.html#ac8e7fff5e77d3ba69a46ab54f1d45c3a">affordance_primitives::AffordancePrimitiveGoal</a></div><div class="ttdeci">affordance_primitive_msgs::AffordancePrimitiveGoal AffordancePrimitiveGoal</div><div class="ttdef"><b>Definition:</b> <a href="msg__types_8hpp_source.html#l00059">msg_types.hpp:59</a></div></div>
+<div class="ttc" id="anamespaceaffordance__primitives_html_a06213a9272795c06fc185cd898bffa52"><div class="ttname"><a href="namespaceaffordance__primitives.html#a06213a9272795c06fc185cd898bffa52">affordance_primitives::AffordancePrimitiveFeedback</a></div><div class="ttdeci">affordance_primitive_msgs::AffordancePrimitiveFeedback AffordancePrimitiveFeedback</div><div class="ttdef"><b>Definition:</b> <a href="msg__types_8hpp_source.html#l00060">msg_types.hpp:60</a></div></div>
+<div class="ttc" id="anamespaceaffordance__primitives_html"><div class="ttname"><a href="namespaceaffordance__primitives.html">affordance_primitives</a></div><div class="ttdef"><b>Definition:</b> <a href="ap__common_8hpp_source.html#l00037">ap_common.hpp:37</a></div></div>
 <div class="ttc" id="aclassaffordance__primitives_1_1_a_p_screw_executor_html_a9c051ad2d8a6144ad5d1d8b493d184cf"><div class="ttname"><a href="classaffordance__primitives_1_1_a_p_screw_executor.html#a9c051ad2d8a6144ad5d1d8b493d184cf">affordance_primitives::APScrewExecutor::APScrewExecutor</a></div><div class="ttdeci">APScrewExecutor()</div><div class="ttdef"><b>Definition:</b> <a href="screw__execution_8cpp_source.html#l00007">screw_execution.cpp:7</a></div></div>
 <div class="ttc" id="aclassaffordance__primitives_1_1_a_p_screw_executor_html"><div class="ttname"><a href="classaffordance__primitives_1_1_a_p_screw_executor.html">affordance_primitives::APScrewExecutor</a></div><div class="ttdef"><b>Definition:</b> <a href="screw__execution_8hpp_source.html#l00041">screw_execution.hpp:41</a></div></div>
-<div class="ttc" id="aclassaffordance__primitives_1_1_a_p_screw_executor_html_a55db3bc8367baf404138529890521001"><div class="ttname"><a href="classaffordance__primitives_1_1_a_p_screw_executor.html#a55db3bc8367baf404138529890521001">affordance_primitives::APScrewExecutor::~APScrewExecutor</a></div><div class="ttdeci">~APScrewExecutor()</div><div class="ttdef"><b>Definition:</b> <a href="screw__execution_8hpp_source.html#l00047">screw_execution.hpp:47</a></div></div>
+<div class="ttc" id="aclassaffordance__primitives_1_1_a_p_screw_executor_html_a55db3bc8367baf404138529890521001"><div class="ttname"><a href="classaffordance__primitives_1_1_a_p_screw_executor.html#a55db3bc8367baf404138529890521001">affordance_primitives::APScrewExecutor::~APScrewExecutor</a></div><div class="ttdeci">~APScrewExecutor()</div><div class="ttdef"><b>Definition:</b> <a href="screw__execution_8hpp_source.html#l00046">screw_execution.hpp:46</a></div></div>
+<div class="ttc" id="aclassaffordance__primitives_1_1_a_p_screw_executor_html_a6395af51b151fdb162c8499438009274"><div class="ttname"><a href="classaffordance__primitives_1_1_a_p_screw_executor.html#a6395af51b151fdb162c8499438009274">affordance_primitives::APScrewExecutor::getScrewTwist</a></div><div class="ttdeci">bool getScrewTwist(const AffordancePrimitiveGoal &amp;req, AffordancePrimitiveFeedback &amp;feedback)</div><div class="ttdef"><b>Definition:</b> <a href="screw__execution_8cpp_source.html#l00011">screw_execution.cpp:11</a></div></div>
 <div class="ttc" id="amsg__types_8hpp_html"><div class="ttname"><a href="msg__types_8hpp.html">msg_types.hpp</a></div></div>
-<div class="ttc" id="aclassaffordance__primitives_1_1_a_p_screw_executor_html_a9f1e06428c6d49b372f77e0a3a1ea5ad"><div class="ttname"><a href="classaffordance__primitives_1_1_a_p_screw_executor.html#a9f1e06428c6d49b372f77e0a3a1ea5ad">affordance_primitives::APScrewExecutor::getScrewTwist</a></div><div class="ttdeci">bool getScrewTwist(AffordancePrimitive::Request &amp;req, AffordancePrimitive::Response &amp;res)</div><div class="ttdef"><b>Definition:</b> <a href="screw__execution_8cpp_source.html#l00017">screw_execution.cpp:17</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

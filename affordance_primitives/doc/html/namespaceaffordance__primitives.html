@@ -64,6 +64,7 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">affordance_primitives Namespace Reference</div>  </div>
@@ -72,9 +73,13 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_a_p_executor.html">APExecutor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_a_p_screw_executor.html">APScrewExecutor</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_empty_parameter_manager.html">EmptyParameterManager</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structaffordance__primitives_1_1_executor_parameters.html">ExecutorParameters</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_kinematic_task_estimator.html">KinematicTaskEstimator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -84,13 +89,23 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_estimator.html">TaskEstimator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_monitor.html">TaskMonitor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a6e2da13974f2b45a20b354e230c440da"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a6e2da13974f2b45a20b354e230c440da">AffordanceParameter</a> = affordance_primitive_msgs::AffordanceParameter</td></tr>
-<tr class="separator:a6e2da13974f2b45a20b354e230c440da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24678f3b30cccf0aee7974bc144c6424"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a24678f3b30cccf0aee7974bc144c6424">AffordancePrimitive</a> = affordance_primitive_msgs::AffordancePrimitive</td></tr>
-<tr class="separator:a24678f3b30cccf0aee7974bc144c6424"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa50c04db5a4e7580b3f30e0b2f7b9641"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#aa50c04db5a4e7580b3f30e0b2f7b9641">APRobotParameter</a> = affordance_primitive_msgs::APRobotParameter</td></tr>
+<tr class="separator:aa50c04db5a4e7580b3f30e0b2f7b9641"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9337b35242bb00d78d14f1c94e30a24d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a9337b35242bb00d78d14f1c94e30a24d">AffordancePrimitiveAction</a> = affordance_primitive_msgs::AffordancePrimitiveAction</td></tr>
+<tr class="separator:a9337b35242bb00d78d14f1c94e30a24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8e7fff5e77d3ba69a46ab54f1d45c3a"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#ac8e7fff5e77d3ba69a46ab54f1d45c3a">AffordancePrimitiveGoal</a> = affordance_primitive_msgs::AffordancePrimitiveGoal</td></tr>
+<tr class="separator:ac8e7fff5e77d3ba69a46ab54f1d45c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06213a9272795c06fc185cd898bffa52"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a06213a9272795c06fc185cd898bffa52">AffordancePrimitiveFeedback</a> = affordance_primitive_msgs::AffordancePrimitiveFeedback</td></tr>
+<tr class="separator:a06213a9272795c06fc185cd898bffa52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1fb34a35cef9d1c7a10da69cbc3a1ee"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#af1fb34a35cef9d1c7a10da69cbc3a1ee">AffordancePrimitiveResult</a> = affordance_primitive_msgs::AffordancePrimitiveResult</td></tr>
+<tr class="separator:af1fb34a35cef9d1c7a10da69cbc3a1ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79b5c305fb828a23e85ddc43c87ffdd2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a79b5c305fb828a23e85ddc43c87ffdd2">CartesianFloat</a> = affordance_primitive_msgs::CartesianFloat</td></tr>
+<tr class="separator:a79b5c305fb828a23e85ddc43c87ffdd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb510a8522bf0bb1f3a9d9bc1ba1a36a"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#adb510a8522bf0bb1f3a9d9bc1ba1a36a">ScrewStamped</a> = affordance_primitive_msgs::ScrewStamped</td></tr>
 <tr class="separator:adb510a8522bf0bb1f3a9d9bc1ba1a36a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1036e8b762a47ee189f7237d49400b53"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a1036e8b762a47ee189f7237d49400b53">PointStamped</a> = geometry_msgs::PointStamped</td></tr>
@@ -122,8 +137,21 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a839fd54c79a28b24b64e90cde96d4359"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a> = geometry_msgs::Wrench</td></tr>
 <tr class="separator:a839fd54c79a28b24b64e90cde96d4359"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a89254a3538b760dba9a715fc16b26fea"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a89254a3538b760dba9a715fc16b26fea">Mode</a> { <a class="el" href="namespaceaffordance__primitives.html#a89254a3538b760dba9a715fc16b26feaa9cad42f896b86b8cf0763d7fd585fa68">INACTIVE</a>, 
+<a class="el" href="namespaceaffordance__primitives.html#a89254a3538b760dba9a715fc16b26feaab8aa55d00972f3d65f5dc8095230c3d0">EXECUTING</a>
+ }</td></tr>
+<tr class="separator:a89254a3538b760dba9a715fc16b26fea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a37b4487a5afd05a3873cfedc9171822b"><td class="memItemLeft" align="right" valign="top">const std::unordered_map&lt; int, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a37b4487a5afd05a3873cfedc9171822b">EXECUTION_RESULT_MAP</a> ({ { 0, &quot;INVALID RESULT&quot; }, { 1, &quot;SUCCESS&quot; }, { 2, &quot;STOP REQUESTED&quot; }, { 3, &quot;PARAMETER FAILURE&quot; }, { 4, &quot;FORCE TORQUE VIOLATION&quot; }, { 5, &quot;KINEMATIC VIOLATION&quot; }, { 6, &quot;TIMED OUT&quot; } })</td></tr>
+<tr class="separator:a37b4487a5afd05a3873cfedc9171822b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a021c0a9c697c46d7e949dea4df4dc6de"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a021c0a9c697c46d7e949dea4df4dc6de">to_string</a> (const int input)</td></tr>
+<tr class="separator:a021c0a9c697c46d7e949dea4df4dc6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acea894769fae5a64e5b9ee76af0c980c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#acea894769fae5a64e5b9ee76af0c980c">enforceAPLimits</a> (const <a class="el" href="namespaceaffordance__primitives.html#aa50c04db5a4e7580b3f30e0b2f7b9641">APRobotParameter</a> &amp;params, <a class="el" href="namespaceaffordance__primitives.html#a06213a9272795c06fc185cd898bffa52">AffordancePrimitiveFeedback</a> &amp;feedback, const double epsilon=1e-8)</td></tr>
+<tr class="separator:acea894769fae5a64e5b9ee76af0c980c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6c35f77a55e9647f3903592fe90b0bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceaffordance__primitives.html#a07281cb3b89c4c72fedba82e8f0ba7ff">PoseStamped</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#ac6c35f77a55e9647f3903592fe90b0bf">getPoseInATFrame</a> (const std::string &amp;root_frame_name, const <a class="el" href="namespaceaffordance__primitives.html#a07281cb3b89c4c72fedba82e8f0ba7ff">PoseStamped</a> &amp;root_frame_pose, const <a class="el" href="namespaceaffordance__primitives.html#a07281cb3b89c4c72fedba82e8f0ba7ff">PoseStamped</a> &amp;incoming_frame)</td></tr>
 <tr class="memdesc:ac6c35f77a55e9647f3903592fe90b0bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a pose to be in the AT frame if necessary.  <a href="namespaceaffordance__primitives.html#ac6c35f77a55e9647f3903592fe90b0bf">More...</a><br /></td></tr>
 <tr class="separator:ac6c35f77a55e9647f3903592fe90b0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,9 +164,6 @@ Functions</h2></td></tr>
 <tr class="memitem:aa46e4d0f50807cc6a9ad9a1bfe3d5a29"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceaffordance__primitives.html#adb510a8522bf0bb1f3a9d9bc1ba1a36a">ScrewStamped</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#aa46e4d0f50807cc6a9ad9a1bfe3d5a29">transformScrew</a> (const <a class="el" href="namespaceaffordance__primitives.html#adb510a8522bf0bb1f3a9d9bc1ba1a36a">ScrewStamped</a> &amp;input_screw, const <a class="el" href="namespaceaffordance__primitives.html#a7a23c36d928cb1395c4cf0e6a74786b5">TransformStamped</a> &amp;transform)</td></tr>
 <tr class="memdesc:aa46e4d0f50807cc6a9ad9a1bfe3d5a29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms a ScrewStamped msg by the prescribed Transform.  <a href="namespaceaffordance__primitives.html#aa46e4d0f50807cc6a9ad9a1bfe3d5a29">More...</a><br /></td></tr>
 <tr class="separator:aa46e4d0f50807cc6a9ad9a1bfe3d5a29"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bf0e2614fc9e6d7db88df18bec265e1"><td class="memItemLeft" align="right" valign="top">Eigen::Vector3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a8bf0e2614fc9e6d7db88df18bec265e1">calculateLinearVelocity</a> (const Eigen::Vector3d &amp;axis, const Eigen::Vector3d &amp;q_vector, const double pitch)</td></tr>
-<tr class="memdesc:a8bf0e2614fc9e6d7db88df18bec265e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper function that calculates the linear velocity component of a Screw Axis.  <a href="namespaceaffordance__primitives.html#a8bf0e2614fc9e6d7db88df18bec265e1">More...</a><br /></td></tr>
-<tr class="separator:a8bf0e2614fc9e6d7db88df18bec265e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fb6472366f886694bce775a5498183a"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a3fb6472366f886694bce775a5498183a">getSkewSymmetricMatrix</a> (const Eigen::Vector3d &amp;vec)</td></tr>
 <tr class="memdesc:a3fb6472366f886694bce775a5498183a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an axis vector to 3x3 skew symmetric matrix, for math.  <a href="namespaceaffordance__primitives.html#a3fb6472366f886694bce775a5498183a">More...</a><br /></td></tr>
 <tr class="separator:a3fb6472366f886694bce775a5498183a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,55 +173,125 @@ Functions</h2></td></tr>
 <tr class="memitem:a13eead2dfdd609aea5fdd2bcf47cf807"><td class="memItemLeft" align="right" valign="top">Eigen::MatrixXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a13eead2dfdd609aea5fdd2bcf47cf807">getAdjointMatrix</a> (const <a class="el" href="namespaceaffordance__primitives.html#aaef288d50d48a8fcafaf2eede6e1ca3a">Transform</a> &amp;transform)</td></tr>
 <tr class="memdesc:a13eead2dfdd609aea5fdd2bcf47cf807"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a transformation into an adjoint matrix for transforming twists and wrenches.  <a href="namespaceaffordance__primitives.html#a13eead2dfdd609aea5fdd2bcf47cf807">More...</a><br /></td></tr>
 <tr class="separator:a13eead2dfdd609aea5fdd2bcf47cf807"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88b5baa049ddc5c38efff2050db6cfee"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a88b5baa049ddc5c38efff2050db6cfee">twistToVector</a> (const <a class="el" href="namespaceaffordance__primitives.html#a945254ede65fffaedc244538843a5719">Twist</a> &amp;twist)</td></tr>
-<tr class="memdesc:a88b5baa049ddc5c38efff2050db6cfee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a twist message to a 6x1 vector with [angular ; linear].  <a href="namespaceaffordance__primitives.html#a88b5baa049ddc5c38efff2050db6cfee">More...</a><br /></td></tr>
-<tr class="separator:a88b5baa049ddc5c38efff2050db6cfee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fc813cbd85801c278dbc5f909c090f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceaffordance__primitives.html#a945254ede65fffaedc244538843a5719">Twist</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a0fc813cbd85801c278dbc5f909c090f9">vectorToTwist</a> (const Eigen::VectorXd &amp;vec)</td></tr>
-<tr class="memdesc:a0fc813cbd85801c278dbc5f909c090f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a 6x1 vector with [angular ; linear] to a twist message.  <a href="namespaceaffordance__primitives.html#a0fc813cbd85801c278dbc5f909c090f9">More...</a><br /></td></tr>
-<tr class="separator:a0fc813cbd85801c278dbc5f909c090f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4dee4ab301eb5456d4e86b465d7ee686"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a4dee4ab301eb5456d4e86b465d7ee686">wrenchToVector</a> (const <a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a> &amp;wrench)</td></tr>
-<tr class="memdesc:a4dee4ab301eb5456d4e86b465d7ee686"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a wrench message to a 6x1 vector with [torque ; force].  <a href="namespaceaffordance__primitives.html#a4dee4ab301eb5456d4e86b465d7ee686">More...</a><br /></td></tr>
-<tr class="separator:a4dee4ab301eb5456d4e86b465d7ee686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac8a983c5438b16d46785fd245888f5f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#aac8a983c5438b16d46785fd245888f5f">vectorToWrench</a> (const Eigen::VectorXd &amp;vec)</td></tr>
-<tr class="memdesc:aac8a983c5438b16d46785fd245888f5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a 6x1 vector with [torque ; force] to a twist message.  <a href="namespaceaffordance__primitives.html#aac8a983c5438b16d46785fd245888f5f">More...</a><br /></td></tr>
-<tr class="separator:aac8a983c5438b16d46785fd245888f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd1c8edb85a12a27e3c38a547702d210"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#acd1c8edb85a12a27e3c38a547702d210">twistToStr</a> (const <a class="el" href="namespaceaffordance__primitives.html#a86c6a24628e6f12390f2d514d2f0e301">TwistStamped</a> &amp;twist)</td></tr>
+<tr class="memdesc:acd1c8edb85a12a27e3c38a547702d210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pretty string format for a TwistStamped message.  <a href="namespaceaffordance__primitives.html#acd1c8edb85a12a27e3c38a547702d210">More...</a><br /></td></tr>
 <tr class="separator:acd1c8edb85a12a27e3c38a547702d210"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78a24d4448dd5fc46fbb07d2d7cae00b"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, 6, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a78a24d4448dd5fc46fbb07d2d7cae00b">CartesianFloatToVector</a> (const <a class="el" href="namespaceaffordance__primitives.html#a79b5c305fb828a23e85ddc43c87ffdd2">CartesianFloat</a> &amp;cart_float)</td></tr>
+<tr class="memdesc:a78a24d4448dd5fc46fbb07d2d7cae00b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms CartesianFloat message to Eigen Vector Assumes the linear 3 values are first in the vector.  <a href="namespaceaffordance__primitives.html#a78a24d4448dd5fc46fbb07d2d7cae00b">More...</a><br /></td></tr>
+<tr class="separator:a78a24d4448dd5fc46fbb07d2d7cae00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af24785897b2edd6e84054157ab84f3a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceaffordance__primitives.html#a79b5c305fb828a23e85ddc43c87ffdd2">CartesianFloat</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#af24785897b2edd6e84054157ab84f3a1">VectorToCartesianFloat</a> (const Eigen::Matrix&lt; double, 6, 1 &gt; &amp;vector)</td></tr>
+<tr class="memdesc:af24785897b2edd6e84054157ab84f3a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms an Eigen Vector to CartesianFloat message Assumes the linear 3 values are first in the vector.  <a href="namespaceaffordance__primitives.html#af24785897b2edd6e84054157ab84f3a1">More...</a><br /></td></tr>
+<tr class="separator:af24785897b2edd6e84054157ab84f3a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6b28a6ac7e33bfc6725881e5636d3d1"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, 6, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#ad6b28a6ac7e33bfc6725881e5636d3d1">WrenchToVector</a> (const <a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a> &amp;wrench)</td></tr>
+<tr class="memdesc:ad6b28a6ac7e33bfc6725881e5636d3d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms Wrench message to Eigen Vector Assumes the linear 3 values are first in the vector.  <a href="namespaceaffordance__primitives.html#ad6b28a6ac7e33bfc6725881e5636d3d1">More...</a><br /></td></tr>
+<tr class="separator:ad6b28a6ac7e33bfc6725881e5636d3d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e9a17f34ed0ed2f6b382e2d6ae4465f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a4e9a17f34ed0ed2f6b382e2d6ae4465f">VectorToWrench</a> (const Eigen::Matrix&lt; double, 6, 1 &gt; &amp;vector)</td></tr>
+<tr class="memdesc:a4e9a17f34ed0ed2f6b382e2d6ae4465f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms an Eigen Vector to Wrench message Assumes the linear 3 values are first in the vector.  <a href="namespaceaffordance__primitives.html#a4e9a17f34ed0ed2f6b382e2d6ae4465f">More...</a><br /></td></tr>
+<tr class="separator:a4e9a17f34ed0ed2f6b382e2d6ae4465f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabaa43432cab5a183b423bf2f07ada06"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#aabaa43432cab5a183b423bf2f07ada06">poseToStr</a> (const <a class="el" href="namespaceaffordance__primitives.html#a07281cb3b89c4c72fedba82e8f0ba7ff">PoseStamped</a> &amp;pose)</td></tr>
+<tr class="memdesc:aabaa43432cab5a183b423bf2f07ada06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pretty string format for a PoseStamped message.  <a href="namespaceaffordance__primitives.html#aabaa43432cab5a183b423bf2f07ada06">More...</a><br /></td></tr>
 <tr class="separator:aabaa43432cab5a183b423bf2f07ada06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47720916e10fcf5ce51c1070def6d362"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a47720916e10fcf5ce51c1070def6d362">screwMsgToStr</a> (const <a class="el" href="namespaceaffordance__primitives.html#adb510a8522bf0bb1f3a9d9bc1ba1a36a">ScrewStamped</a> &amp;screw)</td></tr>
+<tr class="memdesc:a47720916e10fcf5ce51c1070def6d362"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pretty string format for a ScrewStamped message.  <a href="namespaceaffordance__primitives.html#a47720916e10fcf5ce51c1070def6d362">More...</a><br /></td></tr>
 <tr class="separator:a47720916e10fcf5ce51c1070def6d362"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bf0e2614fc9e6d7db88df18bec265e1"><td class="memItemLeft" align="right" valign="top">Eigen::Vector3d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaffordance__primitives.html#a8bf0e2614fc9e6d7db88df18bec265e1">calculateLinearVelocity</a> (const Eigen::Vector3d &amp;axis, const Eigen::Vector3d &amp;q_vector, const double pitch)</td></tr>
+<tr class="memdesc:a8bf0e2614fc9e6d7db88df18bec265e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper function that calculates the linear velocity component of a Screw Axis.  <a href="namespaceaffordance__primitives.html#a8bf0e2614fc9e6d7db88df18bec265e1">More...</a><br /></td></tr>
+<tr class="separator:a8bf0e2614fc9e6d7db88df18bec265e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a6e2da13974f2b45a20b354e230c440da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e2da13974f2b45a20b354e230c440da">&#9670;&nbsp;</a></span>AffordanceParameter</h2>
+<a id="a9337b35242bb00d78d14f1c94e30a24d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9337b35242bb00d78d14f1c94e30a24d">&#9670;&nbsp;</a></span>AffordancePrimitiveAction</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#a6e2da13974f2b45a20b354e230c440da">affordance_primitives::AffordanceParameter</a> = typedef affordance_primitive_msgs::AffordanceParameter</td>
+          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#a9337b35242bb00d78d14f1c94e30a24d">affordance_primitives::AffordancePrimitiveAction</a> = typedef affordance_primitive_msgs::AffordancePrimitiveAction</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00056">56</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00058">58</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a24678f3b30cccf0aee7974bc144c6424"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24678f3b30cccf0aee7974bc144c6424">&#9670;&nbsp;</a></span>AffordancePrimitive</h2>
+<a id="a06213a9272795c06fc185cd898bffa52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06213a9272795c06fc185cd898bffa52">&#9670;&nbsp;</a></span>AffordancePrimitiveFeedback</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#a24678f3b30cccf0aee7974bc144c6424">affordance_primitives::AffordancePrimitive</a> = typedef affordance_primitive_msgs::AffordancePrimitive</td>
+          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#a06213a9272795c06fc185cd898bffa52">affordance_primitives::AffordancePrimitiveFeedback</a> = typedef affordance_primitive_msgs::AffordancePrimitiveFeedback</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00060">60</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac8e7fff5e77d3ba69a46ab54f1d45c3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8e7fff5e77d3ba69a46ab54f1d45c3a">&#9670;&nbsp;</a></span>AffordancePrimitiveGoal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#ac8e7fff5e77d3ba69a46ab54f1d45c3a">affordance_primitives::AffordancePrimitiveGoal</a> = typedef affordance_primitive_msgs::AffordancePrimitiveGoal</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00059">59</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af1fb34a35cef9d1c7a10da69cbc3a1ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1fb34a35cef9d1c7a10da69cbc3a1ee">&#9670;&nbsp;</a></span>AffordancePrimitiveResult</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#af1fb34a35cef9d1c7a10da69cbc3a1ee">affordance_primitives::AffordancePrimitiveResult</a> = typedef affordance_primitive_msgs::AffordancePrimitiveResult</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00061">61</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa50c04db5a4e7580b3f30e0b2f7b9641"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa50c04db5a4e7580b3f30e0b2f7b9641">&#9670;&nbsp;</a></span>APRobotParameter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#aa50c04db5a4e7580b3f30e0b2f7b9641">affordance_primitives::APRobotParameter</a> = typedef affordance_primitive_msgs::APRobotParameter</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00057">57</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a79b5c305fb828a23e85ddc43c87ffdd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79b5c305fb828a23e85ddc43c87ffdd2">&#9670;&nbsp;</a></span>CartesianFloat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceaffordance__primitives.html#a79b5c305fb828a23e85ddc43c87ffdd2">affordance_primitives::CartesianFloat</a> = typedef affordance_primitive_msgs::CartesianFloat</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00062">62</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -212,7 +307,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00060">60</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00065">65</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -228,7 +323,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00059">59</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00064">64</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -244,7 +339,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00062">62</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00067">67</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +355,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00061">61</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00066">66</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -276,7 +371,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00064">64</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00069">69</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +387,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00063">63</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00068">68</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +403,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00058">58</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00063">63</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -324,7 +419,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00066">66</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00071">71</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -340,7 +435,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00065">65</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00070">70</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -356,7 +451,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00068">68</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00073">73</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -372,7 +467,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00067">67</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00072">72</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +483,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00070">70</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00075">75</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -404,7 +499,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00069">69</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00074">74</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -420,7 +515,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00072">72</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00077">77</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
 
 </div>
 </div>
@@ -436,7 +531,28 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00071">71</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="msg__types_8hpp_source.html#l00076">76</a> of file <a class="el" href="msg__types_8hpp_source.html">msg_types.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a89254a3538b760dba9a715fc16b26fea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89254a3538b760dba9a715fc16b26fea">&#9670;&nbsp;</a></span>Mode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespaceaffordance__primitives.html#a89254a3538b760dba9a715fc16b26fea">affordance_primitives::Mode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a89254a3538b760dba9a715fc16b26feaa9cad42f896b86b8cf0763d7fd585fa68"></a>INACTIVE&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a89254a3538b760dba9a715fc16b26feaab8aa55d00972f3d65f5dc8095230c3d0"></a>EXECUTING&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="ap__executor_8hpp_source.html#l00051">51</a> of file <a class="el" href="ap__executor_8hpp_source.html">ap_executor.hpp</a>.</p>
 
 </div>
 </div>
@@ -488,6 +604,35 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a78a24d4448dd5fc46fbb07d2d7cae00b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78a24d4448dd5fc46fbb07d2d7cae00b">&#9670;&nbsp;</a></span>CartesianFloatToVector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt; double, 6, 1 &gt; affordance_primitives::CartesianFloatToVector </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceaffordance__primitives.html#a79b5c305fb828a23e85ddc43c87ffdd2">CartesianFloat</a> &amp;&#160;</td>
+          <td class="paramname"><em>cart_float</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Transforms CartesianFloat message to Eigen Vector Assumes the linear 3 values are first in the vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cart_float</td><td>Message to transform </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A 6x1 Eigen Vector </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00165">165</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a28766321edd19115e68a433c8efb8777"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a28766321edd19115e68a433c8efb8777">&#9670;&nbsp;</a></span>convertPoseToNewFrame()</h2>
 
@@ -534,14 +679,74 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="acea894769fae5a64e5b9ee76af0c980c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acea894769fae5a64e5b9ee76af0c980c">&#9670;&nbsp;</a></span>enforceAPLimits()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void affordance_primitives::enforceAPLimits </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceaffordance__primitives.html#aa50c04db5a4e7580b3f30e0b2f7b9641">APRobotParameter</a> &amp;&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespaceaffordance__primitives.html#a06213a9272795c06fc185cd898bffa52">AffordancePrimitiveFeedback</a> &amp;&#160;</td>
+          <td class="paramname"><em>feedback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>epsilon</em> = <code>1e-8</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Changes AP feedback to be within limits given in goal</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">params</td><td>The parameters containing the limits </td></tr>
+    <tr><td class="paramname">feedback</td><td>The feedback that will be changed to be within limits </td></tr>
+    <tr><td class="paramname">epsilon</td><td>Range within which to consider 0, or limit unset </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ap__executor_8cpp_source.html#l00008">8</a> of file <a class="el" href="ap__executor_8cpp_source.html">ap_executor.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a37b4487a5afd05a3873cfedc9171822b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37b4487a5afd05a3873cfedc9171822b">&#9670;&nbsp;</a></span>EXECUTION_RESULT_MAP()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::unordered_map&lt;int, std::string&gt; affordance_primitives::EXECUTION_RESULT_MAP </td>
+          <td>(</td>
+          <td class="paramtype">{ { 0, &quot;INVALID RESULT&quot; }, { 1, &quot;SUCCESS&quot; }, { 2, &quot;STOP REQUESTED&quot; }, { 3, &quot;PARAMETER FAILURE&quot; }, { 4, &quot;FORCE TORQUE VIOLATION&quot; }, { 5, &quot;KINEMATIC VIOLATION&quot; }, { 6, &quot;TIMED OUT&quot; } }&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a60188e14f036e1a5439b739391b52f63"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a60188e14f036e1a5439b739391b52f63">&#9670;&nbsp;</a></span>getAdjointMatrix() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Eigen::MatrixXd affordance_primitives::getAdjointMatrix </td>
@@ -551,18 +756,13 @@ Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Converts a transformation into an adjoint matrix for transforming twists and wrenches. </p>
 <p>Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B</p>
-<p>When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting between these data types </p>
+<p>When using this adjoint, it assumes the twist is a 6x1 vector with linear on top [linear ; angular]. This follows from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation </p>
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00069">69</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00145">145</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -571,9 +771,6 @@ Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Eigen::MatrixXd affordance_primitives::getAdjointMatrix </td>
@@ -583,18 +780,13 @@ Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Converts a transformation into an adjoint matrix for transforming twists and wrenches. </p>
 <p>Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B</p>
-<p>When using this adjoint, it assumes the twist is a 6x1 vector with angular on top [angular ; linear]. The tf2_eigen library does not convert Twist messages to Eigen Vectors this way, so use the functions included here for converting between these data types </p>
+<p>When using this adjoint, it assumes the twist is a 6x1 vector with linear on top [linear ; angular]. This follows from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation </p>
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00093">93</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00160">160</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -656,9 +848,6 @@ Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Eigen::Matrix3d affordance_primitives::getSkewSymmetricMatrix </td>
@@ -668,16 +857,11 @@ Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Converts an axis vector to 3x3 skew symmetric matrix, for math. </p>
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00046">46</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00131">131</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -732,9 +916,6 @@ Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::string affordance_primitives::poseToStr </td>
@@ -744,14 +925,11 @@ Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00165">165</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p>Gets the pretty string format for a PoseStamped message. </p>
+
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00222">222</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -760,15 +938,37 @@ Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::string affordance_primitives::screwMsgToStr </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceaffordance__primitives.html#adb510a8522bf0bb1f3a9d9bc1ba1a36a">ScrewStamped</a> &amp;&#160;</td>
           <td class="paramname"><em>screw</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the pretty string format for a ScrewStamped message. </p>
+
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00232">232</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a021c0a9c697c46d7e949dea4df4dc6de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a021c0a9c697c46d7e949dea4df4dc6de">&#9670;&nbsp;</a></span>to_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string affordance_primitives::to_string </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -779,7 +979,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00175">175</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ap__common_8hpp_source.html#l00047">47</a> of file <a class="el" href="ap__common_8hpp_source.html">ap_common.hpp</a>.</p>
 
 </div>
 </div>
@@ -834,9 +1034,6 @@ Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::string affordance_primitives::twistToStr </td>
@@ -846,134 +1043,98 @@ Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00156">156</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p>Gets the pretty string format for a TwistStamped message. </p>
+
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00213">213</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a88b5baa049ddc5c38efff2050db6cfee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88b5baa049ddc5c38efff2050db6cfee">&#9670;&nbsp;</a></span>twistToVector()</h2>
+<a id="af24785897b2edd6e84054157ab84f3a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af24785897b2edd6e84054157ab84f3a1">&#9670;&nbsp;</a></span>VectorToCartesianFloat()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Eigen::VectorXd affordance_primitives::twistToVector </td>
+          <td class="memname"><a class="el" href="namespaceaffordance__primitives.html#a79b5c305fb828a23e85ddc43c87ffdd2">CartesianFloat</a> affordance_primitives::VectorToCartesianFloat </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceaffordance__primitives.html#a945254ede65fffaedc244538843a5719">Twist</a> &amp;&#160;</td>
-          <td class="paramname"><em>twist</em></td><td>)</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, 6, 1 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vector</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Converts a twist message to a 6x1 vector with [angular ; linear]. </p>
+<p>Transforms an Eigen Vector to CartesianFloat message Assumes the linear 3 values are first in the vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vector</td><td>Vector to transform </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>CartesianFloat message </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00101">101</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00177">177</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a0fc813cbd85801c278dbc5f909c090f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0fc813cbd85801c278dbc5f909c090f9">&#9670;&nbsp;</a></span>vectorToTwist()</h2>
+<a id="a4e9a17f34ed0ed2f6b382e2d6ae4465f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e9a17f34ed0ed2f6b382e2d6ae4465f">&#9670;&nbsp;</a></span>VectorToWrench()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceaffordance__primitives.html#a945254ede65fffaedc244538843a5719">Twist</a> affordance_primitives::vectorToTwist </td>
+          <td class="memname"><a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a> affordance_primitives::VectorToWrench </td>
           <td>(</td>
-          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
-          <td class="paramname"><em>vec</em></td><td>)</td>
+          <td class="paramtype">const Eigen::Matrix&lt; double, 6, 1 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vector</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Converts a 6x1 vector with [angular ; linear] to a twist message. </p>
+<p>Transforms an Eigen Vector to Wrench message Assumes the linear 3 values are first in the vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vector</td><td>Vector to transform </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Wrench message </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00117">117</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00201">201</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aac8a983c5438b16d46785fd245888f5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac8a983c5438b16d46785fd245888f5f">&#9670;&nbsp;</a></span>vectorToWrench()</h2>
+<a id="ad6b28a6ac7e33bfc6725881e5636d3d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6b28a6ac7e33bfc6725881e5636d3d1">&#9670;&nbsp;</a></span>WrenchToVector()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a> affordance_primitives::vectorToWrench </td>
-          <td>(</td>
-          <td class="paramtype">const Eigen::VectorXd &amp;&#160;</td>
-          <td class="paramname"><em>vec</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Converts a 6x1 vector with [torque ; force] to a twist message. </p>
-
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00146">146</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a4dee4ab301eb5456d4e86b465d7ee686"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4dee4ab301eb5456d4e86b465d7ee686">&#9670;&nbsp;</a></span>wrenchToVector()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Eigen::VectorXd affordance_primitives::wrenchToVector </td>
+          <td class="memname">Eigen::Matrix&lt; double, 6, 1 &gt; affordance_primitives::WrenchToVector </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespaceaffordance__primitives.html#a839fd54c79a28b24b64e90cde96d4359">Wrench</a> &amp;&#160;</td>
           <td class="paramname"><em>wrench</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Converts a wrench message to a 6x1 vector with [torque ; force]. </p>
+<p>Transforms Wrench message to Eigen Vector Assumes the linear 3 values are first in the vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wrench</td><td>Message to transform </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A 6x1 Eigen Vector </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="screw__conversions_8hpp_source.html#l00130">130</a> of file <a class="el" href="screw__conversions_8hpp_source.html">screw_conversions.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="affordance__utils_8cpp_source.html#l00189">189</a> of file <a class="el" href="affordance__utils_8cpp_source.html">affordance_utils.cpp</a>.</p>
 
 </div>
 </div>

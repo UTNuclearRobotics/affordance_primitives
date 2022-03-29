@@ -90,8 +90,8 @@ Inheritance diagram for affordance_primitives::TaskEstimator:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a6269403fb9c7a2e4a81765b66629d5c2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_estimator.html#a6269403fb9c7a2e4a81765b66629d5c2">initialize</a> (const ros::NodeHandle &amp;nh)=0</td></tr>
 <tr class="separator:a6269403fb9c7a2e4a81765b66629d5c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5744b10eb5614c41af66f962f3efdb25"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_estimator.html#a5744b10eb5614c41af66f962f3efdb25">estimateTaskAngle</a> (const affordance_primitives::AffordancePrimitive::Request &amp;ap_req)=0</td></tr>
-<tr class="separator:a5744b10eb5614c41af66f962f3efdb25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54c2ee53ddf066f29772acbccc40d563"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_estimator.html#a54c2ee53ddf066f29772acbccc40d563">estimateTaskAngle</a> (const <a class="el" href="namespaceaffordance__primitives.html#ac8e7fff5e77d3ba69a46ab54f1d45c3a">AffordancePrimitiveGoal</a> &amp;ap_req)=0</td></tr>
+<tr class="separator:a54c2ee53ddf066f29772acbccc40d563"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c4e425d66ddab6171f7a61bec53bce2"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_estimator.html#a4c4e425d66ddab6171f7a61bec53bce2">resetTaskEstimation</a> (double reset_val=0.0)=0</td></tr>
 <tr class="separator:a4c4e425d66ddab6171f7a61bec53bce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a288f233a40386a2ee3dd7608bb996c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaffordance__primitives_1_1_task_estimator.html#a6a288f233a40386a2ee3dd7608bb996c">~TaskEstimator</a> ()</td></tr>
@@ -167,8 +167,8 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a5744b10eb5614c41af66f962f3efdb25"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5744b10eb5614c41af66f962f3efdb25">&#9670;&nbsp;</a></span>estimateTaskAngle()</h2>
+<a id="a54c2ee53ddf066f29772acbccc40d563"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54c2ee53ddf066f29772acbccc40d563">&#9670;&nbsp;</a></span>estimateTaskAngle()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -179,7 +179,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual std::optional&lt;double&gt; affordance_primitives::TaskEstimator::estimateTaskAngle </td>
           <td>(</td>
-          <td class="paramtype">const affordance_primitives::AffordancePrimitive::Request &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespaceaffordance__primitives.html#ac8e7fff5e77d3ba69a46ab54f1d45c3a">AffordancePrimitiveGoal</a> &amp;&#160;</td>
           <td class="paramname"><em>ap_req</em></td><td>)</td>
           <td></td>
         </tr>
@@ -199,7 +199,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An estimation of the angle (theta) of a screw primitive. The optional is not filled if the input was invalid </dd></dl>
 
-<p>Implemented in <a class="el" href="classaffordance__primitives_1_1_kinematic_task_estimator.html#a847d060caf98aea5368234c005f099c6">affordance_primitives::KinematicTaskEstimator</a>.</p>
+<p>Implemented in <a class="el" href="classaffordance__primitives_1_1_kinematic_task_estimator.html#a9d5b224810f7305e3cda86939f361af7">affordance_primitives::KinematicTaskEstimator</a>.</p>
 
 </div>
 </div>
@@ -293,7 +293,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/adamp/vaultbot_workspaces/ut_ws/src/at_work/affordance_primitives/affordance_primitives/include/affordance_primitives/task_estimator/<a class="el" href="task__estimator_8hpp_source.html">task_estimator.hpp</a></li>
+<li>/home/adamp/ws_ats/src/affordance_primitives/affordance_primitives/include/affordance_primitives/task_estimator/<a class="el" href="task__estimator_8hpp_source.html">task_estimator.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
