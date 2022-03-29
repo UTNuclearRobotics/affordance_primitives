@@ -6,6 +6,9 @@ See [this video](https://www.youtube.com/watch?v=3TGl3F_4W_8) for an overview.
 
 To see the docs locally: `roscd affordance_primitives ; firefox doc/html/namespaceaffordance__primitives.html`
 
+## Conceptual Overview
+An AP is a constraint the environment places on a manipulator that generates instantaneous motion and force profiles the manipulator must follow. We consider these constrains by modeling how an articulated object must move during manipulation using screw theory.
+
 # AP Framework
-This repository includes a library for performing AP moves with a generic manipulator. See the paper (TODO: link when public) for more details. The major components of the framework are given below. Red nodes are plugins that allow customization
+This package includes a library for performing AP moves with a generic manipulator. See the paper (TODO: link when public) for more details. The major components of the framework are given below. Red nodes are plugins that allow customization
 ![ap_framework](doc/images/AP_Framework.png "Affordance Primitive Framework")
