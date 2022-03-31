@@ -68,7 +68,8 @@ int main(int argc, char** argv)
   // This is the name of the Task Estimator plugin
   // It is a C++ class that is called to estimate the screw position/angle as the task executes
   // You can write your own, or use "KinematicTaskEstimator" in the affordance_primitives package
-  params.task_estimator_plugin_name = "affordance_primitives::KinematicTaskEstimator";
+  params.task_estimator_plugin_name = "ap_examples::ExampleTaskEstimator";
+  // params.task_estimator_plugin_name = "affordance_primitives::KinematicTaskEstimator";
 
   // Set up executor
   auto executor = std::make_unique<affordance_primitives::APExecutor>(nh, action_name);

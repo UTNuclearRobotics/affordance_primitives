@@ -22,6 +22,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(ap_example_plugins src/example_task_estimator.cpp)
+
 add_executable(ap_executor src/ap_executor_node.cpp)
 target_link_libraries(ap_executor ${catkin_LIBRARIES})
 add_dependencies(ap_executor ${catkin_EXPORTED_TARGETS})

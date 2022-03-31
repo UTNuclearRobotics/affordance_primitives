@@ -16,6 +16,6 @@
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
-
+    <affordance_primitives plugin="${prefix}/ap_example_plugins.xml" />
   </export>
 </package>
