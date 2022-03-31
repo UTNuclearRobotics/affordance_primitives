@@ -2,7 +2,8 @@
 
 This is the high-level repository for Affordance Primitives (APs). For further details see:
   1. [affordance_primitives](affordance_primitives/) for the core code and documentation
-  2. [affordance_primitive_msgs](affordance_primitive_msgs/) for AP message definitions.
+  2. [affordance_primitive_msgs](affordance_primitive_msgs/) for AP message definitions
+  3. [ap_examples](ap_examples/) for examples using APs in your own work
 
 
 ## Citation

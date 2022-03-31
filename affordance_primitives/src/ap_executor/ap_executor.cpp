@@ -166,7 +166,7 @@ AffordancePrimitiveResult APExecutor::execute(const affordance_primitive_msgs::A
     // Check executor status
     {
       const std::lock_guard<std::mutex> lock(mode_mutex_);
-      if (current_mode_ != EXECUTING)
+      if (current_mode_ != EXECUTING || action_server_.isPreemptRequested())
       {
         ap_result.result = ap_result.STOP_REQUESTED;
         break;

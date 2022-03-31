@@ -30,6 +30,7 @@ catkin_package(
   CATKIN_DEPENDS
     affordance_primitive_msgs
     geometry_msgs
+    tf2_ros
 )
 
 include_directories(
