@@ -70,13 +70,13 @@ public:
    * Blocks until a result is found
    * @return The result after waiting
    */
-  ExecutionResult waitForResult();
+  AffordancePrimitiveResult waitForResult();
 
   /**
    * Grabs the result of the monitoring
    * @return The result. If there is none, a std::nullopt is returned
    */
-  std::optional<ExecutionResult> getResult();
+  std::optional<AffordancePrimitiveResult> getResult();
 
   /**
    * Cancels the monitor
@@ -100,7 +100,7 @@ private:
   ros::Time end_time_;
 
   // We need a result to report at the end
-  ExecutionResult result_;
+  AffordancePrimitiveResult result_;
 
   // Hold onto parameters during a monitor session
   APRobotParameter parameters_;
@@ -123,6 +123,6 @@ private:
   std::queue<WrenchStamped> last_wrench_msgs_;
 
   // Check if AP is violated
-  std::optional<ExecutionResult> checkForViolaton(const APRobotParameter& params);
+  std::optional<AffordancePrimitiveResult> checkForViolaton(const APRobotParameter& params);
 };
 }  // namespace affordance_primitives

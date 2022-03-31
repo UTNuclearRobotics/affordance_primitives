@@ -38,9 +38,7 @@
 
 #include <thread>
 
-// constexpr double EPSILON = 1e-4;
-
-using affordance_primitives::ExecutionResult;
+using AffordancePrimitiveResult = affordance_primitive_msgs::AffordancePrimitiveResult;
 
 TEST(TaskMonitor, start_stop_monitor)
 {
@@ -58,16 +56,16 @@ TEST(TaskMonitor, start_stop_monitor)
   ASSERT_NO_THROW(monitor.stopMonitor());
 
   // Result should be STOP_REQUESTED
-  std::optional<ExecutionResult> result = monitor.getResult();
+  std::optional<AffordancePrimitiveResult> result = monitor.getResult();
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result.value(), affordance_primitives::ExecutionResult::STOP_REQUESTED);
+  EXPECT_EQ(result->result, result->STOP_REQUESTED);
 
   // Now try interupting a timed run
   ASSERT_NO_THROW(monitor.startMonitor(params, 0.25));
   ASSERT_NO_THROW(monitor.stopMonitor());
   result = monitor.getResult();
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result.value(), affordance_primitives::ExecutionResult::STOP_REQUESTED);
+  EXPECT_EQ(result->result, result->STOP_REQUESTED);
 }
 
 TEST(TaskMonitor, monitor_timing)
@@ -87,18 +85,18 @@ TEST(TaskMonitor, monitor_timing)
 
   // Wait some time and grab result
   ros::Duration(1.05 * test_duration).sleep();
-  std::optional<ExecutionResult> result = monitor.getResult();
+  std::optional<AffordancePrimitiveResult> result = monitor.getResult();
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result.value(), affordance_primitives::ExecutionResult::TIME_OUT);
+  EXPECT_EQ(result->result, result->TIME_OUT);
 
   // Now test blocking call to waitForResult()
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
-  ExecutionResult result2;
+  AffordancePrimitiveResult result2;
 
   ros::Time start = ros::Time::now();
   result2 = monitor.waitForResult();
   EXPECT_LE((ros::Time::now() - start).toSec(), 1.05 * test_duration);
-  EXPECT_EQ(result2, affordance_primitives::ExecutionResult::TIME_OUT);
+  EXPECT_EQ(result2.result, result2.TIME_OUT);
 }
 
 TEST(TaskMonitor, monitor_ft_readings)
@@ -134,7 +132,8 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Start the monitor and verify it times out
   affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
-  EXPECT_EQ(monitor.waitForResult(), affordance_primitives::ExecutionResult::TIME_OUT);
+  AffordancePrimitiveResult result = monitor.waitForResult();
+  EXPECT_EQ(result.result, result.TIME_OUT);
   t.join();
 
   // Now publish FT readings to violate max force limit
@@ -154,7 +153,8 @@ TEST(TaskMonitor, monitor_ft_readings)
 
   // Start monitor and verify FT limit is violated
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
-  EXPECT_EQ(monitor.waitForResult(), affordance_primitives::ExecutionResult::FT_VIOLATION);
+  result = monitor.waitForResult();
+  EXPECT_EQ(result.result, result.FT_VIOLATION);
   t.join();
 
   // Now publish to violate individual limits
@@ -177,7 +177,8 @@ TEST(TaskMonitor, monitor_ft_readings)
 
   // Start monitor and verify FT limit is violated
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
-  EXPECT_EQ(monitor.waitForResult(), affordance_primitives::ExecutionResult::FT_VIOLATION);
+  result = monitor.waitForResult();
+  EXPECT_EQ(result.result, result.FT_VIOLATION);
   t.join();
 
   // Now check to make sure NOT setting a limit results in no limit
@@ -198,7 +199,8 @@ TEST(TaskMonitor, monitor_ft_readings)
 
   // Start the monitor and verify it times out
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
-  EXPECT_EQ(monitor.waitForResult(), affordance_primitives::ExecutionResult::TIME_OUT);
+  result = monitor.waitForResult();
+  EXPECT_EQ(result.result, result.TIME_OUT);
   t.join();
 }
 
