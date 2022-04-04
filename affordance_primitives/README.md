@@ -4,8 +4,6 @@ Affordance Primitives (APs) use screw theory to model contact-task affordances. 
 
 See [this video](https://www.youtube.com/watch?v=3TGl3F_4W_8) for an overview.
 
-To see the docs locally: `roscd affordance_primitives ; firefox doc/html/namespaceaffordance__primitives.html`
-
 ## Conceptual Overview
 An AP is a constraint the environment places on a manipulator that generates instantaneous motion and force profiles the manipulator must follow. We consider these constrains by modeling how an articulated object must move during manipulation using screw theory.
 
