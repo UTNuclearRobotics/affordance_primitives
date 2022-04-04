@@ -1,6 +1,5 @@
 #include <pluginlib/class_list_macros.h>
 
-#include <affordance_primitives/task_estimator/task_estimator.hpp>
 #include <ap_examples/example_task_estimator.hpp>
 
 namespace ap_examples

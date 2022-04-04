@@ -45,9 +45,7 @@ namespace ap_examples
 class ExampleTaskEstimator : public affordance_primitives::TaskEstimator
 {
 public:
-  ExampleTaskEstimator();
-
-  ~ExampleTaskEstimator(){};
+  ExampleTaskEstimator(){};
 
   void initialize(const ros::NodeHandle& nh);
 
