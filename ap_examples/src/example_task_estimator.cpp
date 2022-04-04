@@ -21,7 +21,7 @@ bool ExampleTaskEstimator::resetTaskEstimation(double reset_val)
 std::optional<double>
 ExampleTaskEstimator::estimateTaskAngle(const affordance_primitives::AffordancePrimitiveGoal& ap_goal)
 {
-  // You can return to std::nullopt to indicate the estimate is invalid
+  // You can return a std::nullopt to indicate the estimate is invalid
   bool something_is_invalid = false;
   if (something_is_invalid)
   {

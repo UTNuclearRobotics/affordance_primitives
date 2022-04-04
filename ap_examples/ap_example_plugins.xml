@@ -2,4 +2,7 @@
   <class type="ap_examples::ExampleTaskEstimator" base_class_type="affordance_primitives::TaskEstimator">
     <description>Testing</description>
   </class>
+  <class type="ap_examples::ExampleParameterManager" base_class_type="affordance_primitives::ParameterManager">
+    <description>Testing</description>
+  </class>
 </library>

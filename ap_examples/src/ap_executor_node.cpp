@@ -63,7 +63,8 @@ int main(int argc, char** argv)
   // This is the name of the Robot Configuration Interface plugin
   // It is a C++ class that will be called on to set various execution parameters on the robot
   // You can write your own, or use "EmptyParameterManager" in the affordance_primitives package
-  params.param_manager_plugin_name = "affordance_primitives::EmptyParameterManager";
+  params.param_manager_plugin_name = "ap_examples::ExampleParameterManager";
+  // params.param_manager_plugin_name = "affordance_primitives::EmptyParameterManager";
 
   // This is the name of the Task Estimator plugin
   // It is a C++ class that is called to estimate the screw position/angle as the task executes

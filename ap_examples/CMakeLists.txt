@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  INCLUDE_DIRS include
  CATKIN_DEPENDS actionlib affordance_primitives
+ LIBRARIES ap_example_plugins
 )
 
 include_directories(
@@ -22,7 +23,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(ap_example_plugins src/example_task_estimator.cpp)
+add_library(ap_example_plugins
+  src/example_parameter_manager.cpp
+  src/example_task_estimator.cpp
+)
 
 add_executable(ap_executor src/ap_executor_node.cpp)
 target_link_libraries(ap_executor ${catkin_LIBRARIES})
@@ -36,8 +40,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-install(TARGETS ap_client ap_executor
+install(TARGETS ap_client ap_example_plugins ap_executor
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+install(FILES ap_example_plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
