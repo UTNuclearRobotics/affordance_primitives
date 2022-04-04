@@ -92,14 +92,6 @@ public:
    */
   bool setScrewAxis(const ScrewStamped& screw_msg);
 
-  /**
-   * @brief Sets up the Screw axis, a twist message (TODO: implement)
-   * @param twist The twist gets normalized based on whether or not the Screw is purely translational
-   * @param pitch Sets the pitch of the screw
-   * @return True if the setup was successful, false otherwise
-   */
-  // bool setScrewAxis(const msg::Twist& twist, const double pitch=0);
-
   // Use the Screw to generate motion profiles
   /**
    * @brief Gets the Twist corresponding to moving along this screw axis at the given velocity
