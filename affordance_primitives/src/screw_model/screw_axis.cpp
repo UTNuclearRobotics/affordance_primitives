@@ -35,7 +35,8 @@
 
 namespace affordance_primitives
 {
-Eigen::Vector3d calculateLinearVelocity(const Eigen::Vector3d& axis, const Eigen::Vector3d& q_vector, double pitch)
+Eigen::Vector3d calculateLinearVelocity(
+  const Eigen::Vector3d & axis, const Eigen::Vector3d & q_vector, double pitch)
 {
   Eigen::Vector3d pitch_component = pitch * axis;
   Eigen::Vector3d rotation_component = axis.cross(q_vector);
@@ -50,14 +51,14 @@ ScrewAxis::ScrewAxis()
 }
 
 ScrewAxis::ScrewAxis(const std::string moving_frame_name, bool is_pure_translation)
-  : moving_frame_name_(moving_frame_name), is_pure_translation_(is_pure_translation)
+: moving_frame_name_(moving_frame_name), is_pure_translation_(is_pure_translation)
 {
   axis_.setZero();
   origin_.setZero();
   translation_component_.setZero();
 }
 
-bool ScrewAxis::setScrewAxis(const Pose& origin_pose, const Pose& axis_pose, double pitch)
+bool ScrewAxis::setScrewAxis(const Pose & origin_pose, const Pose & axis_pose, double pitch)
 {
   // Set the pitch and origin
   pitch_ = pitch;
@@ -68,47 +69,39 @@ bool ScrewAxis::setScrewAxis(const Pose& origin_pose, const Pose& axis_pose, dou
   tf2::fromMsg(axis_pose.position, axis_pose_position);
 
   Eigen::Vector3d calculated_axis = axis_pose_position - origin_;
-  if (calculated_axis.isZero())
-  {
+  if (calculated_axis.isZero()) {
     return false;
   }
 
-  if (is_pure_translation_)
-  {
+  if (is_pure_translation_) {
     translation_component_ = calculated_axis.normalized();
-  }
-  else
-  {
+  } else {
     axis_ = calculated_axis.normalized();
     translation_component_ = calculateLinearVelocity(axis_, origin_, pitch_);
   }
   return true;
 }
 
-bool ScrewAxis::setScrewAxis(const Pose& origin_pose, const Eigen::Vector3d& axis, double pitch)
+bool ScrewAxis::setScrewAxis(const Pose & origin_pose, const Eigen::Vector3d & axis, double pitch)
 {
   // Set all components
   pitch_ = pitch;
   tf2::fromMsg(origin_pose.position, origin_);
 
-  if (axis.isZero())
-  {
+  if (axis.isZero()) {
     return false;
   }
 
-  if (is_pure_translation_)
-  {
+  if (is_pure_translation_) {
     translation_component_ = axis.normalized();
-  }
-  else
-  {
+  } else {
     axis_ = axis.normalized();
     translation_component_ = calculateLinearVelocity(axis_, origin_, pitch_);
   }
   return true;
 }
 
-bool ScrewAxis::setScrewAxis(const ScrewStamped& screw_msg)
+bool ScrewAxis::setScrewAxis(const ScrewStamped & screw_msg)
 {
   // Override moving frame and translation information
   moving_frame_name_ = screw_msg.header.frame_id;
@@ -130,13 +123,10 @@ TwistStamped ScrewAxis::getTwist(double theta_dot) const
   output.header.frame_id = moving_frame_name_;
 
   // All we need is to multiply the theta_dot by motion vectors
-  if (is_pure_translation_)
-  {
+  if (is_pure_translation_) {
     auto linear_velocity = theta_dot * translation_component_;
     tf2::toMsg(linear_velocity, output.twist.linear);
-  }
-  else
-  {
+  } else {
     auto linear_velocity = theta_dot * translation_component_;
     auto angular_velocity = theta_dot * axis_;
     tf2::toMsg(linear_velocity, output.twist.linear);
@@ -150,8 +140,7 @@ Eigen::Isometry3d ScrewAxis::getTF(double delta_theta) const
   Eigen::Isometry3d output;
 
   // The translation case is easy:
-  if (is_pure_translation_)
-  {
+  if (is_pure_translation_) {
     // No rotation and move linearly by displacement
     output.linear() = Eigen::Matrix3d::Identity();
     output.translation() = delta_theta * translation_component_;
@@ -165,9 +154,10 @@ Eigen::Isometry3d ScrewAxis::getTF(double delta_theta) const
   auto skew_axis = getSkewSymmetricMatrix(axis_);
   Eigen::Matrix3d skew_axis_squared = skew_axis * skew_axis;
 
-  output.translation() = ((Eigen::Matrix3d::Identity() * delta_theta) + (1 - cos(delta_theta)) * skew_axis +
-                          (delta_theta - sin(delta_theta)) * skew_axis_squared) *
-                         translation_component_;
+  output.translation() =
+    ((Eigen::Matrix3d::Identity() * delta_theta) + (1 - cos(delta_theta)) * skew_axis +
+     (delta_theta - sin(delta_theta)) * skew_axis_squared) *
+    translation_component_;
 
   // Just use Eigen's Axis-Angle to Rotation Matrix calculations for the rotation component
   Eigen::AngleAxisd axis_angle_rotation(delta_theta, axis_);

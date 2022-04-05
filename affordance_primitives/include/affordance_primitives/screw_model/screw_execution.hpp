@@ -32,10 +32,11 @@
 
 #pragma once
 
-#include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/transform_listener.h>
+
 #include <affordance_primitives/msg_types.hpp>
 #include <chrono>
+#include <rclcpp/rclcpp.hpp>
 
 namespace affordance_primitives
 {
@@ -46,7 +47,7 @@ public:
 
   ~APScrewExecutor(){};
 
-  bool getScrewTwist(const AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback);
+  bool getScrewTwist(const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback);
 
 private:
   std::shared_ptr<rclcpp::Node> node_;

@@ -33,15 +33,15 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
-#include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/msg_types.hpp>
+#include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_execution.hpp>
 
 const std::string TASK_FRAME_NAME = "task_frame";
 const std::string MOVING_FRAME_NAME = "moving_frame";
 constexpr double EPSILON = 1e-4;
 
-inline void checkVector(const affordance_primitives::Vector3& vec, double x, double y, double z)
+inline void checkVector(const affordance_primitives::Vector3 & vec, double x, double y, double z)
 {
   EXPECT_NEAR(vec.x, x, EPSILON);
   EXPECT_NEAR(vec.y, y, EPSILON);
@@ -119,8 +119,9 @@ TEST(ScrewExecution, providedTF)
   bool_result = false;
   ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
   EXPECT_TRUE(bool_result);
-  checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, -1 * ap_goal.screw.pitch * ap_goal.theta_dot,
-              -2 * ap_goal.theta_dot);
+  checkVector(
+    ap_feedback.moving_frame_twist.twist.linear, 0, -1 * ap_goal.screw.pitch * ap_goal.theta_dot,
+    -2 * ap_goal.theta_dot);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, -1 * ap_goal.theta_dot, 0);
 
   // Check valid translation case
@@ -168,7 +169,7 @@ TEST(ScrewExecution, lookupTF)
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, -1 * ap_goal.theta_dot, 0);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "test_screw_execution");
   testing::InitGoogleTest(&argc, argv);

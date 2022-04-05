@@ -31,18 +31,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
+#include <pluginlib/class_loader.h>
 
 #include <affordance_primitives/configs_interface/empty_parameter_manager.hpp>
 #include <affordance_primitives/msg_types.hpp>
-#include <pluginlib/class_loader.h>
 
 TEST(ParameterManager, test_empty_parameter_manager)
 {
   // Load plugin
   pluginlib::ClassLoader<affordance_primitives::ParameterManager> plugin_loader(
-      "affordance_primitives", "affordance_primitives::ParameterManager");
+    "affordance_primitives", "affordance_primitives::ParameterManager");
   boost::shared_ptr<affordance_primitives::ParameterManager> param_manager;
-  ASSERT_NO_THROW(param_manager = plugin_loader.createInstance("affordance_primitives::EmptyParameterManager"));
+  ASSERT_NO_THROW(
+    param_manager = plugin_loader.createInstance("affordance_primitives::EmptyParameterManager"));
 
   // Initialize plugin
   ros::NodeHandle nh;
@@ -56,7 +57,7 @@ TEST(ParameterManager, test_empty_parameter_manager)
   EXPECT_TRUE(out.second.empty());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "test_parameter_manager");
   testing::InitGoogleTest(&argc, argv);

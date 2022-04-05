@@ -40,8 +40,8 @@
    transfering code between versions much easier
 */
 
-#include <affordance_primitive_msgs/msg/ap_robot_parameter.hpp>
 #include <affordance_primitive_msgs/action/affordance_primitive.hpp>
+#include <affordance_primitive_msgs/msg/ap_robot_parameter.hpp>
 #include <affordance_primitive_msgs/msg/cartesian_float.hpp>
 #include <affordance_primitive_msgs/msg/screw_stamped.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
@@ -57,7 +57,8 @@ namespace affordance_primitives
 using APRobotParameter = affordance_primitive_msgs::msg::APRobotParameter;
 using AffordancePrimitive = affordance_primitive_msgs::action::AffordancePrimitive;
 using AffordancePrimitiveGoal = affordance_primitive_msgs::action::AffordancePrimitive::Goal;
-using AffordancePrimitiveFeedback = affordance_primitive_msgs::action::AffordancePrimitive::Feedback;
+using AffordancePrimitiveFeedback =
+  affordance_primitive_msgs::action::AffordancePrimitive::Feedback;
 using AffordancePrimitiveResult = affordance_primitive_msgs::action::AffordancePrimitive::Result;
 using CartesianFloat = affordance_primitive_msgs::msg::CartesianFloat;
 using ScrewStamped = affordance_primitive_msgs::msg::ScrewStamped;

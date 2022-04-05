@@ -35,12 +35,12 @@
 
 namespace affordance_primitives
 {
-PoseStamped getPoseInATFrame(const std::string& root_frame_name, const PoseStamped& root_frame_pose,
-                             const PoseStamped& incoming_frame)
+PoseStamped getPoseInATFrame(
+  const std::string & root_frame_name, const PoseStamped & root_frame_pose,
+  const PoseStamped & incoming_frame)
 {
   // If the frame is already in the AT root, just return it
-  if (incoming_frame.header.frame_id == root_frame_name)
-  {
+  if (incoming_frame.header.frame_id == root_frame_name) {
     return incoming_frame;
   }
 
@@ -53,11 +53,10 @@ PoseStamped getPoseInATFrame(const std::string& root_frame_name, const PoseStamp
   return output;
 }
 
-TwistStamped getTwistFromPoses(const PoseStamped& start_pose, const PoseStamped& end_pose)
+TwistStamped getTwistFromPoses(const PoseStamped & start_pose, const PoseStamped & end_pose)
 {
   // Can't do it if they are in different frames
-  if (start_pose.header.frame_id != end_pose.header.frame_id)
-  {
+  if (start_pose.header.frame_id != end_pose.header.frame_id) {
     throw std::runtime_error("Poses must be in same frame");
   }
 
@@ -81,10 +80,10 @@ TwistStamped getTwistFromPoses(const PoseStamped& start_pose, const PoseStamped&
   return output;
 }
 
-Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const PoseStamped& transformed_pose)
+Eigen::Isometry3d convertPoseToNewFrame(
+  const PoseStamped & new_base_frame, const PoseStamped & transformed_pose)
 {
-  if (new_base_frame.header.frame_id != transformed_pose.header.frame_id)
-  {
+  if (new_base_frame.header.frame_id != transformed_pose.header.frame_id) {
     throw std::runtime_error("Poses must be in same frame");
   }
 
@@ -97,16 +96,14 @@ Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const
   return tf_root_to_new_base_frame.inverse() * tf_root_to_transformed_pose;
 }
 
-ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStamped& transform)
+ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformStamped & transform)
 {
-  if (input_screw.header.frame_id == transform.child_frame_id)
-  {
+  if (input_screw.header.frame_id == transform.child_frame_id) {
     // Already in the correct frame
     return input_screw;
-  }
-  else if (input_screw.header.frame_id != transform.header.frame_id)
-  {
-    throw std::runtime_error("Cannot transform screw: transform frame does not match incoming screw frame");
+  } else if (input_screw.header.frame_id != transform.header.frame_id) {
+    throw std::runtime_error(
+      "Cannot transform screw: transform frame does not match incoming screw frame");
   }
 
   ScrewStamped output;
@@ -120,7 +117,8 @@ ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStam
 
   // Perform the transform
   Eigen::Vector3d rotated_axis = tf_new_to_old.linear() * screw_axis;
-  Eigen::Vector3d transformed_origin = tf_new_to_old.translation() + tf_new_to_old.linear() * screw_origin;
+  Eigen::Vector3d transformed_origin =
+    tf_new_to_old.translation() + tf_new_to_old.linear() * screw_origin;
 
   // Convert back from Eigen types
   output.origin = tf2::toMsg(transformed_origin);
@@ -128,7 +126,7 @@ ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStam
   return output;
 }
 
-Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec)
+Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d & vec)
 {
   Eigen::Matrix3d output;
   output.setZero();
@@ -142,7 +140,7 @@ Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec)
   return output;
 }
 
-Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
+Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d & transform)
 {
   Eigen::MatrixXd adjoint(6, 6);
 
@@ -157,12 +155,12 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform)
   return adjoint;
 }
 
-Eigen::MatrixXd getAdjointMatrix(const Transform& transform)
+Eigen::MatrixXd getAdjointMatrix(const Transform & transform)
 {
   return getAdjointMatrix(tf2::transformToEigen(transform));
 }
 
-Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat& cart_float)
+Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat & cart_float)
 {
   Eigen::Matrix<double, 6, 1> output;
   output[0] = cart_float.trans_x;
@@ -174,7 +172,7 @@ Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat& cart_fl
   return output;
 }
 
-CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1>& vector)
+CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1> & vector)
 {
   CartesianFloat output;
   output.trans_x = vector[0];
@@ -186,7 +184,7 @@ CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1>& vector)
   return output;
 }
 
-Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench& wrench)
+Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench & wrench)
 {
   Eigen::Matrix<double, 6, 1> output;
   output[0] = wrench.force.x;
@@ -198,7 +196,7 @@ Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench& wrench)
   return output;
 }
 
-Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1>& vector)
+Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1> & vector)
 {
   Wrench output;
   output.force.x = vector[0];
@@ -210,26 +208,27 @@ Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1>& vector)
   return output;
 }
 
-std::string twistToStr(const TwistStamped& twist)
+std::string twistToStr(const TwistStamped & twist)
 {
   std::stringstream stream;
-  stream << "\nHeader: " << twist.header.frame_id << "\nX: " << twist.twist.linear.x << "\nY: " << twist.twist.linear.y
-         << "\nZ: " << twist.twist.linear.z << "\nRoll: " << twist.twist.angular.x
-         << "\nPitch: " << twist.twist.angular.y << "\nYaw: " << twist.twist.angular.z;
+  stream << "\nHeader: " << twist.header.frame_id << "\nX: " << twist.twist.linear.x
+         << "\nY: " << twist.twist.linear.y << "\nZ: " << twist.twist.linear.z
+         << "\nRoll: " << twist.twist.angular.x << "\nPitch: " << twist.twist.angular.y
+         << "\nYaw: " << twist.twist.angular.z;
   return stream.str();
 }
 
-std::string poseToStr(const PoseStamped& pose)
+std::string poseToStr(const PoseStamped & pose)
 {
   std::stringstream stream;
-  stream << "\nHeader: " << pose.header.frame_id << "\nX: " << pose.pose.position.x << "\nY: " << pose.pose.position.y
-         << "\nZ: " << pose.pose.position.z << "\nQX: " << pose.pose.orientation.x
-         << "\nQY: " << pose.pose.orientation.y << "\nQZ: " << pose.pose.orientation.z
-         << "\nQW: " << pose.pose.orientation.w;
+  stream << "\nHeader: " << pose.header.frame_id << "\nX: " << pose.pose.position.x
+         << "\nY: " << pose.pose.position.y << "\nZ: " << pose.pose.position.z
+         << "\nQX: " << pose.pose.orientation.x << "\nQY: " << pose.pose.orientation.y
+         << "\nQZ: " << pose.pose.orientation.z << "\nQW: " << pose.pose.orientation.w;
   return stream.str();
 }
 
-std::string screwMsgToStr(const ScrewStamped& screw)
+std::string screwMsgToStr(const ScrewStamped & screw)
 {
   std::string pitch;
   if (screw.is_pure_translation)
@@ -239,8 +238,9 @@ std::string screwMsgToStr(const ScrewStamped& screw)
 
   std::stringstream stream;
   stream << "\nHeader: " << screw.header.frame_id << "\nOrigin X: " << screw.origin.x
-         << "\nOrigin Y: " << screw.origin.y << "\nOrigin Z: " << screw.origin.z << "\nAxis X: " << screw.axis.x
-         << "\nAxis Y: " << screw.axis.y << "\nAxis Z: " << screw.axis.z << "\nPitch: " << pitch;
+         << "\nOrigin Y: " << screw.origin.y << "\nOrigin Z: " << screw.origin.z
+         << "\nAxis X: " << screw.axis.x << "\nAxis Y: " << screw.axis.y
+         << "\nAxis Z: " << screw.axis.z << "\nPitch: " << pitch;
   return stream.str();
 }
 }  // namespace affordance_primitives
