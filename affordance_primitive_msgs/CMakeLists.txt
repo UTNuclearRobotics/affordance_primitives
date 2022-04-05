@@ -1,51 +1,37 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(affordance_primitive_msgs)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-find_package(catkin REQUIRED COMPONENTS
-  actionlib_msgs
-  geometry_msgs
-  message_generation
-  std_msgs
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(action_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+
+
+set(msg_files
+  "msg/APRobotParameter.msg"
+  "msg/CartesianBool.msg"
+  "msg/CartesianFloat.msg"
+  "msg/ScrewStamped.msg"
 )
 
-## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  APRobotParameter.msg
-  CartesianBool.msg
-  CartesianFloat.msg
-  ScrewStamped.msg
+set(action_files
+  "action/AffordancePrimitive.action"
 )
 
-add_action_files(
-  DIRECTORY action
-  FILES AffordancePrimitive.action
-)
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${msg_files}
+  ${action_files}
   DEPENDENCIES
-  actionlib_msgs
-  geometry_msgs
-  std_msgs
-)
-
-catkin_package(
-  CATKIN_DEPENDS
-    actionlib_msgs
+    action_msgs
     geometry_msgs
-    message_runtime
     std_msgs
 )
 
-###########
-## Build ##
-###########
+ament_export_dependencies(rosidl_default_runtime)
 
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+ament_package()
