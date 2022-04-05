@@ -1,13 +1,17 @@
-#include <pluginlib/class_list_macros.h>
-#include <tf2_eigen/tf2_eigen.h>
-
 #include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
+#include <pluginlib/class_list_macros.hpp>
+#include <tf2_eigen/tf2_eigen.hpp>
 
 namespace affordance_primitives
 {
-KinematicTaskEstimator::KinematicTaskEstimator() : tfListener_(tfBuffer_) {}
+KinematicTaskEstimator::KinematicTaskEstimator() {}
 
-void KinematicTaskEstimator::initialize(const ros::NodeHandle & nh) { nh_ = nh; }
+void KinematicTaskEstimator::initialize(rclcpp::Node::SharedPtr node)
+{
+  node_ = node;
+  tfBuffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+  tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
+}
 
 bool KinematicTaskEstimator::resetTaskEstimation(double reset_val)
 {
@@ -25,10 +29,12 @@ std::optional<double> KinematicTaskEstimator::estimateTaskAngle(
   if (ap_req.moving_frame_source == ap_req.LOOKUP) {
     // Lookup the TF
     try {
-      tfmsg_moving_to_task_frame = tfBuffer_.lookupTransform(
-        ap_req.moving_frame_name, ap_req.screw.header.frame_id, ros::Time(0));
+      tfmsg_moving_to_task_frame = tfBuffer_->lookupTransform(
+        ap_req.moving_frame_name, ap_req.screw.header.frame_id, rclcpp::Time(0));
     } catch (tf2::TransformException & ex) {
-      ROS_WARN_THROTTLE(1, "%s", ex.what());
+      rclcpp::Clock & clock = *node_->get_clock();
+      RCLCPP_WARN_THROTTLE(
+        node_->get_logger(), clock, std::chrono::milliseconds(1000).count(), "%s", ex.what());
       return std::nullopt;
     }
   } else if (ap_req.moving_frame_source == ap_req.PROVIDED) {
@@ -36,14 +42,18 @@ std::optional<double> KinematicTaskEstimator::estimateTaskAngle(
     tfmsg_moving_to_task_frame = ap_req.moving_to_task_frame;
     // Check validity
     if (tfmsg_moving_to_task_frame.child_frame_id != ap_req.screw.header.frame_id) {
-      ROS_WARN_STREAM_THROTTLE(
-        1,
+      rclcpp::Clock & clock = *node_->get_clock();
+      RCLCPP_WARN_STREAM_THROTTLE(
+        node_->get_logger(), clock, std::chrono::milliseconds(1000).count(),
         "Provided 'moving_to_task_frame' child frame "
         "name does not match screw header (task) frame, ending...");
       return std::nullopt;
     }
   } else {
-    ROS_WARN_STREAM_THROTTLE(1, "Unexpected 'moving_frame_source' requested, ending...");
+    rclcpp::Clock & clock = *node_->get_clock();
+    RCLCPP_WARN_STREAM_THROTTLE(
+      node_->get_logger(), clock, std::chrono::milliseconds(1000).count(),
+      "Unexpected 'moving_frame_source' requested, ending...");
     return std::nullopt;
   }
 

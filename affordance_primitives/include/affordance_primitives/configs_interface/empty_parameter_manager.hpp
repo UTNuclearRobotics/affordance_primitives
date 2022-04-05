@@ -32,9 +32,8 @@
 
 #pragma once
 
-#include <ros/ros.h>
-
 #include <affordance_primitives/configs_interface/parameter_manager.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace affordance_primitives
 {
@@ -46,7 +45,7 @@ class EmptyParameterManager : public affordance_primitives::ParameterManager
 public:
   EmptyParameterManager(){};
 
-  void initialize(const ros::NodeHandle & nh);
+  void initialize(rclcpp::Node::SharedPtr node);
 
   /** Tries to set a robot's parameters
    *

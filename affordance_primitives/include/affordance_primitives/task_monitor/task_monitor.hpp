@@ -32,8 +32,6 @@
 
 #pragma once
 
-#include <ros/ros.h>
-
 #include <affordance_primitives/ap_common.hpp>
 #include <affordance_primitives/msg_types.hpp>
 #include <atomic>
@@ -41,6 +39,7 @@
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <rclcpp/rclcpp.hpp>
 #include <thread>
 
 namespace affordance_primitives
@@ -53,7 +52,7 @@ namespace affordance_primitives
 class TaskMonitor
 {
 public:
-  TaskMonitor(const ros::NodeHandle & nh, const std::string ft_topic_name);
+  TaskMonitor(rclcpp::Node::SharedPtr node, const std::string ft_topic_name);
 
   ~TaskMonitor();
 
@@ -90,14 +89,14 @@ private:
   void mainLoop();
 
   // node handle
-  ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::Node> node_;
 
   // Mutex for protecting the class variables
   mutable std::mutex mutex_;
   std::condition_variable condition_variable_;
 
   // An end time for the timeout
-  ros::Time end_time_;
+  rclcpp::Time end_time_;
 
   // We need a result to report at the end
   AffordancePrimitiveResult result_;
@@ -114,7 +113,7 @@ private:
   std::thread thread_;
 
   // Subscriber for listening to F/T topic
-  ros::Subscriber ft_sub_;
+  rclcpp::Subscription<WrenchStamped>::SharedPtr ft_sub_;
 
   // F/T Callback
   void ftCB(const WrenchStamped & msg);

@@ -32,10 +32,9 @@
 
 #pragma once
 
-#include <ros/ros.h>
-
 #include <affordance_primitives/msg_types.hpp>
 #include <optional>
+#include <rclcpp/rclcpp.hpp>
 
 namespace affordance_primitives
 {
@@ -45,7 +44,7 @@ namespace affordance_primitives
 class TaskEstimator
 {
 public:
-  virtual void initialize(const ros::NodeHandle & nh) = 0;
+  virtual void initialize(rclcpp::Node::SharedPtr node) = 0;
 
   /** Returns the estimated angle of a task
    *
@@ -65,6 +64,6 @@ public:
 
 protected:
   TaskEstimator(){};
-  ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::Node> node_;
 };
 }  // namespace affordance_primitives

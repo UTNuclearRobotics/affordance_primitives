@@ -49,21 +49,21 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
-  # include/${PROJECT_NAME}/ap_executor/ap_executor.hpp
-  # include/${PROJECT_NAME}/configs_interface/empty_parameter_manager.hpp
-  # include/${PROJECT_NAME}/configs_interface/parameter_manager.hpp
+  include/${PROJECT_NAME}/ap_executor/ap_executor.hpp
+  include/${PROJECT_NAME}/configs_interface/empty_parameter_manager.hpp
+  include/${PROJECT_NAME}/configs_interface/parameter_manager.hpp
   include/${PROJECT_NAME}/screw_model/screw_axis.hpp
   include/${PROJECT_NAME}/screw_model/screw_execution.hpp
-  # include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
-  # include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
-  # include/${PROJECT_NAME}/task_monitor/task_monitor.hpp
-  # src/ap_executor/ap_executor.cpp
-  # src/configs_interface/empty_parameter_manager.cpp
+  include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
+  include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
+  include/${PROJECT_NAME}/task_monitor/task_monitor.hpp
+  src/ap_executor/ap_executor.cpp
+  src/configs_interface/empty_parameter_manager.cpp
   src/screw_model/affordance_utils.cpp
   src/screw_model/screw_axis.cpp
   src/screw_model/screw_execution.cpp
-  # src/task_estimator/kinematic_task_estimator.cpp
-  # src/task_monitor/task_monitor.cpp
+  src/task_estimator/kinematic_task_estimator.cpp
+  src/task_monitor/task_monitor.cpp
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -118,9 +118,9 @@ ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 #   target_link_libraries(test_ap_executor ${catkin_LIBRARIES} ${PROJECT_NAME})
 # endif()
 
-# if(BUILD_TESTING)
-#   find_package(ament_lint_auto REQUIRED)
-#   ament_lint_auto_find_test_dependencies()
-# endif()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_package()

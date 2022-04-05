@@ -32,9 +32,8 @@
 
 #pragma once
 
-#include <ros/ros.h>
-
 #include <affordance_primitives/msg_types.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <utility>
 
 namespace affordance_primitives
@@ -45,7 +44,7 @@ namespace affordance_primitives
 class ParameterManager
 {
 public:
-  virtual void initialize(const ros::NodeHandle & nh) = 0;
+  virtual void initialize(rclcpp::Node::SharedPtr node) = 0;
 
   /** Tries to set a robot's parameters
    *
@@ -60,6 +59,6 @@ public:
 
 protected:
   ParameterManager(){};
-  ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::Node> node_;
 };
 }  // namespace affordance_primitives

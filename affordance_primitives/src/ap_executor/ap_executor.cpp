@@ -54,9 +54,34 @@ void enforceAPLimits(
   feedback.expected_wrench.wrench = VectorToWrench(wrench_requested);
 }
 
-APExecutor::APExecutor(const ros::NodeHandle & nh, const std::string action_name)
-: nh_(nh), action_server_(nh_, action_name, boost::bind(&APExecutor::execute, this, _1), false)
+APExecutor::APExecutor(rclcpp::Node::SharedPtr node, const std::string action_name) : node_(node)
 {
+  using namespace std::placeholders;
+  action_server_ = rclcpp_action::create_server<AffordancePrimitive>(
+    node_, action_name, std::bind(&APExecutor::handle_goal, this, _1, _2),
+    std::bind(&APExecutor::handle_cancel, this, _1),
+    std::bind(&APExecutor::handle_accepted, this, _1));
+}
+
+rclcpp_action::GoalResponse APExecutor::handle_goal(
+  const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const AffordancePrimitive::Goal> goal)
+{
+  (void)uuid;
+  return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+}
+
+rclcpp_action::CancelResponse APExecutor::handle_cancel(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle)
+{
+  (void)goal_handle;
+  return rclcpp_action::CancelResponse::ACCEPT;
+}
+
+void APExecutor::handle_accepted(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle)
+{
+  using namespace std::placeholders;
+  std::thread{std::bind(&APExecutor::execute, this, _1), goal_handle}.detach();
 }
 
 bool APExecutor::initialize(const ExecutorParameters & params)
@@ -65,10 +90,11 @@ bool APExecutor::initialize(const ExecutorParameters & params)
   pm_loader_ = std::make_shared<pluginlib::ClassLoader<ParameterManager>>(
     "affordance_primitives", "affordance_primitives::ParameterManager");
   try {
-    parameter_manager_ = pm_loader_->createInstance(params.param_manager_plugin_name);
-    parameter_manager_->initialize(nh_);
+    parameter_manager_ = pm_loader_->createSharedInstance(params.param_manager_plugin_name);
+    parameter_manager_->initialize(node_);
   } catch (pluginlib::PluginlibException & ex) {
-    ROS_ERROR("Parameter Manager plugin failed to load, error was: %s", ex.what());
+    RCLCPP_ERROR(
+      node_->get_logger(), "Parameter Manager plugin failed to load, error was: %s", ex.what());
     return false;
   }
 
@@ -76,50 +102,51 @@ bool APExecutor::initialize(const ExecutorParameters & params)
   te_loader_ = std::make_shared<pluginlib::ClassLoader<TaskEstimator>>(
     "affordance_primitives", "affordance_primitives::TaskEstimator");
   try {
-    task_estimator_ = te_loader_->createInstance(params.task_estimator_plugin_name);
-    task_estimator_->initialize(nh_);
+    task_estimator_ = te_loader_->createSharedInstance(params.task_estimator_plugin_name);
+    task_estimator_->initialize(node_);
   } catch (pluginlib::PluginlibException & ex) {
-    ROS_ERROR("Task Estimator plugin failed to load, error was: %s", ex.what());
+    RCLCPP_ERROR(
+      node_->get_logger(), "Task Estimator plugin failed to load, error was: %s", ex.what());
     return false;
   }
 
   // Create the execution monitor
-  monitor_ = std::make_unique<TaskMonitor>(nh_, params.monitor_ft_topic_name);
+  monitor_ = std::make_unique<TaskMonitor>(node_, params.monitor_ft_topic_name);
 
   // This handles the screw math
-  screw_executor_ = std::make_unique<APScrewExecutor>();
+  screw_executor_ = std::make_unique<APScrewExecutor>(node_);
 
-  action_server_.start();
   return true;
 }
 
 AffordancePrimitiveResult APExecutor::execute(
-  const affordance_primitive_msgs::AffordancePrimitiveGoalConstPtr & goal)
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle)
 {
   // End any currently running task
   stop();
 
-  AffordancePrimitiveResult ap_result;
+  std::shared_ptr<AffordancePrimitiveResult> ap_result;
+  auto goal = goal_handle->get_goal();
 
   // Update parameters
   if (!updateParams(goal->robot_params)) {
-    ap_result.result = ap_result.PARAM_FAILURE;
-    action_server_.setSucceeded(ap_result);
-    return ap_result;
+    ap_result->result = ap_result->PARAM_FAILURE;
+    goal_handle->succeed(ap_result);
+    return *ap_result;
   }
 
   // Check input for errors
   const double epislon = 1e-8;
   if (fabs(goal->theta_dot) < epislon) {
-    ROS_ERROR("No velocity set, skipping");
-    ap_result.result = ap_result.PARAM_FAILURE;
-    action_server_.setSucceeded(ap_result);
-    return ap_result;
+    RCLCPP_ERROR(node_->get_logger(), "No velocity set, skipping");
+    ap_result->result = ap_result->PARAM_FAILURE;
+    goal_handle->succeed(ap_result);
+    return *ap_result;
   }
   if (fabs(goal->screw_distance) < epislon) {
-    ap_result.result = ap_result.SUCCESS;
-    action_server_.setSucceeded(ap_result);
-    return ap_result;
+    ap_result->result = ap_result->SUCCESS;
+    goal_handle->succeed(ap_result);
+    return *ap_result;
   }
 
   // Set current mode
@@ -134,54 +161,54 @@ AffordancePrimitiveResult APExecutor::execute(
   monitor_->startMonitor(goal->robot_params, timeout);
 
   // Execute commands while monitoring
-  ros::Rate loop_rate(100);
-  ap_result.result = ap_result.INVALID_RESULT;
+  rclcpp::Rate loop_rate(100);
+  ap_result->result = ap_result->INVALID_RESULT;
 
   // Start estimating task
   if (!task_estimator_->resetTaskEstimation(0)) {
     stop();
-    ap_result.result = ap_result.KIN_VIOLATION;
-    action_server_.setSucceeded(ap_result);
-    return ap_result;
+    ap_result->result = ap_result->KIN_VIOLATION;
+    goal_handle->succeed(ap_result);
+    return *ap_result;
   }
 
-  while (ros::ok()) {
+  while (rclcpp::ok()) {
     // Check executor status
     {
       const std::lock_guard<std::mutex> lock(mode_mutex_);
-      if (current_mode_ != EXECUTING || action_server_.isPreemptRequested()) {
-        ap_result.result = ap_result.STOP_REQUESTED;
+      if (current_mode_ != EXECUTING || !goal_handle->is_active()) {
+        ap_result->result = ap_result->STOP_REQUESTED;
         break;
       }
     }
     // Check if the monitor has ended
     std::optional<AffordancePrimitiveResult> monitor_result = monitor_->getResult();
     if (monitor_result.has_value()) {
-      ap_result = monitor_result.value();
+      *ap_result = monitor_result.value();
       break;
     }
     // Otherwise, send commands
     else {
-      AffordancePrimitiveFeedback ap_feedback;
-      if (!screw_executor_->getScrewTwist(*goal, ap_feedback)) {
-        ap_result.result = ap_result.KIN_VIOLATION;
+      std::shared_ptr<AffordancePrimitiveFeedback> ap_feedback;
+      if (!screw_executor_->getScrewTwist(*goal, *ap_feedback)) {
+        ap_result->result = ap_result->KIN_VIOLATION;
         break;
       }
 
       // Check if we have reached the goal
       std::optional<double> total_delta_theta = task_estimator_->estimateTaskAngle(*goal);
       if (!total_delta_theta.has_value()) {
-        ap_result.result = ap_result.KIN_VIOLATION;
+        ap_result->result = ap_result->KIN_VIOLATION;
         break;
       } else if (total_delta_theta.value() >= fabs(goal->screw_distance)) {
-        ap_result.result = ap_result.SUCCESS;
+        ap_result->result = ap_result->SUCCESS;
         break;
       }
 
       // Publish feedback
-      ap_feedback.moving_frame_twist.header.stamp = ros::Time::now();
-      enforceAPLimits(goal->robot_params, ap_feedback);
-      action_server_.publishFeedback(ap_feedback);
+      ap_feedback->moving_frame_twist.header.stamp = node_->get_clock()->now();
+      enforceAPLimits(goal->robot_params, *ap_feedback);
+      goal_handle->publish_feedback(ap_feedback);
 
       loop_rate.sleep();
     }
@@ -189,10 +216,10 @@ AffordancePrimitiveResult APExecutor::execute(
 
   // Cleanup
   stop();
-  postExecuteReset();
+  postExecuteReset(goal_handle);
 
-  action_server_.setSucceeded(ap_result);
-  return ap_result;
+  goal_handle->succeed(ap_result);
+  return *ap_result;
 }
 
 void APExecutor::stop()
@@ -211,18 +238,20 @@ bool APExecutor::updateParams(const APRobotParameter & parameters)
 {
   auto set_params = parameter_manager_->setParameters(parameters);
   if (!set_params.first) {
-    ROS_ERROR_STREAM("Could not set parameters, error was: " << set_params.second);
+    RCLCPP_ERROR_STREAM(
+      node_->get_logger(), "Could not set parameters, error was: " << set_params.second);
     return false;
   }
 
   return true;
 }
 
-bool APExecutor::postExecuteReset()
+bool APExecutor::postExecuteReset(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle)
 {
   // We want to publish a 0-motion twist just in case things are still moving
-  AffordancePrimitiveFeedback ap_feedback;
-  action_server_.publishFeedback(ap_feedback);
+  std::shared_ptr<AffordancePrimitiveFeedback> ap_feedback;
+  goal_handle->publish_feedback(ap_feedback);
 
   return true;
 }

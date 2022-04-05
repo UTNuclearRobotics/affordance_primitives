@@ -32,10 +32,6 @@
 
 #pragma once
 
-#include <actionlib/server/simple_action_server.h>
-#include <pluginlib/class_loader.h>
-#include <ros/ros.h>
-
 #include <affordance_primitives/ap_common.hpp>
 #include <affordance_primitives/configs_interface/parameter_manager.hpp>
 #include <affordance_primitives/msg_types.hpp>
@@ -44,6 +40,11 @@
 #include <affordance_primitives/task_monitor/task_monitor.hpp>
 #include <mutex>
 #include <optional>
+#include <pluginlib/class_loader.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <thread>
+
+#include "rclcpp_action/rclcpp_action.hpp"
 
 namespace affordance_primitives
 {
@@ -85,7 +86,7 @@ public:
    * @param nh ROS node handle
    * @param action_name the name the AP executor action will take
    */
-  APExecutor(const ros::NodeHandle & nh, const std::string action_name);
+  APExecutor(rclcpp::Node::SharedPtr node, const std::string action_name);
 
   ~APExecutor() { stop(); };
 
@@ -106,7 +107,16 @@ protected:
    * @return The result of the execution
    */
   AffordancePrimitiveResult execute(
-    const affordance_primitive_msgs::AffordancePrimitiveGoalConstPtr & goal);
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle);
+
+  rclcpp_action::GoalResponse handle_goal(
+    const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const AffordancePrimitive::Goal> goal);
+
+  rclcpp_action::CancelResponse handle_cancel(
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle);
+
+  void handle_accepted(
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle);
 
   /** Carries out the setting of the passed parameters
    *
@@ -119,21 +129,22 @@ protected:
    *
    * @return True if successful, false otherwise
    */
-  bool postExecuteReset();
+  bool postExecuteReset(
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle);
 
   // node handle
-  ros::NodeHandle nh_;
+  std::shared_ptr<rclcpp::Node> node_;
 
   // Action server
-  actionlib::SimpleActionServer<AffordancePrimitiveAction> action_server_;
+  rclcpp_action::Server<AffordancePrimitive>::SharedPtr action_server_;
 
   // This manages setting the parameters for a robot
   std::shared_ptr<pluginlib::ClassLoader<ParameterManager>> pm_loader_;
-  boost::shared_ptr<ParameterManager> parameter_manager_;
+  std::shared_ptr<ParameterManager> parameter_manager_;
 
   // This estimates the task angle
   std::shared_ptr<pluginlib::ClassLoader<TaskEstimator>> te_loader_;
-  boost::shared_ptr<TaskEstimator> task_estimator_;
+  std::shared_ptr<TaskEstimator> task_estimator_;
 
   // Hold the current mode of operation
   Mode current_mode_{INACTIVE};

@@ -32,12 +32,12 @@
 
 #pragma once
 
-#include <ros/ros.h>
 #include <tf2_ros/transform_listener.h>
 
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/task_estimator/task_estimator.hpp>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 
 namespace affordance_primitives
 {
@@ -51,7 +51,7 @@ public:
 
   ~KinematicTaskEstimator(){};
 
-  void initialize(const ros::NodeHandle & nh);
+  void initialize(rclcpp::Node::SharedPtr node);
 
   /** Returns the estimated angle of a task
    *
@@ -74,7 +74,7 @@ private:
   std::optional<affordance_primitives::TransformStamped> last_tf_moving_to_task_frame_;
 
   // Allows getting moving frame poses from tf tree
-  tf2_ros::Buffer tfBuffer_;
-  tf2_ros::TransformListener tfListener_;
+  std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
+  std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 };
 }  // namespace affordance_primitives

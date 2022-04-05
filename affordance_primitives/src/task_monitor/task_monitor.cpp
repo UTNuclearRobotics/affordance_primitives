@@ -1,10 +1,15 @@
 #include <affordance_primitives/task_monitor/task_monitor.hpp>
+#include <chrono>
+
+using std::placeholders::_1;
 
 namespace affordance_primitives
 {
-TaskMonitor::TaskMonitor(const ros::NodeHandle & nh, const std::string ft_topic_name) : nh_(nh)
+TaskMonitor::TaskMonitor(rclcpp::Node::SharedPtr node, const std::string ft_topic_name)
+: node_(node)
 {
-  ft_sub_ = nh_.subscribe(ft_topic_name, 1, &TaskMonitor::ftCB, this);
+  ft_sub_ = node_->create_subscription<WrenchStamped>(
+    ft_topic_name, 1, std::bind(&TaskMonitor::ftCB, this, _1));
   result_.result = result_.STOP_REQUESTED;
 };
 
@@ -24,7 +29,8 @@ void TaskMonitor::startMonitor(const APRobotParameter & parameters, const double
     // Set end time if passed a timeout parameter
     if (timeout > 0) {
       has_timeout_ = true;
-      end_time_ = ros::Time::now() + ros::Duration(timeout);
+      end_time_ =
+        node_->get_clock()->now() + rclcpp::Duration(std::chrono::duration<double>(timeout));
     } else {
       has_timeout_ = false;
     }
@@ -135,7 +141,7 @@ std::optional<AffordancePrimitiveResult> TaskMonitor::checkForViolaton(
 
 void TaskMonitor::mainLoop()
 {
-  ros::Rate loop_rate(100);
+  rclcpp::Rate loop_rate(100);
 
   {
     const std::lock_guard<std::mutex> lock(mutex_);
@@ -146,8 +152,7 @@ void TaskMonitor::mainLoop()
   // Clear wrench queue before starting
   last_wrench_msgs_ = std::queue<WrenchStamped>();
 
-  while (ros::ok() && continue_monitoring_) {
-    ros::spinOnce();
+  while (rclcpp::ok() && continue_monitoring_) {
     {
       const std::lock_guard<std::mutex> lock(mutex_);
 
@@ -159,7 +164,7 @@ void TaskMonitor::mainLoop()
       }
 
       // Check if we have passed the end time
-      if (has_timeout_ && ros::Time::now() > end_time_) {
+      if (has_timeout_ && node_->get_clock()->now() > end_time_) {
         result_.result = result_.TIME_OUT;
         break;
       }
