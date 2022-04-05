@@ -32,23 +32,25 @@
 
 #pragma once
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <tf2_ros/transform_listener.h>
 #include <affordance_primitives/msg_types.hpp>
+#include <chrono>
 
 namespace affordance_primitives
 {
 class APScrewExecutor
 {
 public:
-  APScrewExecutor();
+  APScrewExecutor(rclcpp::Node::SharedPtr node);
 
   ~APScrewExecutor(){};
 
   bool getScrewTwist(const AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback);
 
 private:
-  tf2_ros::Buffer tfBuffer_;
-  tf2_ros::TransformListener tfListener_;
+  std::shared_ptr<rclcpp::Node> node_;
+  std::unique_ptr<tf2_ros::Buffer> tfBuffer_;
+  std::unique_ptr<tf2_ros::TransformListener> tfListener_;
 };
 }  // namespace affordance_primitives

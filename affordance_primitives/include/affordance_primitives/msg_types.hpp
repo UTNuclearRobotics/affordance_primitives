@@ -40,39 +40,39 @@
    transfering code between versions much easier
 */
 
-#include <affordance_primitive_msgs/APRobotParameter.h>
-#include <affordance_primitive_msgs/AffordancePrimitiveAction.h>
-#include <affordance_primitive_msgs/CartesianFloat.h>
-#include <affordance_primitive_msgs/ScrewStamped.h>
-#include <geometry_msgs/PointStamped.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/QuaternionStamped.h>
-#include <geometry_msgs/TransformStamped.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <geometry_msgs/Vector3Stamped.h>
-#include <geometry_msgs/WrenchStamped.h>
+#include <affordance_primitive_msgs/msg/ap_robot_parameter.hpp>
+#include <affordance_primitive_msgs/action/affordance_primitive.hpp>
+#include <affordance_primitive_msgs/msg/cartesian_float.hpp>
+#include <affordance_primitive_msgs/msg/screw_stamped.hpp>
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/quaternion_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/vector3_stamped.hpp>
+#include <geometry_msgs/msg/wrench_stamped.hpp>
 
 namespace affordance_primitives
 {
-using APRobotParameter = affordance_primitive_msgs::APRobotParameter;
-using AffordancePrimitiveAction = affordance_primitive_msgs::AffordancePrimitiveAction;
-using AffordancePrimitiveGoal = affordance_primitive_msgs::AffordancePrimitiveGoal;
-using AffordancePrimitiveFeedback = affordance_primitive_msgs::AffordancePrimitiveFeedback;
-using AffordancePrimitiveResult = affordance_primitive_msgs::AffordancePrimitiveResult;
-using CartesianFloat = affordance_primitive_msgs::CartesianFloat;
-using ScrewStamped = affordance_primitive_msgs::ScrewStamped;
-using PointStamped = geometry_msgs::PointStamped;
-using Point = geometry_msgs::Point;
-using PoseStamped = geometry_msgs::PoseStamped;
-using Pose = geometry_msgs::Pose;
-using QuaternionStamped = geometry_msgs::QuaternionStamped;
-using Quaternion = geometry_msgs::Quaternion;
-using TransformStamped = geometry_msgs::TransformStamped;
-using Transform = geometry_msgs::Transform;
-using TwistStamped = geometry_msgs::TwistStamped;
-using Twist = geometry_msgs::Twist;
-using Vector3Stamped = geometry_msgs::Vector3Stamped;
-using Vector3 = geometry_msgs::Vector3;
-using WrenchStamped = geometry_msgs::WrenchStamped;
-using Wrench = geometry_msgs::Wrench;
+using APRobotParameter = affordance_primitive_msgs::msg::APRobotParameter;
+using AffordancePrimitive = affordance_primitive_msgs::action::AffordancePrimitive;
+using AffordancePrimitiveGoal = affordance_primitive_msgs::action::AffordancePrimitive::Goal;
+using AffordancePrimitiveFeedback = affordance_primitive_msgs::action::AffordancePrimitive::Feedback;
+using AffordancePrimitiveResult = affordance_primitive_msgs::action::AffordancePrimitive::Result;
+using CartesianFloat = affordance_primitive_msgs::msg::CartesianFloat;
+using ScrewStamped = affordance_primitive_msgs::msg::ScrewStamped;
+using PointStamped = geometry_msgs::msg::PointStamped;
+using Point = geometry_msgs::msg::Point;
+using PoseStamped = geometry_msgs::msg::PoseStamped;
+using Pose = geometry_msgs::msg::Pose;
+using QuaternionStamped = geometry_msgs::msg::QuaternionStamped;
+using Quaternion = geometry_msgs::msg::Quaternion;
+using TransformStamped = geometry_msgs::msg::TransformStamped;
+using Transform = geometry_msgs::msg::Transform;
+using TwistStamped = geometry_msgs::msg::TwistStamped;
+using Twist = geometry_msgs::msg::Twist;
+using Vector3Stamped = geometry_msgs::msg::Vector3Stamped;
+using Vector3 = geometry_msgs::msg::Vector3;
+using WrenchStamped = geometry_msgs::msg::WrenchStamped;
+using Wrench = geometry_msgs::msg::Wrench;
 }  // namespace affordance_primitives

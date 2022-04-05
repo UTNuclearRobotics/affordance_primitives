@@ -4,8 +4,10 @@
 
 namespace affordance_primitives
 {
-APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_)
+APScrewExecutor::APScrewExecutor(rclcpp::Node::SharedPtr node) : node_(node)
 {
+  tfBuffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+  tfListener_ = std::make_unique<tf2_ros::TransformListener>(*tfBuffer_);
 }
 
 bool APScrewExecutor::getScrewTwist(const AffordancePrimitiveGoal& req, AffordancePrimitiveFeedback& feedback)
@@ -19,11 +21,12 @@ bool APScrewExecutor::getScrewTwist(const AffordancePrimitiveGoal& req, Affordan
     try
     {
       tfmsg_moving_to_task_frame =
-          tfBuffer_.lookupTransform(req.moving_frame_name, req.screw.header.frame_id, ros::Time(0));
+          tfBuffer_->lookupTransform(req.moving_frame_name, req.screw.header.frame_id, rclcpp::Time(0));
     }
     catch (tf2::TransformException& ex)
     {
-      ROS_WARN_THROTTLE(1, "%s", ex.what());
+      rclcpp::Clock& clock = *node_->get_clock();
+      RCLCPP_WARN_THROTTLE(node_->get_logger(), clock, std::chrono::milliseconds(1000).count(), "%s", ex.what());
       return false;
     }
   }
@@ -34,14 +37,16 @@ bool APScrewExecutor::getScrewTwist(const AffordancePrimitiveGoal& req, Affordan
     // Check validity
     if (tfmsg_moving_to_task_frame.child_frame_id != req.screw.header.frame_id)
     {
-      ROS_WARN_STREAM_THROTTLE(1, "Provided 'moving_to_task_frame' child frame "
+      rclcpp::Clock& clock = *node_->get_clock();
+      RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), clock, std::chrono::milliseconds(1000).count(), "Provided 'moving_to_task_frame' child frame "
                                   "name does not match screw header (task) frame, ending...");
       return false;
     }
   }
   else
   {
-    ROS_WARN_STREAM_THROTTLE(1, "Unexpected 'moving_frame_source' requested, ending...");
+    rclcpp::Clock& clock = *node_->get_clock();
+    RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), clock, std::chrono::milliseconds(1000).count(), "Unexpected 'moving_frame_source' requested, ending...");
     return false;
   }
 
