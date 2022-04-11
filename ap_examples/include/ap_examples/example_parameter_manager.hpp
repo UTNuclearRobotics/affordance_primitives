@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : empty_parameter_manager.h
+//      Title     : example_parameter_manager.h
 //      Project   : affordance_primitives
-//      Created   : 12/29/2021
+//      Created   : 04/04/2022
 //      Author    : Adam Pettinger
-//      Copyright : Copyright© The University of Texas at Austin, 2014-2021. All
+//      Copyright : Copyright© The University of Texas at Austin, 2014-2022. All
 //      rights reserved.
 //
 //          All files within this directory are subject to the following, unless
@@ -35,16 +35,19 @@
 #include <ros/ros.h>
 #include <affordance_primitives/configs_interface/parameter_manager.hpp>
 
-namespace affordance_primitives
+namespace ap_examples
 {
 /**
  * An example of a ParameterManager plugin implementation that is trivial
  */
-class EmptyParameterManager : public affordance_primitives::ParameterManager
+class ExampleParameterManager : public affordance_primitives::ParameterManager
 {
 public:
-  EmptyParameterManager(){};
+  ExampleParameterManager(){};
 
+  /**
+   * This is called once on start up. You can save the NodeHandle, send an initial/default configuration, etc
+   */
   void initialize(const ros::NodeHandle& nh);
 
   /** Tries to set a robot's parameters
@@ -54,5 +57,10 @@ public:
    * value is a string that provides logging messages
    */
   std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params);
+
+private:
+  ros::NodeHandle nh_;
+
+  // You could create some service clients, publishers, or other ways to set parameters in the robot controller
 };
-}  // namespace affordance_primitives
+}  // namespace ap_examples

@@ -3,10 +3,6 @@
 
 namespace affordance_primitives
 {
-EmptyParameterManager::EmptyParameterManager()
-{
-}
-
 void EmptyParameterManager::initialize(const ros::NodeHandle& nh)
 {
   nh_ = nh;

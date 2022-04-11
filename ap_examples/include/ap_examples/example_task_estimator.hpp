@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : empty_parameter_manager.h
-//      Project   : affordance_primitives
-//      Created   : 12/29/2021
+//      Title     : example_task_estimator.hpp
+//      Project   : ap_examples
+//      Created   : 03/31/2022
 //      Author    : Adam Pettinger
-//      Copyright : Copyright© The University of Texas at Austin, 2014-2021. All
+//      Copyright : Copyright© The University of Texas at Austin, 2014-2022. All
 //      rights reserved.
 //
 //          All files within this directory are subject to the following, unless
@@ -33,26 +33,38 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <affordance_primitives/configs_interface/parameter_manager.hpp>
 
-namespace affordance_primitives
+#include <affordance_primitives/msg_types.hpp>
+#include <affordance_primitives/task_estimator/task_estimator.hpp>
+
+namespace ap_examples
 {
 /**
- * An example of a ParameterManager plugin implementation that is trivial
+ * A demonstration TaskEstimator that waits some bit, then estimates PI
  */
-class EmptyParameterManager : public affordance_primitives::ParameterManager
+class ExampleTaskEstimator : public affordance_primitives::TaskEstimator
 {
 public:
-  EmptyParameterManager(){};
+  ExampleTaskEstimator(){};
 
   void initialize(const ros::NodeHandle& nh);
 
-  /** Tries to set a robot's parameters
+  /** Returns the estimated angle of a task
    *
-   * @param params The parameters to get set
-   * @return The first value is true if everything was set correctly, second
-   * value is a string that provides logging messages
+   * @param ap_req The affordance primitive being used for motion
+   * @return An estimation of the angle (theta) of a screw primitive. The
+   * optional is not filled if the input was invalid
    */
-  std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params);
+  std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitiveGoal& ap_goal);
+
+  /** Resets the internal estimation
+   *
+   * @param reset_val The value to reset to
+   */
+  bool resetTaskEstimation(double reset_val = 0);
+
+private:
+  // This example will be time based, so we will save the starting time
+  ros::Time start_time_;
 };
-}  // namespace affordance_primitives
+}  // namespace ap_examples
