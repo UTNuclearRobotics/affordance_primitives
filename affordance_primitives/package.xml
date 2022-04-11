@@ -25,6 +25,5 @@
 
   <export>
     <build_type>ament_cmake</build_type>
-    <affordance_primitives plugin="${prefix}/plugins.xml" />
   </export>
 </package>

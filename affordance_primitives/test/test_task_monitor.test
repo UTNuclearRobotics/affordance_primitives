@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test_task_monitor" pkg="affordance_primitives" type="test_task_monitor" time-limit="15" />
-</launch>

@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="tf" type="static_transform_publisher" name="static_tf_pub" args="2 0 0 0.7071 0 0 0.7071 /moving_frame /task_frame 100"/>
-  <test test-name="test_screw_execution" pkg="affordance_primitives" type="test_screw_execution" time-limit="15" />
-</launch>

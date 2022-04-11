@@ -31,11 +31,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_execution.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 const std::string TASK_FRAME_NAME = "task_frame";
 const std::string MOVING_FRAME_NAME = "moving_frame";
@@ -71,7 +71,8 @@ inline void checkVector(const affordance_primitives::Vector3 & vec, double x, do
 
 TEST(ScrewExecution, providedTF)
 {
-  affordance_primitives::APScrewExecutor exec;
+  auto node = std::make_shared<rclcpp::Node>("test_screw_executor");
+  affordance_primitives::APScrewExecutor exec(node);
   affordance_primitives::AffordancePrimitiveGoal ap_goal;
   affordance_primitives::AffordancePrimitiveFeedback ap_feedback;
 
@@ -135,13 +136,10 @@ TEST(ScrewExecution, providedTF)
 
 TEST(ScrewExecution, lookupTF)
 {
-  affordance_primitives::APScrewExecutor exec;
+  auto node = std::make_shared<rclcpp::Node>("test_screw_executor");
+  affordance_primitives::APScrewExecutor exec(node);
   affordance_primitives::AffordancePrimitiveGoal ap_goal;
   affordance_primitives::AffordancePrimitiveFeedback ap_feedback;
-
-  // Wait for tf to publish
-  ros::NodeHandle nh;
-  ros::topic::waitForMessage<tf2_msgs::TFMessage>("/tf", nh);
 
   // Set up Screw msg
   ap_goal.moving_frame_source = ap_goal.LOOKUP;
@@ -171,11 +169,8 @@ TEST(ScrewExecution, lookupTF)
 
 int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "test_screw_execution");
+  rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
-
-  ros::AsyncSpinner spinner(8);
-  spinner.start();
 
   int result = RUN_ALL_TESTS();
   return result;

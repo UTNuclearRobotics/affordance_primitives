@@ -31,23 +31,26 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
-#include <pluginlib/class_loader.h>
 
 #include <affordance_primitives/configs_interface/empty_parameter_manager.hpp>
 #include <affordance_primitives/msg_types.hpp>
+#include <pluginlib/class_loader.hpp>
 
 TEST(ParameterManager, test_empty_parameter_manager)
 {
+  auto node = std::make_shared<rclcpp::Node>("test_parameter_manager");
+
   // Load plugin
-  pluginlib::ClassLoader<affordance_primitives::ParameterManager> plugin_loader(
-    "affordance_primitives", "affordance_primitives::ParameterManager");
-  boost::shared_ptr<affordance_primitives::ParameterManager> param_manager;
+  auto plugin_loader =
+    std::make_shared<pluginlib::ClassLoader<affordance_primitives::ParameterManager>>(
+      "affordance_primitives", "affordance_primitives::ParameterManager");
+  std::shared_ptr<affordance_primitives::ParameterManager> param_manager;
   ASSERT_NO_THROW(
-    param_manager = plugin_loader.createInstance("affordance_primitives::EmptyParameterManager"));
+    param_manager =
+      plugin_loader->createSharedInstance("affordance_primitives::EmptyParameterManager"));
 
   // Initialize plugin
-  ros::NodeHandle nh;
-  ASSERT_NO_THROW(param_manager->initialize(nh));
+  ASSERT_NO_THROW(param_manager->initialize(node));
 
   // Test basic functionality
   affordance_primitives::APRobotParameter parameters;
@@ -59,11 +62,8 @@ TEST(ParameterManager, test_empty_parameter_manager)
 
 int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "test_parameter_manager");
+  rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
-
-  ros::AsyncSpinner spinner(8);
-  spinner.start();
 
   int result = RUN_ALL_TESTS();
   return result;

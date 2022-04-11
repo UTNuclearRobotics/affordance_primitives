@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test_task_estimator" pkg="affordance_primitives" type="test_task_estimator" time-limit="15" />
-</launch>

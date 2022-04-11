@@ -31,27 +31,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/task_monitor/task_monitor.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <thread>
 
-using AffordancePrimitiveResult = affordance_primitive_msgs::AffordancePrimitiveResult;
+using AffordancePrimitiveResult = affordance_primitive_msgs::action::AffordancePrimitive::Result;
 
 TEST(TaskMonitor, start_stop_monitor)
 {
-  ros::NodeHandle nh;
+  auto node = std::make_shared<rclcpp::Node>("test_task_monitor");
 
   // Default parameters
   affordance_primitives::APRobotParameter params;
 
   // Create and start monitor with no timeout
-  affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
+  affordance_primitives::TaskMonitor monitor(node, "ft_topic_name");
   ASSERT_NO_THROW(monitor.startMonitor(params));
 
   // Wait some time, then stop monitor
-  ros::Duration(0.25).sleep();
+  rclcpp::sleep_for(std::chrono::milliseconds(250));
   ASSERT_NO_THROW(monitor.stopMonitor());
 
   // Result should be STOP_REQUESTED
@@ -69,21 +69,22 @@ TEST(TaskMonitor, start_stop_monitor)
 
 TEST(TaskMonitor, monitor_timing)
 {
-  ros::NodeHandle nh;
+  auto node = std::make_shared<rclcpp::Node>("test_task_monitor");
   const double test_duration = 0.25;
 
   // Default parameters
   affordance_primitives::APRobotParameter params;
 
   // Create and start monitor with timeout
-  affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
+  affordance_primitives::TaskMonitor monitor(node, "ft_topic_name");
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
 
   // Immediately getting the result shouldn't work
   EXPECT_FALSE(monitor.getResult().has_value());
 
   // Wait some time and grab result
-  ros::Duration(1.05 * test_duration).sleep();
+  std::chrono::duration<double> wait_time(1.05 * test_duration);
+  rclcpp::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time));
   std::optional<AffordancePrimitiveResult> result = monitor.getResult();
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(result->result, result->TIME_OUT);
@@ -92,17 +93,18 @@ TEST(TaskMonitor, monitor_timing)
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
   AffordancePrimitiveResult result2;
 
-  ros::Time start = ros::Time::now();
+  rclcpp::Time start = node->now();
   result2 = monitor.waitForResult();
-  EXPECT_LE((ros::Time::now() - start).toSec(), 1.05 * test_duration);
+  EXPECT_LE(
+    (node->now() - start).nanoseconds(),
+    std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time).count());
   EXPECT_EQ(result2.result, result2.TIME_OUT);
 }
 
 TEST(TaskMonitor, monitor_ft_readings)
 {
-  ros::NodeHandle nh;
-  ros::Publisher ft_pub =
-    nh.advertise<affordance_primitives::WrenchStamped>("ft_topic_name", 1, true);
+  auto node = std::make_shared<rclcpp::Node>("test_task_monitor");
+  auto ft_pub = node->create_publisher<affordance_primitives::WrenchStamped>("ft_topic_name", 1);
 
   const double test_duration = 0.25;
   const double ft_pub_period = 0.005;  // 200 hz
@@ -122,14 +124,16 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Start publishing FT readings of 0
   affordance_primitives::WrenchStamped pub_wrench;
   std::thread t([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
+    std::chrono::duration<double> wait_time_sec(ft_pub_period);
+    auto wait_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time_sec);
     for (size_t i = 0; i < num_publish; ++i) {
-      ft_pub.publish(pub_wrench);
-      ros::Duration(ft_pub_period).sleep();
+      ft_pub->publish(pub_wrench);
+      rclcpp::sleep_for(wait_time_ns);
     }
   });
 
   // Start the monitor and verify it times out
-  affordance_primitives::TaskMonitor monitor(nh, "ft_topic_name");
+  affordance_primitives::TaskMonitor monitor(node, "ft_topic_name");
   ASSERT_NO_THROW(monitor.startMonitor(params, test_duration));
   AffordancePrimitiveResult result = monitor.waitForResult();
   EXPECT_EQ(result.result, result.TIME_OUT);
@@ -137,14 +141,16 @@ TEST(TaskMonitor, monitor_ft_readings)
 
   // Now publish FT readings to violate max force limit
   t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
+    std::chrono::duration<double> wait_time_sec(ft_pub_period);
+    auto wait_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time_sec);
     for (size_t i = 0; i < num_publish; ++i) {
       if (i == num_publish / 3) {
         pub_wrench.wrench.force.x = 99;
         pub_wrench.wrench.force.y = 99;
         pub_wrench.wrench.force.z = 99;
       }
-      ft_pub.publish(pub_wrench);
-      ros::Duration(ft_pub_period).sleep();
+      ft_pub->publish(pub_wrench);
+      rclcpp::sleep_for(wait_time_ns);
     }
   });
 
@@ -157,14 +163,16 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Now publish to violate individual limits
   pub_wrench = affordance_primitives::WrenchStamped();
   t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
+    std::chrono::duration<double> wait_time_sec(ft_pub_period);
+    auto wait_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time_sec);
     for (size_t i = 0; i < num_publish; ++i) {
       if (i == num_publish / 3) {
         pub_wrench.wrench.torque.z = 11;
       } else {
         pub_wrench.wrench.torque.z = 9;
       }
-      ft_pub.publish(pub_wrench);
-      ros::Duration(ft_pub_period).sleep();
+      ft_pub->publish(pub_wrench);
+      rclcpp::sleep_for(wait_time_ns);
     }
   });
 
@@ -177,14 +185,16 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Now check to make sure NOT setting a limit results in no limit
   params.max_force = 0;
   t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
+    std::chrono::duration<double> wait_time_sec(ft_pub_period);
+    auto wait_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(wait_time_sec);
     for (size_t i = 0; i < num_publish; ++i) {
       if (i == num_publish / 3) {
         pub_wrench.wrench.force.x = 99;
         pub_wrench.wrench.force.y = 99;
         pub_wrench.wrench.force.z = 99;
       }
-      ft_pub.publish(pub_wrench);
-      ros::Duration(ft_pub_period).sleep();
+      ft_pub->publish(pub_wrench);
+      rclcpp::sleep_for(wait_time_ns);
     }
   });
 
@@ -197,11 +207,8 @@ TEST(TaskMonitor, monitor_ft_readings)
 
 int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "test_task_monitor");
+  rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
-
-  ros::AsyncSpinner spinner(8);
-  spinner.start();
 
   int result = RUN_ALL_TESTS();
   return result;

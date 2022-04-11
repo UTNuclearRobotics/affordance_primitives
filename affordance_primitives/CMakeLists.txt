@@ -67,6 +67,11 @@ add_library(${PROJECT_NAME} SHARED
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+pluginlib_export_plugin_description_file(${PROJECT_NAME} plugins.xml)
 
 install(
   TARGETS ${PROJECT_NAME}
@@ -80,47 +85,49 @@ install(
 install(DIRECTORY include/ DESTINATION include)
 install(FILES plugins.xml DESTINATION share/${PROJECT_NAME})
 
+ament_export_libraries(${PROJECT_NAME})
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
-
-
-
-
-
-
 
 #############
 ## TESTING ##
 #############
-
-# if(CATKIN_ENABLE_TESTING)
-#   find_package(rostest REQUIRED)
-
-#   catkin_add_gtest(test_affordance_utils test/test_affordance_utils.cpp)
-#   target_link_libraries(test_affordance_utils ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-#   catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
-#   target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-#   add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)
-#   target_link_libraries(test_screw_execution ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-#   add_rostest_gtest(test_parameter_manager test/test_parameter_manager.test test/test_parameter_manager.cpp)
-#   target_link_libraries(test_parameter_manager ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-#   add_rostest_gtest(test_task_estimator test/test_task_estimator.test test/test_task_estimator.cpp)
-#   target_link_libraries(test_task_estimator ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-#   add_rostest_gtest(test_task_monitor test/test_task_monitor.test test/test_task_monitor.cpp)
-#   target_link_libraries(test_task_monitor ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-#   add_rostest_gtest(test_ap_executor test/test_ap_executor.test test/test_ap_executor.cpp)
-#   target_link_libraries(test_ap_executor ${catkin_LIBRARIES} ${PROJECT_NAME})
-# endif()
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+  find_package(ament_cmake_gtest)
+
   ament_lint_auto_find_test_dependencies()
+
+  ament_add_gtest(test_affordance_utils test/test_affordance_utils.cpp)
+  target_link_libraries(test_affordance_utils ${PROJECT_NAME})
+
+  ament_add_gtest(test_screw_axis test/test_screw_axis.cpp)
+  target_link_libraries(test_screw_axis ${PROJECT_NAME})
+
+  ament_add_gtest_executable(test_task_estimator test/test_task_estimator.cpp)
+  target_link_libraries(test_task_estimator ${PROJECT_NAME})
+  ament_target_dependencies(test_task_estimator ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  add_ros_test(test/launch/test_task_estimator.test.py TIMEOUT 120 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+
+  ament_add_gtest_executable(test_screw_execution test/test_screw_execution.cpp)
+  target_link_libraries(test_screw_execution ${PROJECT_NAME})
+  ament_target_dependencies(test_screw_execution ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  add_ros_test(test/launch/test_screw_execution.test.py TIMEOUT 120 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+
+  ament_add_gtest_executable(test_parameter_manager test/test_parameter_manager.cpp)
+  target_link_libraries(test_parameter_manager ${PROJECT_NAME})
+  ament_target_dependencies(test_parameter_manager ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  add_ros_test(test/launch/test_parameter_manager.test.py TIMEOUT 120 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+
+  ament_add_gtest_executable(test_ap_executor test/test_ap_executor.cpp)
+  target_link_libraries(test_ap_executor ${PROJECT_NAME})
+  ament_target_dependencies(test_ap_executor ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  add_ros_test(test/launch/test_ap_executor.test.py TIMEOUT 120 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+
+  ament_add_gtest_executable(test_task_monitor test/test_task_monitor.cpp)
+  target_link_libraries(test_task_monitor ${PROJECT_NAME})
+  ament_target_dependencies(test_task_monitor ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  add_ros_test(test/launch/test_task_monitor.test.py TIMEOUT 120 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
 ament_package()

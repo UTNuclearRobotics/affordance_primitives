@@ -31,25 +31,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
-#include <pluginlib/class_loader.h>
 
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
+#include <pluginlib/class_loader.hpp>
 
 constexpr double EPSILON = 1e-4;
 
 TEST(ParameterManager, test_kinematic_task_estimator)
 {
+  auto node = std::make_shared<rclcpp::Node>("test_task_estimator");
+
   // Load plugin
-  pluginlib::ClassLoader<affordance_primitives::TaskEstimator> plugin_loader(
-    "affordance_primitives", "affordance_primitives::TaskEstimator");
-  boost::shared_ptr<affordance_primitives::TaskEstimator> task_estimator;
+  auto plugin_loader =
+    std::make_shared<pluginlib::ClassLoader<affordance_primitives::TaskEstimator>>(
+      "affordance_primitives", "affordance_primitives::TaskEstimator");
+  std::shared_ptr<affordance_primitives::TaskEstimator> task_estimator;
   ASSERT_NO_THROW(
-    task_estimator = plugin_loader.createInstance("affordance_primitives::KinematicTaskEstimator"));
+    task_estimator =
+      plugin_loader->createSharedInstance("affordance_primitives::KinematicTaskEstimator"));
 
   // Initialize plugin
-  ros::NodeHandle nh;
-  ASSERT_NO_THROW(task_estimator->initialize(nh));
+  ASSERT_NO_THROW(task_estimator->initialize(node));
 
   // Set up test AP
   affordance_primitives::AffordancePrimitiveGoal ap;
@@ -97,11 +100,8 @@ TEST(ParameterManager, test_kinematic_task_estimator)
 
 int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "test_parameter_manager");
+  rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
-
-  ros::AsyncSpinner spinner(8);
-  spinner.start();
 
   int result = RUN_ALL_TESTS();
   return result;

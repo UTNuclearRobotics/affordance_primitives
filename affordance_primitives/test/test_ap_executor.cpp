@@ -31,11 +31,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
-#include <ros/ros.h>
-#include <tf2_eigen/tf2_eigen.h>
 
 #include <affordance_primitives/ap_executor/ap_executor.hpp>
 #include <affordance_primitives/msg_types.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <tf2_eigen/tf2_eigen.hpp>
 
 constexpr double EPSILON = 1e-4;
 
@@ -144,13 +144,13 @@ TEST_F(APExecutorTest, enforce_no_limits)
 
 TEST_F(APExecutorTest, initialize_and_end_properly)
 {
-  ros::NodeHandle nh;
+  auto node = std::make_shared<rclcpp::Node>("test_ap_executor");
 
   // Try initializing with valid plugins, should not throw
   std::shared_ptr<affordance_primitives::APExecutor> executor;
   bool init_result = false;
   ASSERT_NO_THROW(
-    executor = std::make_shared<affordance_primitives::APExecutor>(nh, "action_name"));
+    executor = std::make_shared<affordance_primitives::APExecutor>(node, "action_name"));
   ASSERT_NO_THROW(init_result = executor->initialize(executor_params));
   EXPECT_TRUE(init_result);
 
@@ -161,7 +161,7 @@ TEST_F(APExecutorTest, initialize_and_end_properly)
   executor_params.param_manager_plugin_name = "invalid_plugin";
   init_result = false;
   ASSERT_NO_THROW(
-    executor = std::make_shared<affordance_primitives::APExecutor>(nh, "action_name"));
+    executor = std::make_shared<affordance_primitives::APExecutor>(node, "action_name"));
   ASSERT_NO_THROW(init_result = executor->initialize(executor_params));
   EXPECT_FALSE(init_result);
   ASSERT_NO_THROW(executor.reset());
@@ -169,11 +169,8 @@ TEST_F(APExecutorTest, initialize_and_end_properly)
 
 int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "test_ap_executor");
+  rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
-
-  ros::AsyncSpinner spinner(8);
-  spinner.start();
 
   int result = RUN_ALL_TESTS();
   return result;

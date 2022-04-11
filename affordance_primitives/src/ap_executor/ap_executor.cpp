@@ -74,6 +74,7 @@ rclcpp_action::CancelResponse APExecutor::handle_cancel(
   const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle)
 {
   (void)goal_handle;
+  stop();
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 

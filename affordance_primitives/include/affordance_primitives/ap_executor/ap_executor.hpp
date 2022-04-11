@@ -83,7 +83,7 @@ class APExecutor
 public:
   /** Constructor
    *
-   * @param nh ROS node handle
+   * @param node ROS node handle
    * @param action_name the name the AP executor action will take
    */
   APExecutor(rclcpp::Node::SharedPtr node, const std::string action_name);
