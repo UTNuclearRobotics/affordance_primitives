@@ -149,7 +149,8 @@ TEST_F(APExecutorTest, initialize_and_end_properly)
   // Try initializing with valid plugins, should not throw
   std::shared_ptr<affordance_primitives::APExecutor> executor;
   bool init_result = false;
-  ASSERT_NO_THROW(executor = std::make_shared<affordance_primitives::APExecutor>(nh, "action_name"));
+  ASSERT_NO_THROW(
+    executor = std::make_shared<affordance_primitives::APExecutor>(nh, "action_name"));
   ASSERT_NO_THROW(init_result = executor->initialize(executor_params));
   EXPECT_TRUE(init_result);
 
@@ -159,13 +160,14 @@ TEST_F(APExecutorTest, initialize_and_end_properly)
   // Should fail gracefully when we initialize it with invalid plugin names
   executor_params.param_manager_plugin_name = "invalid_plugin";
   init_result = false;
-  ASSERT_NO_THROW(executor = std::make_shared<affordance_primitives::APExecutor>(nh, "action_name"));
+  ASSERT_NO_THROW(
+    executor = std::make_shared<affordance_primitives::APExecutor>(nh, "action_name"));
   ASSERT_NO_THROW(init_result = executor->initialize(executor_params));
   EXPECT_FALSE(init_result);
   ASSERT_NO_THROW(executor.reset());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "test_ap_executor");
   testing::InitGoogleTest(&argc, argv);

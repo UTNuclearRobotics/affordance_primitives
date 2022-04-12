@@ -35,7 +35,7 @@
 #include <affordance_primitives/ap_executor/ap_executor.hpp>
 
 // Callback that happens during Execution feedback
-void executorFeedbackCB(const affordance_primitive_msgs::AffordancePrimitiveActionFeedback& msg)
+void executorFeedbackCB(const affordance_primitive_msgs::AffordancePrimitiveActionFeedback & msg)
 {
   // You could send these commands directly to the robot, filter them, etc
 
@@ -43,7 +43,7 @@ void executorFeedbackCB(const affordance_primitive_msgs::AffordancePrimitiveActi
   ROS_INFO_STREAM_THROTTLE(2.0, msg.feedback);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "ap_executor_node");
   ros::NodeHandle nh;
@@ -76,14 +76,14 @@ int main(int argc, char** argv)
   auto executor = std::make_unique<affordance_primitives::APExecutor>(nh, action_name);
 
   // Initialize and start action server
-  if (!executor->initialize(params))
-  {
+  if (!executor->initialize(params)) {
     return EXIT_FAILURE;
   }
 
   // Set up subscriber that connects execution feedback to robot commands
   // Every control loop cycle, the executor action server publishes the velocity and force the robot should apply
-  ros::Subscriber exeuction_feedback_sub = nh.subscribe(action_name + "/feedback", 1000, executorFeedbackCB);
+  ros::Subscriber exeuction_feedback_sub =
+    nh.subscribe(action_name + "/feedback", 1000, executorFeedbackCB);
 
   ros::waitForShutdown();
 }

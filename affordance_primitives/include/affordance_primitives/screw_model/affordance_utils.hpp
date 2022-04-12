@@ -33,11 +33,11 @@
 
 #pragma once
 
-#include <optional>
-#include <sstream>
+#include <tf2_eigen/tf2_eigen.h>
 
 #include <affordance_primitives/msg_types.hpp>
-#include <tf2_eigen/tf2_eigen.h>
+#include <optional>
+#include <sstream>
 
 namespace affordance_primitives
 {
@@ -50,8 +50,9 @@ namespace affordance_primitives
  * @return The converted pose
  * @exception Throws a std::runtime_error if the pose could not be converted
  */
-PoseStamped getPoseInATFrame(const std::string& root_frame_name, const PoseStamped& root_frame_pose,
-                             const PoseStamped& incoming_frame);
+PoseStamped getPoseInATFrame(
+  const std::string & root_frame_name, const PoseStamped & root_frame_pose,
+  const PoseStamped & incoming_frame);
 
 /**
  * @brief Get the twist that represents moving from a start_pose to an end_pose
@@ -60,7 +61,7 @@ PoseStamped getPoseInATFrame(const std::string& root_frame_name, const PoseStamp
  * @return The found twist
  * @exception Throws a std::runtime_error if the poses are not in the same frame
  */
-TwistStamped getTwistFromPoses(const PoseStamped& start_pose, const PoseStamped& end_pose);
+TwistStamped getTwistFromPoses(const PoseStamped & start_pose, const PoseStamped & end_pose);
 
 /**
  * @brief Calculates the pose of a frame with respect to a new pose, given that all input frames are defined w.r.t. the
@@ -70,7 +71,8 @@ TwistStamped getTwistFromPoses(const PoseStamped& start_pose, const PoseStamped&
  * @return The new pose
  * @exception Throws a std::runtime_error if the poses are not in the same frame
  */
-Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const PoseStamped& transformed_pose);
+Eigen::Isometry3d convertPoseToNewFrame(
+  const PoseStamped & new_base_frame, const PoseStamped & transformed_pose);
 
 /**
  * @brief Transforms a ScrewStamped msg by the prescribed Transform
@@ -79,12 +81,12 @@ Eigen::Isometry3d convertPoseToNewFrame(const PoseStamped& new_base_frame, const
  * @return The transformed ScrewStamped
  * @exception Throws a std::runtime_error if the transform cannot be completed
  */
-ScrewStamped transformScrew(const ScrewStamped& input_screw, const TransformStamped& transform);
+ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformStamped & transform);
 
 /**
  * @brief Converts an axis vector to 3x3 skew symmetric matrix, for math
  */
-Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec);
+Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d & vec);
 
 /**
  * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
@@ -94,7 +96,7 @@ Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d& vec);
  * When using this adjoint, it assumes the twist is a 6x1 vector with linear on top [linear ; angular]. This follows
  * from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation
  */
-Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform);
+Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d & transform);
 
 /**
  * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
@@ -104,12 +106,12 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d& transform);
  * When using this adjoint, it assumes the twist is a 6x1 vector with linear on top [linear ; angular]. This follows
  * from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation
  */
-Eigen::MatrixXd getAdjointMatrix(const Transform& transform);
+Eigen::MatrixXd getAdjointMatrix(const Transform & transform);
 
 /**
  * @brief Gets the pretty string format for a TwistStamped message
  */
-std::string twistToStr(const TwistStamped& twist);
+std::string twistToStr(const TwistStamped & twist);
 
 /**
  * @brief Transforms CartesianFloat message to Eigen Vector
@@ -117,7 +119,7 @@ std::string twistToStr(const TwistStamped& twist);
  * @param cart_float Message to transform
  * @return A 6x1 Eigen Vector
  */
-Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat& cart_float);
+Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat & cart_float);
 
 /**
  * @brief Transforms an Eigen Vector to CartesianFloat message
@@ -125,7 +127,7 @@ Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat& cart_fl
  * @param vector Vector to transform
  * @return CartesianFloat message
  */
-CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1>& vector);
+CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1> & vector);
 
 /**
  * @brief Transforms Wrench message to Eigen Vector
@@ -133,7 +135,7 @@ CartesianFloat VectorToCartesianFloat(const Eigen::Matrix<double, 6, 1>& vector)
  * @param wrench Message to transform
  * @return A 6x1 Eigen Vector
  */
-Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench& wrench);
+Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench & wrench);
 
 /**
  * @brief Transforms an Eigen Vector to Wrench message
@@ -141,16 +143,16 @@ Eigen::Matrix<double, 6, 1> WrenchToVector(const Wrench& wrench);
  * @param vector Vector to transform
  * @return Wrench message
  */
-Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1>& vector);
+Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1> & vector);
 
 /**
  * @brief Gets the pretty string format for a PoseStamped message
  */
-std::string poseToStr(const PoseStamped& pose);
+std::string poseToStr(const PoseStamped & pose);
 
 /**
  * @brief Gets the pretty string format for a ScrewStamped message
  */
-std::string screwMsgToStr(const ScrewStamped& screw);
+std::string screwMsgToStr(const ScrewStamped & screw);
 
 }  // namespace affordance_primitives

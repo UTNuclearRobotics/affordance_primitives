@@ -34,32 +34,33 @@ const std::string ROOT_FRAME_NAME = "AT_frame_name";
 const std::string PLANNING_FRAME_NAME = "world";
 constexpr double EPSILON = 1e-4;
 
-inline void checkVector(const affordance_primitives::Vector3& vec, double x, double y, double z)
+inline void checkVector(const affordance_primitives::Vector3 & vec, double x, double y, double z)
 {
   EXPECT_NEAR(vec.x, x, EPSILON);
   EXPECT_NEAR(vec.y, y, EPSILON);
   EXPECT_NEAR(vec.z, z, EPSILON);
 }
-inline void checkVector(const Eigen::Vector3d& vec, double x, double y, double z)
+inline void checkVector(const Eigen::Vector3d & vec, double x, double y, double z)
 {
   EXPECT_NEAR(vec.x(), x, EPSILON);
   EXPECT_NEAR(vec.y(), y, EPSILON);
   EXPECT_NEAR(vec.z(), z, EPSILON);
 }
-inline void checkPoint(const affordance_primitives::Point& point, double x, double y, double z)
+inline void checkPoint(const affordance_primitives::Point & point, double x, double y, double z)
 {
   EXPECT_NEAR(point.x, x, EPSILON);
   EXPECT_NEAR(point.y, y, EPSILON);
   EXPECT_NEAR(point.z, z, EPSILON);
 }
-inline void checkQuaternion(const affordance_primitives::Quaternion& quat, double x, double y, double z, double w)
+inline void checkQuaternion(
+  const affordance_primitives::Quaternion & quat, double x, double y, double z, double w)
 {
   EXPECT_NEAR(quat.x, x, EPSILON);
   EXPECT_NEAR(quat.y, y, EPSILON);
   EXPECT_NEAR(quat.z, z, EPSILON);
   EXPECT_NEAR(quat.w, w, EPSILON);
 }
-inline void checkQuaternion(const Eigen::Quaterniond& quat, double x, double y, double z, double w)
+inline void checkQuaternion(const Eigen::Quaterniond & quat, double x, double y, double z, double w)
 {
   EXPECT_NEAR(quat.x(), x, EPSILON);
   EXPECT_NEAR(quat.y(), y, EPSILON);
@@ -84,13 +85,15 @@ TEST(AffordanceUtils, getPoseInATFrame)
 
   // First, if the other_pose is in the AT frame already, it should return as-is
   other_pose.header.frame_id = ROOT_FRAME_NAME;
-  ASSERT_NO_THROW(result = affordance_primitives::getPoseInATFrame(ROOT_FRAME_NAME, AT_base_pose, other_pose));
+  ASSERT_NO_THROW(
+    result = affordance_primitives::getPoseInATFrame(ROOT_FRAME_NAME, AT_base_pose, other_pose));
   checkPoint(result.pose.position, 0, 0, 0);
   checkQuaternion(result.pose.orientation, 0.5 * sqrt(2), 0, 0, 0.5 * sqrt(2));
 
   // Second, if the other_pose is also in the planning frame, a conversion should happen
   other_pose.header.frame_id = PLANNING_FRAME_NAME;
-  ASSERT_NO_THROW(result = affordance_primitives::getPoseInATFrame(ROOT_FRAME_NAME, AT_base_pose, other_pose));
+  ASSERT_NO_THROW(
+    result = affordance_primitives::getPoseInATFrame(ROOT_FRAME_NAME, AT_base_pose, other_pose));
 
   // The result should be AT frame -> input pose
   checkPoint(result.pose.position, -1, -1, -1);
@@ -98,8 +101,9 @@ TEST(AffordanceUtils, getPoseInATFrame)
 
   // Finally, it should throw if it cannot convert the pose
   other_pose.header.frame_id = "some_other_frame";
-  EXPECT_THROW(result = affordance_primitives::getPoseInATFrame(ROOT_FRAME_NAME, AT_base_pose, other_pose),
-               std::runtime_error);
+  EXPECT_THROW(
+    result = affordance_primitives::getPoseInATFrame(ROOT_FRAME_NAME, AT_base_pose, other_pose),
+    std::runtime_error);
 }
 
 TEST(AffordanceUtils, getTwistFromPoses)
@@ -128,7 +132,8 @@ TEST(AffordanceUtils, getTwistFromPoses)
 
   // Finally, it should throw if the poses have different headers
   end_pose.header.frame_id = "some_other_frame";
-  EXPECT_THROW(result = affordance_primitives::getTwistFromPoses(start_pose, end_pose), std::runtime_error);
+  EXPECT_THROW(
+    result = affordance_primitives::getTwistFromPoses(start_pose, end_pose), std::runtime_error);
 }
 
 TEST(AffordanceUtils, convertPoseToNewFrame)
@@ -139,7 +144,9 @@ TEST(AffordanceUtils, convertPoseToNewFrame)
   // First make sure we throw if the frames do not match
   grasp_pose.header.frame_id = ROOT_FRAME_NAME;
   screw_origin_pose.header.frame_id = PLANNING_FRAME_NAME;
-  EXPECT_THROW(result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose), std::runtime_error);
+  EXPECT_THROW(
+    result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose),
+    std::runtime_error);
 
   // If the new base is identity, we should get back what we put in
   screw_origin_pose.header.frame_id = ROOT_FRAME_NAME;
@@ -154,7 +161,8 @@ TEST(AffordanceUtils, convertPoseToNewFrame)
   screw_origin_pose.pose.orientation.w = 0.5 * sqrt(2);
 
   // Check the result
-  ASSERT_NO_THROW(result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose));
+  ASSERT_NO_THROW(
+    result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose));
   checkVector(result.translation(), 1, 1, 0);
   checkQuaternion(Eigen::Quaterniond(result.linear()), 0, 0, 0.5 * sqrt(2), 0.5 * sqrt(2));
 
@@ -164,7 +172,8 @@ TEST(AffordanceUtils, convertPoseToNewFrame)
   grasp_pose.pose.position.z = 0;
 
   // Check the result
-  ASSERT_NO_THROW(result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose));
+  ASSERT_NO_THROW(
+    result = affordance_primitives::convertPoseToNewFrame(grasp_pose, screw_origin_pose));
   checkVector(result.translation(), 0, 1, 0);
   checkQuaternion(Eigen::Quaterniond(result.linear()), 0, 0, 0.5 * sqrt(2), 0.5 * sqrt(2));
 }
@@ -190,18 +199,22 @@ TEST(AffordanceUtils, transformScrew)
 
   // If the screw is already in new frame, no transforms should happen
   input_screw_msg.header.frame_id = "new_screw_frame";
-  ASSERT_NO_THROW(output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg));
+  ASSERT_NO_THROW(
+    output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg));
   checkVector(output_screw_msg.axis, 1, 0, 0);
   checkPoint(output_screw_msg.origin, 0, 2, 0);
   EXPECT_EQ(output_screw_msg.header.frame_id, input_screw_msg.header.frame_id);
 
   // If the TF doesn't have the frames we need, we can't do the TF
   input_screw_msg.header.frame_id = "some_random_frame";
-  ASSERT_THROW(output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg), std::runtime_error);
+  ASSERT_THROW(
+    output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg),
+    std::runtime_error);
 
   // Otherwise, the transform should work
   input_screw_msg.header.frame_id = PLANNING_FRAME_NAME;
-  ASSERT_NO_THROW(output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg));
+  ASSERT_NO_THROW(
+    output_screw_msg = affordance_primitives::transformScrew(input_screw_msg, tf_msg));
 
   // From the new frame, the axis should be -y and the origin should be (2, 3, 0)
   EXPECT_EQ(output_screw_msg.header.frame_id, tf_msg.child_frame_id);
@@ -209,7 +222,7 @@ TEST(AffordanceUtils, transformScrew)
   checkVector(output_screw_msg.axis, 0, -1, 0);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

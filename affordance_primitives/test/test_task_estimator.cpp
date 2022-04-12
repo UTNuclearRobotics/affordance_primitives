@@ -31,20 +31,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
-
-#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
-#include <affordance_primitives/msg_types.hpp>
 #include <pluginlib/class_loader.h>
+
+#include <affordance_primitives/msg_types.hpp>
+#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
 
 constexpr double EPSILON = 1e-4;
 
 TEST(ParameterManager, test_kinematic_task_estimator)
 {
   // Load plugin
-  pluginlib::ClassLoader<affordance_primitives::TaskEstimator> plugin_loader("affordance_primitives",
-                                                                             "affordance_primitives::TaskEstimator");
+  pluginlib::ClassLoader<affordance_primitives::TaskEstimator> plugin_loader(
+    "affordance_primitives", "affordance_primitives::TaskEstimator");
   boost::shared_ptr<affordance_primitives::TaskEstimator> task_estimator;
-  ASSERT_NO_THROW(task_estimator = plugin_loader.createInstance("affordance_primitives::KinematicTaskEstimator"));
+  ASSERT_NO_THROW(
+    task_estimator = plugin_loader.createInstance("affordance_primitives::KinematicTaskEstimator"));
 
   // Initialize plugin
   ros::NodeHandle nh;
@@ -94,7 +95,7 @@ TEST(ParameterManager, test_kinematic_task_estimator)
   EXPECT_NEAR(output.value(), sqrt(0.5 * 0.5 + 0.75 * 0.75), EPSILON);  // Meters
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "test_parameter_manager");
   testing::InitGoogleTest(&argc, argv);

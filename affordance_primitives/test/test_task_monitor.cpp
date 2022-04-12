@@ -33,9 +33,8 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
 
-#include <affordance_primitives/task_monitor/task_monitor.hpp>
 #include <affordance_primitives/msg_types.hpp>
-
+#include <affordance_primitives/task_monitor/task_monitor.hpp>
 #include <thread>
 
 using AffordancePrimitiveResult = affordance_primitive_msgs::AffordancePrimitiveResult;
@@ -102,7 +101,8 @@ TEST(TaskMonitor, monitor_timing)
 TEST(TaskMonitor, monitor_ft_readings)
 {
   ros::NodeHandle nh;
-  ros::Publisher ft_pub = nh.advertise<affordance_primitives::WrenchStamped>("ft_topic_name", 1, true);
+  ros::Publisher ft_pub =
+    nh.advertise<affordance_primitives::WrenchStamped>("ft_topic_name", 1, true);
 
   const double test_duration = 0.25;
   const double ft_pub_period = 0.005;  // 200 hz
@@ -122,8 +122,7 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Start publishing FT readings of 0
   affordance_primitives::WrenchStamped pub_wrench;
   std::thread t([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
-    for (size_t i = 0; i < num_publish; ++i)
-    {
+    for (size_t i = 0; i < num_publish; ++i) {
       ft_pub.publish(pub_wrench);
       ros::Duration(ft_pub_period).sleep();
     }
@@ -138,10 +137,8 @@ TEST(TaskMonitor, monitor_ft_readings)
 
   // Now publish FT readings to violate max force limit
   t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
-    for (size_t i = 0; i < num_publish; ++i)
-    {
-      if (i == num_publish / 3)
-      {
+    for (size_t i = 0; i < num_publish; ++i) {
+      if (i == num_publish / 3) {
         pub_wrench.wrench.force.x = 99;
         pub_wrench.wrench.force.y = 99;
         pub_wrench.wrench.force.z = 99;
@@ -160,14 +157,10 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Now publish to violate individual limits
   pub_wrench = affordance_primitives::WrenchStamped();
   t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
-    for (size_t i = 0; i < num_publish; ++i)
-    {
-      if (i == num_publish / 3)
-      {
+    for (size_t i = 0; i < num_publish; ++i) {
+      if (i == num_publish / 3) {
         pub_wrench.wrench.torque.z = 11;
-      }
-      else
-      {
+      } else {
         pub_wrench.wrench.torque.z = 9;
       }
       ft_pub.publish(pub_wrench);
@@ -184,10 +177,8 @@ TEST(TaskMonitor, monitor_ft_readings)
   // Now check to make sure NOT setting a limit results in no limit
   params.max_force = 0;
   t = std::thread([&ft_pub, &pub_wrench, num_publish, ft_pub_period]() {
-    for (size_t i = 0; i < num_publish; ++i)
-    {
-      if (i == num_publish / 3)
-      {
+    for (size_t i = 0; i < num_publish; ++i) {
+      if (i == num_publish / 3) {
         pub_wrench.wrench.force.x = 99;
         pub_wrench.wrench.force.y = 99;
         pub_wrench.wrench.force.z = 99;
@@ -204,7 +195,7 @@ TEST(TaskMonitor, monitor_ft_readings)
   t.join();
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "test_task_monitor");
   testing::InitGoogleTest(&argc, argv);

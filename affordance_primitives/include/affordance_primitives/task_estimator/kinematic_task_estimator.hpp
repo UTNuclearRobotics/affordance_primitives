@@ -32,12 +32,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include <ros/ros.h>
+#include <tf2_ros/transform_listener.h>
+
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/task_estimator/task_estimator.hpp>
-#include <tf2_ros/transform_listener.h>
+#include <memory>
 
 namespace affordance_primitives
 {
@@ -51,14 +51,14 @@ public:
 
   ~KinematicTaskEstimator(){};
 
-  void initialize(const ros::NodeHandle& nh);
+  void initialize(const ros::NodeHandle & nh);
 
   /** Returns the estimated angle of a task
    *
    * @param ap_req The affordance primitive being used for motion
    * @return An estimation of the angle (theta) of a screw primitive. The optional is not filled if the input was invalid
    */
-  std::optional<double> estimateTaskAngle(const AffordancePrimitiveGoal& ap_req);
+  std::optional<double> estimateTaskAngle(const AffordancePrimitiveGoal & ap_req);
 
   /** Resets the internal estimation
    *

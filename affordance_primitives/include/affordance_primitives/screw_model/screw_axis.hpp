@@ -34,7 +34,6 @@
 #pragma once
 
 #include <affordance_primitives/msg_types.hpp>
-
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 
 namespace affordance_primitives
@@ -46,8 +45,8 @@ namespace affordance_primitives
  * @param pitch The pitch of the screw axis
  * @return A vector representing the "normalized" (which may not have norm==1) linear velocity of the screw
  */
-Eigen::Vector3d calculateLinearVelocity(const Eigen::Vector3d& axis, const Eigen::Vector3d& q_vector,
-                                        const double pitch);
+Eigen::Vector3d calculateLinearVelocity(
+  const Eigen::Vector3d & axis, const Eigen::Vector3d & q_vector, const double pitch);
 
 class ScrewAxis
 {
@@ -65,8 +64,9 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const Pose& origin_pose, const Pose& axis_pose, double pitch = 0);
-  bool setScrewAxis(const Eigen::Isometry3d& origin_pose, const Eigen::Isometry3d& axis_pose, double pitch = 0)
+  bool setScrewAxis(const Pose & origin_pose, const Pose & axis_pose, double pitch = 0);
+  bool setScrewAxis(
+    const Eigen::Isometry3d & origin_pose, const Eigen::Isometry3d & axis_pose, double pitch = 0)
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), Eigen::toMsg(axis_pose), pitch);
   };
@@ -79,8 +79,9 @@ public:
    * @param pitch Sets the pitch of the screw
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const Pose& origin_pose, const Eigen::Vector3d& axis, double pitch = 0);
-  bool setScrewAxis(const Eigen::Isometry3d& origin_pose, const Eigen::Vector3d& axis, double pitch = 0)
+  bool setScrewAxis(const Pose & origin_pose, const Eigen::Vector3d & axis, double pitch = 0);
+  bool setScrewAxis(
+    const Eigen::Isometry3d & origin_pose, const Eigen::Vector3d & axis, double pitch = 0)
   {
     return setScrewAxis(Eigen::toMsg(origin_pose), axis, pitch);
   };
@@ -90,7 +91,7 @@ public:
    * @param screw_msg The input message. The screw axis must be non-zero here
    * @return True if the setup was successful, false otherwise
    */
-  bool setScrewAxis(const ScrewStamped& screw_msg);
+  bool setScrewAxis(const ScrewStamped & screw_msg);
 
   // Use the Screw to generate motion profiles
   /**
@@ -108,26 +109,11 @@ public:
   Eigen::Isometry3d getTF(double delta_theta) const;
 
   // Getters
-  std::string getFrame() const
-  {
-    return moving_frame_name_;
-  };
-  Eigen::Vector3d getQVector() const
-  {
-    return origin_;
-  };
-  Eigen::Vector3d getAxis() const
-  {
-    return axis_;
-  };
-  Eigen::Vector3d getLinearVector() const
-  {
-    return translation_component_;
-  };
-  double getPitch() const
-  {
-    return pitch_;
-  };
+  std::string getFrame() const { return moving_frame_name_; };
+  Eigen::Vector3d getQVector() const { return origin_; };
+  Eigen::Vector3d getAxis() const { return axis_; };
+  Eigen::Vector3d getLinearVector() const { return translation_component_; };
+  double getPitch() const { return pitch_; };
 
 private:
   // The name of the moving coordinate frame (e.g end-effector)

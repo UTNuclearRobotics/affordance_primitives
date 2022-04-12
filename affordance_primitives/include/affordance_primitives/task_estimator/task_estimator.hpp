@@ -33,8 +33,8 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <affordance_primitives/msg_types.hpp>
 
+#include <affordance_primitives/msg_types.hpp>
 #include <optional>
 
 namespace affordance_primitives
@@ -45,14 +45,14 @@ namespace affordance_primitives
 class TaskEstimator
 {
 public:
-  virtual void initialize(const ros::NodeHandle& nh) = 0;
+  virtual void initialize(const ros::NodeHandle & nh) = 0;
 
   /** Returns the estimated angle of a task
    *
    * @param ap_req The affordance primitive being used for motion
    * @return An estimation of the angle (theta) of a screw primitive. The optional is not filled if the input was invalid
    */
-  virtual std::optional<double> estimateTaskAngle(const AffordancePrimitiveGoal& ap_req) = 0;
+  virtual std::optional<double> estimateTaskAngle(const AffordancePrimitiveGoal & ap_req) = 0;
 
   /** Resets the internal estimation
    *

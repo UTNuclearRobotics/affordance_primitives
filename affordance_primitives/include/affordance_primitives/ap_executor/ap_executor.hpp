@@ -42,17 +42,12 @@
 #include <affordance_primitives/screw_model/screw_execution.hpp>
 #include <affordance_primitives/task_estimator/task_estimator.hpp>
 #include <affordance_primitives/task_monitor/task_monitor.hpp>
-
-#include <optional>
 #include <mutex>
+#include <optional>
 
 namespace affordance_primitives
 {
-enum Mode
-{
-  INACTIVE,
-  EXECUTING
-};
+enum Mode { INACTIVE, EXECUTING };
 
 /**
  * Stores parameters needed for execution of APs
@@ -73,7 +68,9 @@ struct ExecutorParameters
  * @param feedback The feedback that will be changed to be within limits
  * @param epsilon Range within which to consider 0, or limit unset
  */
-void enforceAPLimits(const APRobotParameter& params, AffordancePrimitiveFeedback& feedback, const double epsilon = 1e-8);
+void enforceAPLimits(
+  const APRobotParameter & params, AffordancePrimitiveFeedback & feedback,
+  const double epsilon = 1e-8);
 
 /**
  * Manages the execution of an Affordance Primitive as an Action. A client will need to interface with this class to
@@ -88,19 +85,16 @@ public:
    * @param nh ROS node handle
    * @param action_name the name the AP executor action will take
    */
-  APExecutor(const ros::NodeHandle& nh, const std::string action_name);
+  APExecutor(const ros::NodeHandle & nh, const std::string action_name);
 
-  ~APExecutor()
-  {
-    stop();
-  };
+  ~APExecutor() { stop(); };
 
   /** Sets up and starts the action server
    *
    * @param params A number of parameters necessary for execution
    * @return true if successfully initialized, false otherwise
    */
-  bool initialize(const ExecutorParameters& params);
+  bool initialize(const ExecutorParameters & params);
 
   /* \brief Stops the current action */
   void stop();
@@ -111,14 +105,15 @@ protected:
    * @param ap_goal The screw-primitive to move with
    * @return The result of the execution
    */
-  AffordancePrimitiveResult execute(const affordance_primitive_msgs::AffordancePrimitiveGoalConstPtr& goal);
+  AffordancePrimitiveResult execute(
+    const affordance_primitive_msgs::AffordancePrimitiveGoalConstPtr & goal);
 
   /** Carries out the setting of the passed parameters
    *
    * @param parameters Parameter object defining this move's parameters
    * @return true if parameters changed successfully, false otherwise
    */
-  bool updateParams(const APRobotParameter& parameters);
+  bool updateParams(const APRobotParameter & parameters);
 
   /** Does post-execution reset like resetting dims, stopping motion, etc
    *
@@ -141,7 +136,7 @@ protected:
   boost::shared_ptr<TaskEstimator> task_estimator_;
 
   // Hold the current mode of operation
-  Mode current_mode_{ INACTIVE };
+  Mode current_mode_{INACTIVE};
   mutable std::mutex mode_mutex_;
 
   // The monitor obejct for getting the execution status

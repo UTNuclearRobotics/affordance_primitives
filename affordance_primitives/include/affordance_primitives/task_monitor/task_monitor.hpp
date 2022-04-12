@@ -33,9 +33,9 @@
 #pragma once
 
 #include <ros/ros.h>
+
 #include <affordance_primitives/ap_common.hpp>
 #include <affordance_primitives/msg_types.hpp>
-
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
@@ -53,7 +53,7 @@ namespace affordance_primitives
 class TaskMonitor
 {
 public:
-  TaskMonitor(const ros::NodeHandle& nh, const std::string ft_topic_name);
+  TaskMonitor(const ros::NodeHandle & nh, const std::string ft_topic_name);
 
   ~TaskMonitor();
 
@@ -64,7 +64,7 @@ public:
    * @param timeout Timeout to wait, a non-positive number is infinite timeout.
    * Timing out is considered a SUCCESS from the TaskMonitor's perspective
    */
-  void startMonitor(const APRobotParameter& parameters, const double timeout = 0.0);
+  void startMonitor(const APRobotParameter & parameters, const double timeout = 0.0);
 
   /**
    * Blocks until a result is found
@@ -106,9 +106,9 @@ private:
   APRobotParameter parameters_;
 
   // Track monitor status and if a stop has been requested
-  std::atomic<bool> active_monitor_{ false };
-  std::atomic<bool> continue_monitoring_{ false };
-  std::atomic<bool> has_timeout_{ false };
+  std::atomic<bool> active_monitor_{false};
+  std::atomic<bool> continue_monitoring_{false};
+  std::atomic<bool> has_timeout_{false};
 
   // Thread where the actual monitoring will happen
   std::thread thread_;
@@ -117,12 +117,12 @@ private:
   ros::Subscriber ft_sub_;
 
   // F/T Callback
-  void ftCB(const WrenchStamped& msg);
+  void ftCB(const WrenchStamped & msg);
 
   // Store recent wrench message
   std::queue<WrenchStamped> last_wrench_msgs_;
 
   // Check if AP is violated
-  std::optional<AffordancePrimitiveResult> checkForViolaton(const APRobotParameter& params);
+  std::optional<AffordancePrimitiveResult> checkForViolaton(const APRobotParameter & params);
 };
 }  // namespace affordance_primitives

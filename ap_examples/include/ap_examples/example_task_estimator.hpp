@@ -47,7 +47,7 @@ class ExampleTaskEstimator : public affordance_primitives::TaskEstimator
 public:
   ExampleTaskEstimator(){};
 
-  void initialize(const ros::NodeHandle& nh);
+  void initialize(const ros::NodeHandle & nh);
 
   /** Returns the estimated angle of a task
    *
@@ -55,7 +55,8 @@ public:
    * @return An estimation of the angle (theta) of a screw primitive. The
    * optional is not filled if the input was invalid
    */
-  std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitiveGoal& ap_goal);
+  std::optional<double> estimateTaskAngle(
+    const affordance_primitives::AffordancePrimitiveGoal & ap_goal);
 
   /** Resets the internal estimation
    *

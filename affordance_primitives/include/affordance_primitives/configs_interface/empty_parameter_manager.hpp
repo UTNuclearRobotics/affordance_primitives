@@ -33,6 +33,7 @@
 #pragma once
 
 #include <ros/ros.h>
+
 #include <affordance_primitives/configs_interface/parameter_manager.hpp>
 
 namespace affordance_primitives
@@ -45,7 +46,7 @@ class EmptyParameterManager : public affordance_primitives::ParameterManager
 public:
   EmptyParameterManager(){};
 
-  void initialize(const ros::NodeHandle& nh);
+  void initialize(const ros::NodeHandle & nh);
 
   /** Tries to set a robot's parameters
    *
@@ -53,6 +54,7 @@ public:
    * @return The first value is true if everything was set correctly, second
    * value is a string that provides logging messages
    */
-  std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params);
+  std::pair<bool, std::string> setParameters(
+    const affordance_primitives::APRobotParameter & params);
 };
 }  // namespace affordance_primitives
