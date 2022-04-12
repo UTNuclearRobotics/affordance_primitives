@@ -32,8 +32,8 @@
 
 #pragma once
 
-#include <ros/ros.h>
 #include <affordance_primitives/configs_interface/parameter_manager.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace ap_examples
 {
@@ -48,7 +48,7 @@ public:
   /**
    * This is called once on start up. You can save the NodeHandle, send an initial/default configuration, etc
    */
-  void initialize(const ros::NodeHandle& nh);
+  void initialize(rclcpp::Node::SharedPtr node);
 
   /** Tries to set a robot's parameters
    *
@@ -56,10 +56,11 @@ public:
    * @return The first value is true if everything was set correctly, second
    * value is a string that provides logging messages
    */
-  std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params);
+  std::pair<bool, std::string> setParameters(
+    const affordance_primitives::APRobotParameter & params);
 
 private:
-  ros::NodeHandle nh_;
+  rclcpp::Node::SharedPtr node_;
 
   // You could create some service clients, publishers, or other ways to set parameters in the robot controller
 };

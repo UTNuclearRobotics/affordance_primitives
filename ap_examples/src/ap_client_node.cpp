@@ -30,35 +30,30 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <ros/ros.h>
-#include <actionlib/client/simple_action_client.h>
-
+#include <affordance_primitive_msgs/action/affordance_primitive.hpp>
 #include <affordance_primitives/ap_common.hpp>
-#include <affordance_primitive_msgs/AffordancePrimitiveAction.h>
+#include <affordance_primitives/screw_model/affordance_utils.hpp>
+#include <rclcpp/rclcpp.hpp>
 
-int main(int argc, char** argv)
+#include "rclcpp_action/rclcpp_action.hpp"
+
+int main(int argc, char ** argv)
 {
-  ros::init(argc, argv, "ap_client_node");
-  ros::NodeHandle nh;
-  ros::AsyncSpinner spinner(0);
-  spinner.start();
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<rclcpp::Node>("ap_client_node");
 
   // This is the name of the action that will be available for executing Affordance Primitives
   const std::string action_name = "ap_execution";
 
   // Set up the action client. This will be the interface with the AP execution server
-  auto action_client =
-      std::make_unique<actionlib::SimpleActionClient<affordance_primitive_msgs::AffordancePrimitiveAction>>(action_name,
-                                                                                                            true);
-  if (!action_client->waitForServer(ros::Duration(30)))
-  {
-    return EXIT_FAILURE;
-  }
+  using AffordancePrimitive = affordance_primitive_msgs::action::AffordancePrimitive;
+  using GoalHandleAffordancePrimitive = rclcpp_action::ClientGoalHandle<AffordancePrimitive>;
+  auto action_client = rclcpp_action::create_client<AffordancePrimitive>(node, action_name);
 
   // Set up the action request
   // This consists of information about the EE link, the screw axis to move about, the task's impedance, robot control
   // parameters to use, and how fast and far to move
-  affordance_primitive_msgs::AffordancePrimitiveGoal ap_goal;
+  AffordancePrimitive::Goal ap_goal;
 
   // There are 2 options for EE link information. One is a link name to look up on the TF tree. Here we will directly
   // pass the transformation to the link
@@ -95,18 +90,50 @@ int main(int argc, char** argv)
   ap_goal.theta_dot = 0.05;
 
   // To trigger the move, we call the action
-  action_client->sendGoal(ap_goal);
+  auto send_goal_options = rclcpp_action::Client<AffordancePrimitive>::SendGoalOptions();
+  auto goal_response_callback =
+    [&node](std::shared_future<GoalHandleAffordancePrimitive::SharedPtr> future) {
+      auto goal_handle = future.get();
+      if (!goal_handle) {
+        RCLCPP_ERROR(node->get_logger(), "Goal was rejected by server");
+      } else {
+        RCLCPP_INFO(node->get_logger(), "Goal accepted by server, waiting for result");
+      }
+    };
+  auto feedback_callback = [&node](
+                             GoalHandleAffordancePrimitive::SharedPtr,
+                             const std::shared_ptr<const AffordancePrimitive::Feedback> feedback) {
+    // You could send these commands directly to the robot, filter them, etc
 
-  // We can interact with the client as usual
-  bool finished_before_timeout = action_client->waitForResult(ros::Duration(15));
-  if (finished_before_timeout)
-  {
-    auto result = action_client->getResult();
-    ROS_ERROR_STREAM("Result: " << affordance_primitives::to_string(result->result));
-  }
-  else
-  {
-    action_client->cancelGoal();
-    ROS_ERROR("Action did not finish before the time out.");
-  }
+    // Here we will just print them out
+    std::string output = affordance_primitives::twistToStr(feedback->moving_frame_twist);
+    rclcpp::Clock & clock = *node->get_clock();
+    RCLCPP_INFO_STREAM_THROTTLE(
+      node->get_logger(), clock, std::chrono::milliseconds(1000).count(), output);
+  };
+  auto result_callback = [&node](const GoalHandleAffordancePrimitive::WrappedResult & result_msg) {
+    switch (result_msg.code) {
+      case rclcpp_action::ResultCode::SUCCEEDED:
+        break;
+      case rclcpp_action::ResultCode::ABORTED:
+        RCLCPP_ERROR(node->get_logger(), "Goal was aborted");
+        return;
+      case rclcpp_action::ResultCode::CANCELED:
+        RCLCPP_ERROR(node->get_logger(), "Goal was canceled");
+        return;
+      default:
+        RCLCPP_ERROR(node->get_logger(), "Unknown result code");
+        return;
+    }
+    std::string output = affordance_primitives::to_string(result_msg.result->result);
+    RCLCPP_INFO_STREAM(node->get_logger(), output);
+    rclcpp::shutdown();
+  };
+  send_goal_options.goal_response_callback = goal_response_callback;
+  send_goal_options.feedback_callback = feedback_callback;
+  send_goal_options.result_callback = result_callback;
+
+  action_client->async_send_goal(ap_goal, send_goal_options);
+
+  rclcpp::spin(node);
 }

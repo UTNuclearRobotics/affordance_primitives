@@ -32,10 +32,9 @@
 
 #pragma once
 
-#include <ros/ros.h>
-
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/task_estimator/task_estimator.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace ap_examples
 {
@@ -47,7 +46,7 @@ class ExampleTaskEstimator : public affordance_primitives::TaskEstimator
 public:
   ExampleTaskEstimator(){};
 
-  void initialize(const ros::NodeHandle& nh);
+  void initialize(rclcpp::Node::SharedPtr node);
 
   /** Returns the estimated angle of a task
    *
@@ -55,7 +54,8 @@ public:
    * @return An estimation of the angle (theta) of a screw primitive. The
    * optional is not filled if the input was invalid
    */
-  std::optional<double> estimateTaskAngle(const affordance_primitives::AffordancePrimitiveGoal& ap_goal);
+  std::optional<double> estimateTaskAngle(
+    const affordance_primitives::AffordancePrimitiveGoal & ap_goal);
 
   /** Resets the internal estimation
    *
@@ -65,6 +65,6 @@ public:
 
 private:
   // This example will be time based, so we will save the starting time
-  ros::Time start_time_;
+  rclcpp::Time start_time_;
 };
 }  // namespace ap_examples

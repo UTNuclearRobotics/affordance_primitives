@@ -30,25 +30,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <ros/ros.h>
-
 #include <affordance_primitives/ap_executor/ap_executor.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sstream>
 
-// Callback that happens during Execution feedback
-void executorFeedbackCB(const affordance_primitive_msgs::AffordancePrimitiveActionFeedback& msg)
+int main(int argc, char ** argv)
 {
-  // You could send these commands directly to the robot, filter them, etc
-
-  // Here we will just print them out
-  ROS_INFO_STREAM_THROTTLE(2.0, msg.feedback);
-}
-
-int main(int argc, char** argv)
-{
-  ros::init(argc, argv, "ap_executor_node");
-  ros::NodeHandle nh;
-  ros::AsyncSpinner spinner(0);
-  spinner.start();
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<rclcpp::Node>("ap_executor_node");
 
   // This is the name of the action that will be available for executing Affordance Primitives
   const std::string action_name = "ap_execution";
@@ -73,17 +62,13 @@ int main(int argc, char** argv)
   // params.task_estimator_plugin_name = "affordance_primitives::KinematicTaskEstimator";
 
   // Set up executor
-  auto executor = std::make_unique<affordance_primitives::APExecutor>(nh, action_name);
+  auto executor = std::make_unique<affordance_primitives::APExecutor>(node, action_name);
 
   // Initialize and start action server
-  if (!executor->initialize(params))
-  {
+  if (!executor->initialize(params)) {
     return EXIT_FAILURE;
   }
 
-  // Set up subscriber that connects execution feedback to robot commands
-  // Every control loop cycle, the executor action server publishes the velocity and force the robot should apply
-  ros::Subscriber exeuction_feedback_sub = nh.subscribe(action_name + "/feedback", 1000, executorFeedbackCB);
-
-  ros::waitForShutdown();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
 }

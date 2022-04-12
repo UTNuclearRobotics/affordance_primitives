@@ -8,16 +8,13 @@ The source files are intended to be the documentation and are well commented. Th
   3. `ap_example_plugins`: a library containing the plugins `ExampleTaskEstimator` and `ExampleParameterManager`, which demonstrate setting up and using your own custom plugins to modify AP execution behavior.
 
 ## Basic Demonstration
-To run the basic AP action examples, you will need 3 terminals. Run the following:
+To run the basic AP action examples, you will need 2 terminals. Run the following:
 
 ```sh
-roscore
+ros2 run ap_examples ap_executor
 ```
 ```sh
-rosrun ap_examples ap_executor
-```
-```sh
-rosrun ap_examples ap_client
+ros2 run ap_examples ap_client
 ```
 
 This should create an AP action server and client, then call a basic AP execution

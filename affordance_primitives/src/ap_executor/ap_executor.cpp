@@ -126,7 +126,7 @@ AffordancePrimitiveResult APExecutor::execute(
   // End any currently running task
   stop();
 
-  std::shared_ptr<AffordancePrimitiveResult> ap_result;
+  auto ap_result = std::make_shared<AffordancePrimitiveResult>();
   auto goal = goal_handle->get_goal();
 
   // Update parameters
@@ -190,7 +190,7 @@ AffordancePrimitiveResult APExecutor::execute(
     }
     // Otherwise, send commands
     else {
-      std::shared_ptr<AffordancePrimitiveFeedback> ap_feedback;
+      auto ap_feedback = std::make_shared<AffordancePrimitiveFeedback>();
       if (!screw_executor_->getScrewTwist(*goal, *ap_feedback)) {
         ap_result->result = ap_result->KIN_VIOLATION;
         break;
@@ -251,7 +251,7 @@ bool APExecutor::postExecuteReset(
   const std::shared_ptr<rclcpp_action::ServerGoalHandle<AffordancePrimitive>> goal_handle)
 {
   // We want to publish a 0-motion twist just in case things are still moving
-  std::shared_ptr<AffordancePrimitiveFeedback> ap_feedback;
+  auto ap_feedback = std::make_shared<AffordancePrimitiveFeedback>();
   goal_handle->publish_feedback(ap_feedback);
 
   return true;
