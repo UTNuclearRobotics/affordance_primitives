@@ -1,0 +1,49 @@
+# Ask to lookup a known frame in the tf tree. "moving_to_task_frame" is ignored in this case
+int8 LOOKUP=0
+
+# Provide a transform to the moving frame. "moving_frame_name" is ignored in this case
+# "moving_to_task_frame" is the transform from the moving frame (e.g. gripper) to the task frame (where the screw is defined)
+int8 PROVIDED=1
+
+# Source of moving frame
+int8 moving_frame_source
+
+# Moving frame input
+string moving_frame_name
+geometry_msgs/TransformStamped moving_to_task_frame
+
+# Screw axis to move about
+affordance_primitive_msgs/ScrewStamped screw
+
+# Task Impedance
+float64 task_impedance_translation
+float64 task_impedance_rotation
+
+# Maximum velocity to move along the screw. It is unsigned and will be considered same sign as "screw_distance"
+float64 theta_dot
+
+# The (signed) distance to move along the screw. Meters (pure translation case), Radians (otherwise)
+float64 screw_distance
+
+# The robot configs/parameters to use during this AP move
+affordance_primitive_msgs/APRobotParameter robot_params
+
+---
+
+int8 INVALID_RESULT=0
+int8 SUCCESS=1
+int8 STOP_REQUESTED=2
+int8 PARAM_FAILURE=3
+int8 FT_VIOLATION=4
+int8 KIN_VIOLATION=5
+int8 TIME_OUT=6
+
+int8 result
+
+---
+
+# Resulting velocity of the moving frame
+geometry_msgs/TwistStamped moving_frame_twist
+
+# Wrench required in the EE frame
+geometry_msgs/WrenchStamped expected_wrench

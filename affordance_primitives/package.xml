@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>affordance_primitives</name>
+  <version>0.1.0</version>
+  <description>Library for affordance motion primitives.</description>
+
+  <maintainer email="adam.pettinger@utexas.edu">Adam Pettinger</maintainer>
+  <author email="adam.pettinger@utexas.edu">Adam Pettinger</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>affordance_primitive_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>tf2_eigen</depend>
+  <depend>tf2_ros</depend>
+
+  <!-- <test_depend>ament_cmake_gtest</test_depend> -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_clang_format</test_depend>
+  <test_depend>ros_testing</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
