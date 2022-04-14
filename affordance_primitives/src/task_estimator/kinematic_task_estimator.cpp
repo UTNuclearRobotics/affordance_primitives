@@ -1,17 +1,13 @@
-#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
-#include <tf2_eigen/tf2_eigen.h>
 #include <pluginlib/class_list_macros.h>
+#include <tf2_eigen/tf2_eigen.h>
+
+#include <affordance_primitives/task_estimator/kinematic_task_estimator.hpp>
 
 namespace affordance_primitives
 {
-KinematicTaskEstimator::KinematicTaskEstimator() : tfListener_(tfBuffer_)
-{
-}
+KinematicTaskEstimator::KinematicTaskEstimator() : tfListener_(tfBuffer_) {}
 
-void KinematicTaskEstimator::initialize(const ros::NodeHandle& nh)
-{
-  nh_ = nh;
-}
+void KinematicTaskEstimator::initialize(const ros::NodeHandle & nh) { nh_ = nh; }
 
 bool KinematicTaskEstimator::resetTaskEstimation(double reset_val)
 {
@@ -20,46 +16,39 @@ bool KinematicTaskEstimator::resetTaskEstimation(double reset_val)
   return true;
 }
 
-std::optional<double> KinematicTaskEstimator::estimateTaskAngle(const AffordancePrimitiveGoal& ap_req)
+std::optional<double> KinematicTaskEstimator::estimateTaskAngle(
+  const AffordancePrimitiveGoal & ap_req)
 {
   TransformStamped tfmsg_moving_to_task_frame;
 
   // Check if we can transform the Task frame to the Moving frame
-  if (ap_req.moving_frame_source == ap_req.LOOKUP)
-  {
+  if (ap_req.moving_frame_source == ap_req.LOOKUP) {
     // Lookup the TF
-    try
-    {
-      tfmsg_moving_to_task_frame =
-          tfBuffer_.lookupTransform(ap_req.moving_frame_name, ap_req.screw.header.frame_id, ros::Time(0));
-    }
-    catch (tf2::TransformException& ex)
-    {
+    try {
+      tfmsg_moving_to_task_frame = tfBuffer_.lookupTransform(
+        ap_req.moving_frame_name, ap_req.screw.header.frame_id, ros::Time(0));
+    } catch (tf2::TransformException & ex) {
       ROS_WARN_THROTTLE(1, "%s", ex.what());
       return std::nullopt;
     }
-  }
-  else if (ap_req.moving_frame_source == ap_req.PROVIDED)
-  {
+  } else if (ap_req.moving_frame_source == ap_req.PROVIDED) {
     // Set it
     tfmsg_moving_to_task_frame = ap_req.moving_to_task_frame;
     // Check validity
-    if (tfmsg_moving_to_task_frame.child_frame_id != ap_req.screw.header.frame_id)
-    {
-      ROS_WARN_STREAM_THROTTLE(1, "Provided 'moving_to_task_frame' child frame "
-                                  "name does not match screw header (task) frame, ending...");
+    if (tfmsg_moving_to_task_frame.child_frame_id != ap_req.screw.header.frame_id) {
+      ROS_WARN_STREAM_THROTTLE(
+        1,
+        "Provided 'moving_to_task_frame' child frame "
+        "name does not match screw header (task) frame, ending...");
       return std::nullopt;
     }
-  }
-  else
-  {
+  } else {
     ROS_WARN_STREAM_THROTTLE(1, "Unexpected 'moving_frame_source' requested, ending...");
     return std::nullopt;
   }
 
   // Check if we HAVE a previous pose. If not, just return the current estimate
-  if (!last_tf_moving_to_task_frame_)
-  {
+  if (!last_tf_moving_to_task_frame_) {
     last_tf_moving_to_task_frame_ = tfmsg_moving_to_task_frame;
     return current_estimation_;
   }
@@ -73,12 +62,9 @@ std::optional<double> KinematicTaskEstimator::estimateTaskAngle(const Affordance
   const Eigen::Isometry3d tf_last_to_current = last_tf * current_tf.inverse();
 
   // Translation case is much easier
-  if (ap_req.screw.is_pure_translation)
-  {
+  if (ap_req.screw.is_pure_translation) {
     current_estimation_ += tf_last_to_current.translation().norm();
-  }
-  else
-  {
+  } else {
     // Use Eigen to do the heavy math lifting
     Eigen::AngleAxisd rotation_se3(tf_last_to_current.linear());
 
@@ -94,4 +80,5 @@ std::optional<double> KinematicTaskEstimator::estimateTaskAngle(const Affordance
 
 }  // namespace affordance_primitives
 
-PLUGINLIB_EXPORT_CLASS(affordance_primitives::KinematicTaskEstimator, affordance_primitives::TaskEstimator);
+PLUGINLIB_EXPORT_CLASS(
+  affordance_primitives::KinematicTaskEstimator, affordance_primitives::TaskEstimator);

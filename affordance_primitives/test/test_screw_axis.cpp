@@ -33,13 +33,14 @@
 const std::string MOVING_FRAME_NAME = "moving_frame_name";
 constexpr double EPSILON = 1e-4;
 
-void checkVector(const Eigen::Vector3d& vec, const double x, const double y, const double z)
+void checkVector(const Eigen::Vector3d & vec, const double x, const double y, const double z)
 {
   EXPECT_NEAR(vec.x(), x, EPSILON);
   EXPECT_NEAR(vec.y(), y, EPSILON);
   EXPECT_NEAR(vec.z(), z, EPSILON);
 }
-void checkVector(const affordance_primitives::Vector3& vec, const double x, const double y, const double z)
+void checkVector(
+  const affordance_primitives::Vector3 & vec, const double x, const double y, const double z)
 {
   EXPECT_NEAR(vec.x, x, EPSILON);
   EXPECT_NEAR(vec.y, y, EPSILON);
@@ -67,7 +68,8 @@ TEST(ScrewAxis, calculate_linear_component)
   Eigen::Vector3d q_vector(-1, 0, 0);
   double pitch = 0;
 
-  Eigen::Vector3d linear_velocity = affordance_primitives::calculateLinearVelocity(z_axis, q_vector, pitch);
+  Eigen::Vector3d linear_velocity =
+    affordance_primitives::calculateLinearVelocity(z_axis, q_vector, pitch);
 
   // This should result in positive y velocity only
   checkVector(linear_velocity, 0.0, 1.0, 0.0);
@@ -304,7 +306,7 @@ TEST(ScrewAxis, get_transform)
   checkVector(transform.translation(), 0.0, 0.0, M_PI / 2);  // With respect to starting position
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -45,7 +45,7 @@ namespace affordance_primitives
 class ParameterManager
 {
 public:
-  virtual void initialize(const ros::NodeHandle& nh) = 0;
+  virtual void initialize(const ros::NodeHandle & nh) = 0;
 
   /** Tries to set a robot's parameters
    *
@@ -53,7 +53,8 @@ public:
    * @return The first value is true if everything was set correctly, second
    * value is a string that provides logging messages
    */
-  virtual std::pair<bool, std::string> setParameters(const affordance_primitives::APRobotParameter& params) = 0;
+  virtual std::pair<bool, std::string> setParameters(
+    const affordance_primitives::APRobotParameter & params) = 0;
 
   virtual ~ParameterManager(){};
 

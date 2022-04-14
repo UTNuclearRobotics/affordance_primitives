@@ -30,13 +30,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
+#include <affordance_primitive_msgs/AffordancePrimitiveAction.h>
+#include <ros/ros.h>
 
 #include <affordance_primitives/ap_common.hpp>
-#include <affordance_primitive_msgs/AffordancePrimitiveAction.h>
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "ap_client_node");
   ros::NodeHandle nh;
@@ -47,11 +47,10 @@ int main(int argc, char** argv)
   const std::string action_name = "ap_execution";
 
   // Set up the action client. This will be the interface with the AP execution server
-  auto action_client =
-      std::make_unique<actionlib::SimpleActionClient<affordance_primitive_msgs::AffordancePrimitiveAction>>(action_name,
-                                                                                                            true);
-  if (!action_client->waitForServer(ros::Duration(30)))
-  {
+  auto action_client = std::make_unique<
+    actionlib::SimpleActionClient<affordance_primitive_msgs::AffordancePrimitiveAction>>(
+    action_name, true);
+  if (!action_client->waitForServer(ros::Duration(30))) {
     return EXIT_FAILURE;
   }
 
@@ -99,13 +98,10 @@ int main(int argc, char** argv)
 
   // We can interact with the client as usual
   bool finished_before_timeout = action_client->waitForResult(ros::Duration(15));
-  if (finished_before_timeout)
-  {
+  if (finished_before_timeout) {
     auto result = action_client->getResult();
     ROS_ERROR_STREAM("Result: " << affordance_primitives::to_string(result->result));
-  }
-  else
-  {
+  } else {
     action_client->cancelGoal();
     ROS_ERROR("Action did not finish before the time out.");
   }
