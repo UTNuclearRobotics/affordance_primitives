@@ -23,7 +23,7 @@ std::pair<bool, std::string> ExampleParameterManager::setParameters(
 
   // Here we can call service clients, publish parameters, etc, to change the controller configuration
   // In the example, we will print the parameters and exit successfully
-  RCLCPP_INFO_STREAM(node_->get_logger(), to_yaml(params));
+  RCLCPP_INFO_STREAM(node_->get_logger(), "Setting params");
   return std::make_pair(true, "");
 };
 }  // namespace ap_examples
