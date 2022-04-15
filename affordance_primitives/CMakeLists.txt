@@ -94,7 +94,8 @@ ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 #############
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  find_package(ament_cmake_gtest)
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ros_testing REQUIRED)
 
   ament_lint_auto_find_test_dependencies()
 
