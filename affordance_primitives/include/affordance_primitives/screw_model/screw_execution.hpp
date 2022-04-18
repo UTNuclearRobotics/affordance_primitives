@@ -36,9 +36,30 @@
 #include <tf2_ros/transform_listener.h>
 
 #include <affordance_primitives/msg_types.hpp>
+#include <optional>
 
 namespace affordance_primitives
 {
+/**
+ * @brief Calculates the twist in the affordance frame, with format [linear ; angular]
+ * @param screw The screw message
+ * @param theta_dot The (signed) velocity to rotate (or translate in linear case) along the screw axis
+ * @return Twist defined with respect to the screw axis frame
+ */
+Eigen::Matrix<double, 6, 1> calculateAffordanceTwist(const ScrewStamped & screw, double theta_dot);
+
+/**
+ * @brief Calculates the wrench in the affordance frame, with format [force ; torque]
+ * @param screw The screw message
+ * @param twist The twist, given in the affordance frame
+ * @param impedance_translation Translational impedance from the AP
+ * @param impedance_rotation Rotational impedance from the AP
+ * @return Wrench defined with respect to the screw axis frame
+ */
+Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
+  const ScrewStamped & screw, const Eigen::Matrix<double, 6, 1> & twist,
+  double impedance_translation, double impendance_rotation);
+
 class APScrewExecutor
 {
 public:
@@ -49,6 +70,14 @@ public:
   bool getScrewTwist(const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback);
 
 private:
+  /**
+   * @brief Gets the TF from the moving frame to task frame, either by looking it up or checking the passed one
+   * @param req The AP request containing frame information
+   * @return If request invalid or lookup failed, returns nullopt. Otherwise, the TF is the location of the task frame with respect to the moving frame
+   */
+  std::optional<Eigen::Isometry3d> getTFInfo(const AffordancePrimitiveGoal & req);
+
+  // TF Lookup
   tf2_ros::Buffer tfBuffer_;
   tf2_ros::TransformListener tfListener_;
 };

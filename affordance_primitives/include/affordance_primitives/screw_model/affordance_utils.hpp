@@ -109,6 +109,26 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d & transform);
 Eigen::MatrixXd getAdjointMatrix(const Transform & transform);
 
 /**
+ * @brief Transforms a twist to a new frame
+ * Equation: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ * @param twist The twist to transform, with format [linear ; angular]
+ * @param tf The transformation from the new frame to old frame
+ * @return The transformed twist, with format [linear ; angular]
+ */
+Eigen::Matrix<double, 6, 1> transformTwist(
+  const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf);
+
+/**
+ * @brief Transforms a twist to a new frame
+ * Equation: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ * @param twist The twist to transform, with format [linear ; angular]
+ * @param tf The transformation from the new frame to old frame
+ * @return The transformed twist, with format [linear ; angular]
+ */
+Eigen::Matrix<double, 6, 1> transformWrench(
+  const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf);
+
+/**
  * @brief Gets the pretty string format for a TwistStamped message
  */
 std::string twistToStr(const TwistStamped & twist);
