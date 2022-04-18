@@ -165,4 +165,21 @@ Eigen::Isometry3d ScrewAxis::getTF(double delta_theta) const
 
   return output;
 }
+
+std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(double theta_step, size_t num_steps)
+{
+  std::vector<Eigen::Isometry3d> output;
+
+  // Check for invalid inputs
+  if (num_steps < 1 || fabs(theta_step) < 1e-8) {
+    return output;
+  }
+
+  // Iterate over number of steps to generate waypoints
+  output.reserve(num_steps);
+  for (size_t i = 1; i < num_steps + 1; i++) {
+    output.push_back(getTF(i * theta_step));
+  }
+  return output;
+}
 }  // namespace affordance_primitives

@@ -306,6 +306,42 @@ TEST(ScrewAxis, get_transform)
   checkVector(transform.translation(), 0.0, 0.0, M_PI / 2);  // With respect to starting position
 }
 
+TEST(ScrewAxis, get_waypoints)
+{
+  affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME);
+
+  // Origin at [1,0,0], axis of [0, 0, 1]
+  affordance_primitives::Pose first_pose;
+  first_pose.position.x = 1.0;
+  Eigen::Vector3d z_axis(0, 0, 1);
+  ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, z_axis));
+
+  // Will test a 90-degree rotation
+  const double angle = 0.5 * M_PI;
+  const size_t num_steps = 10;
+  const double theta_step = angle / num_steps;
+  std::vector<Eigen::Isometry3d> waypoints;
+  ASSERT_NO_THROW(waypoints = screw_axis.getWaypoints(theta_step, num_steps));
+
+  // Check output has correct size
+  EXPECT_EQ(waypoints.size(), num_steps);
+
+  // Check that the back waypoint matches a 90 degree rotation
+  auto last_wp = waypoints.back();
+  checkVector(last_wp.translation(), 1.0, -1.0, 0.0);  // With respect to starting position
+  checkVector(last_wp.linear().col(0), 0, 1, 0);       // New x axis faces old y axis
+  checkVector(last_wp.linear().col(1), -1, 0, 0);      // New y axis faces old -x axis
+  checkVector(last_wp.linear().col(2), 0, 0, 1);       // z axis did not change
+
+  // Now check for bad input cases
+  std::vector<Eigen::Isometry3d> waypoints2;
+  ASSERT_NO_THROW(waypoints2 = screw_axis.getWaypoints(theta_step, 0));
+  EXPECT_TRUE(waypoints2.empty());
+
+  ASSERT_NO_THROW(waypoints2 = screw_axis.getWaypoints(0.0, num_steps));
+  EXPECT_TRUE(waypoints2.empty());
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
