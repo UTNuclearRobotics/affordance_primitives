@@ -48,6 +48,15 @@ inline void checkVector(const affordance_primitives::Vector3 & vec, double x, do
   EXPECT_NEAR(vec.z, z, EPSILON);
 }
 
+inline void checkQuaternion(
+  const affordance_primitives::Quaternion & quat, double x, double y, double z, double w)
+{
+  EXPECT_NEAR(quat.x, x, EPSILON);
+  EXPECT_NEAR(quat.y, y, EPSILON);
+  EXPECT_NEAR(quat.z, z, EPSILON);
+  EXPECT_NEAR(quat.w, w, EPSILON);
+}
+
 /*
     TEST CASE:
 
@@ -114,6 +123,13 @@ TEST(ScrewExecution, providedTF)
   checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, 0, -2 * ap_goal.theta_dot);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, -1 * ap_goal.theta_dot, 0);
 
+  // Check transform matches what we sent
+  EXPECT_EQ(ap_feedback.tf_moving_to_task.header.frame_id, MOVING_FRAME_NAME);
+  EXPECT_EQ(ap_feedback.tf_moving_to_task.child_frame_id, TASK_FRAME_NAME);
+  checkVector(ap_feedback.tf_moving_to_task.transform.translation, 2, 0, 0);
+  checkQuaternion(
+    ap_feedback.tf_moving_to_task.transform.rotation, 0.5 * sqrt(2), 0, 0, 0.5 * sqrt(2));
+
   // Check valid screw motion case
   ap_goal.screw.pitch = 1.5;
   bool_result = false;
@@ -167,6 +183,13 @@ TEST(ScrewExecution, lookupTF)
   EXPECT_TRUE(bool_result);
   checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, 0, -2 * ap_goal.theta_dot);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, -1 * ap_goal.theta_dot, 0);
+
+  // Check the lookup worked and returned correctly
+  EXPECT_EQ(ap_feedback.tf_moving_to_task.header.frame_id, MOVING_FRAME_NAME);
+  EXPECT_EQ(ap_feedback.tf_moving_to_task.child_frame_id, TASK_FRAME_NAME);
+  checkVector(ap_feedback.tf_moving_to_task.transform.translation, 2, 0, 0);
+  checkQuaternion(
+    ap_feedback.tf_moving_to_task.transform.rotation, 0.5 * sqrt(2), 0, 0, 0.5 * sqrt(2));
 }
 
 int main(int argc, char ** argv)

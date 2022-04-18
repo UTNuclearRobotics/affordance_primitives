@@ -3,6 +3,7 @@ int8 LOOKUP=0
 
 # Provide a transform to the moving frame. "moving_frame_name" is ignored in this case
 # "moving_to_task_frame" is the transform from the moving frame (e.g. gripper) to the task frame (where the screw is defined)
+# This is only really useful for testing/debugging as this will be constant (i.e. won't change/move during execution)
 int8 PROVIDED=1
 
 # Source of moving frame
@@ -47,3 +48,7 @@ geometry_msgs/TwistStamped moving_frame_twist
 
 # Wrench required in the EE frame
 geometry_msgs/WrenchStamped expected_wrench
+
+# Just for convenience, we return the TF moving -> task frame
+# This is useful so a client using this feedback doesn't have to look it up again
+geometry_msgs/TransformStamped tf_moving_to_task

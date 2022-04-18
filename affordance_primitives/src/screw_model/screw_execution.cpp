@@ -84,6 +84,7 @@ bool APScrewExecutor::getScrewTwist(
   feedback.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
   feedback.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
   feedback.expected_wrench.wrench = VectorToWrench(wrench_to_apply);
+  feedback.tf_moving_to_task = tfmsg_moving_to_task_frame;
 
   return true;
 }
