@@ -33,6 +33,7 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <tf2_eigen/tf2_eigen.h>
 #include <tf2_ros/transform_listener.h>
 
 #include <affordance_primitives/msg_types.hpp>
@@ -58,7 +59,18 @@ Eigen::Matrix<double, 6, 1> calculateAffordanceTwist(const ScrewStamped & screw,
  */
 Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
   const ScrewStamped & screw, const Eigen::Matrix<double, 6, 1> & twist,
-  double impedance_translation, double impendance_rotation);
+  double impedance_translation, double impedance_rotation);
+
+/**
+ * @brief Calculates the wrench needed at the moving frame to perform the task. Given in moving reference frame
+ * @param affordance_wrench The calculated "afforance wrench", from the task velocity and impedance
+ * @param tf_moving_to_task The transformation from the moving frame to the task frame (i.e. frame screw is defined in)
+ * @param screw The screw message for the AP
+ * @return Wrench defined with respect to the moving frame, representing the F/T the robot needs to apply
+ */
+Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
+  const Eigen::Matrix<double, 6, 1> & affordance_wrench,
+  const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw);
 
 class APScrewExecutor
 {

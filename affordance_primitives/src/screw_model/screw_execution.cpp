@@ -4,6 +4,61 @@
 
 namespace affordance_primitives
 {
+// TODO: add test
+Eigen::Matrix<double, 6, 1> calculateAffordanceTwist(const ScrewStamped & screw, double theta_dot)
+{
+  // ScrewAxis does most of the heavy lifting
+  ScrewAxis screw_axis;
+  screw_axis.setScrewAxis(screw);
+  TwistStamped affordance_twist_msg = screw_axis.getTwist(theta_dot);
+
+  // Convert to Eigen Type and return
+  Eigen::Matrix<double, 6, 1> affordance_twist;
+  tf2::fromMsg(affordance_twist_msg.twist, affordance_twist);
+  return affordance_twist;
+}
+
+// TODO: add test
+Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
+  const ScrewStamped & screw, const Eigen::Matrix<double, 6, 1> & twist,
+  double impedance_translation, double impedance_rotation)
+{
+  Eigen::Matrix<double, 6, 1> affordance_wrench;
+  if (screw.is_pure_translation) {
+    // Pure Translation: No torque, force is just along direction of motion
+    affordance_wrench.head(3) = impedance_translation * twist.head(3);
+    affordance_wrench.tail(3).setZero();
+  } else {
+    // Rotation cases: torque comes from angular velocity, force from the linear velocity
+    affordance_wrench.head(3) = impedance_translation * screw.pitch * twist.tail(3);
+    affordance_wrench.tail(3) = impedance_rotation * twist.tail(3);
+  }
+  return affordance_wrench;
+}
+
+// TODO: add test
+Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
+  const Eigen::Matrix<double, 6, 1> & affordance_wrench,
+  const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw)
+{
+  Eigen::Matrix<double, 6, 1> wrench_to_apply;
+
+  // Convert the affordance_wrench to the moving frame
+  Eigen::Matrix<double, 6, 1> moving_wrench = transformWrench(affordance_wrench, tf_moving_to_task);
+
+  // Convert screw origin to Eigen types
+  Eigen::Vector3d screw_origin;
+  tf2::fromMsg(screw.origin, screw_origin);
+
+  // Calculate wrench to apply
+  wrench_to_apply.tail(3) = moving_wrench.tail(3);
+  Eigen::Vector3d radius =
+    tf_moving_to_task.translation() + tf_moving_to_task.linear() * screw_origin;
+  wrench_to_apply.head(3) =
+    moving_wrench.head(3) + radius.cross(Eigen::Vector3d(moving_wrench.tail(3)));
+  return wrench_to_apply;
+}
+
 APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_) {}
 
 bool APScrewExecutor::getScrewTwist(

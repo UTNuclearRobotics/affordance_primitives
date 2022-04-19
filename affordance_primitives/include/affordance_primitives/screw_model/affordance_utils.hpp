@@ -119,14 +119,14 @@ Eigen::Matrix<double, 6, 1> transformTwist(
   const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf);
 
 /**
- * @brief Transforms a twist to a new frame
- * Equation: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
- * @param twist The twist to transform, with format [linear ; angular]
+ * @brief Transforms a wrench to a new frame
+ * Equation: wrench_in_A = Adjoint(tf_from_B_to_A)^T * wrench_in_B
+ * @param wrench The wrench to transform, with format [force ; torque]
  * @param tf The transformation from the new frame to old frame
- * @return The transformed twist, with format [linear ; angular]
+ * @return The transformed wrench, with format [force ; torque]
  */
 Eigen::Matrix<double, 6, 1> transformWrench(
-  const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf);
+  const Eigen::Matrix<double, 6, 1> & wrench, const Eigen::Isometry3d & tf);
 
 /**
  * @brief Gets the pretty string format for a TwistStamped message

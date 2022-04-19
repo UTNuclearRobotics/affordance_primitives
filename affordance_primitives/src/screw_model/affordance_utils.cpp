@@ -160,6 +160,20 @@ Eigen::MatrixXd getAdjointMatrix(const Transform & transform)
   return getAdjointMatrix(tf2::transformToEigen(transform));
 }
 
+// TODO: add test
+Eigen::Matrix<double, 6, 1> transformTwist(
+  const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf)
+{
+  return getAdjointMatrix(tf) * twist;
+}
+
+// TODO: add test
+Eigen::Matrix<double, 6, 1> transformWrench(
+  const Eigen::Matrix<double, 6, 1> & wrench, const Eigen::Isometry3d & tf)
+{
+  return getAdjointMatrix(tf.inverse()).transpose() * wrench;
+}
+
 Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat & cart_float)
 {
   Eigen::Matrix<double, 6, 1> output;
