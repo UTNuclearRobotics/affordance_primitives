@@ -176,8 +176,8 @@ std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(double theta_step, size_t
   }
 
   // Iterate over number of steps to generate waypoints
-  output.reserve(num_steps);
-  for (size_t i = 1; i < num_steps + 1; i++) {
+  output.reserve(num_steps + 1);
+  for (size_t i = 0; i < num_steps + 1; i++) {
     output.push_back(getTF(i * theta_step));
   }
   return output;

@@ -108,6 +108,8 @@ ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformSta
 
   ScrewStamped output;
   output.header.frame_id = transform.child_frame_id;
+  output.is_pure_translation = input_screw.is_pure_translation;
+  output.pitch = input_screw.pitch;
 
   // Convert to Eigen types
   auto tf_new_to_old = (tf2::transformToEigen(transform.transform)).inverse();
