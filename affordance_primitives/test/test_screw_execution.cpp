@@ -48,6 +48,13 @@ inline void checkVector(const affordance_primitives::Vector3 & vec, double x, do
   EXPECT_NEAR(vec.z, z, EPSILON);
 }
 
+inline void checkVector(const Eigen::Vector3d & vec, double x, double y, double z)
+{
+  EXPECT_NEAR(vec.x(), x, EPSILON);
+  EXPECT_NEAR(vec.y(), y, EPSILON);
+  EXPECT_NEAR(vec.z(), z, EPSILON);
+}
+
 inline void checkQuaternion(
   const affordance_primitives::Quaternion & quat, double x, double y, double z, double w)
 {
@@ -190,6 +197,52 @@ TEST(ScrewExecution, lookupTF)
   checkVector(ap_feedback.tf_moving_to_task.transform.translation, 2, 0, 0);
   checkQuaternion(
     ap_feedback.tf_moving_to_task.transform.rotation, 0.5 * sqrt(2), 0, 0, 0.5 * sqrt(2));
+}
+
+TEST(ScrewExecution, helperFunctions)
+{
+  // Set up Screw msg
+  affordance_primitives::ScrewStamped screw_msg;
+  screw_msg.header.frame_id = TASK_FRAME_NAME;
+  screw_msg.axis.z = 1;
+
+  // Set up test case TF
+  Eigen::Isometry3d tf_moving_to_task;
+  tf_moving_to_task.translation() = Eigen::Vector3d(2, 0, 0);
+  tf_moving_to_task.linear() =
+    Eigen::Quaterniond(sqrt(2) / 2, sqrt(2) / 2, 0, 0).toRotationMatrix();
+
+  // Check for affordance twist
+  const double delta_theta = 1.0;
+  Eigen::Matrix<double, 6, 1> affordance_twist;
+  ASSERT_NO_THROW(
+    affordance_twist = affordance_primitives::calculateAffordanceTwist(screw_msg, delta_theta));
+
+  // This is actually really easy.. we expect rotation about 0 with no translation
+  checkVector(affordance_twist.head(3), 0, 0, 0);
+  checkVector(affordance_twist.tail(3), 0, 0, 1);
+
+  // Now check the affordance wrench
+  const double impedance_translation = 100;
+  const double impedance_rotation = 5;
+  Eigen::Matrix<double, 6, 1> affordance_wrench;
+  ASSERT_NO_THROW(
+    affordance_wrench = affordance_primitives::calculateAffordanceWrench(
+      screw_msg, affordance_twist, impedance_translation, impedance_rotation));
+
+  // Expect no force, and some torque
+  checkVector(affordance_wrench.head(3), 0, 0, 0);
+  checkVector(affordance_wrench.tail(3), 0, 0, impedance_rotation);
+
+  // Finally, we check calculated the wrench we must apply at the moving frame
+  Eigen::Matrix<double, 6, 1> applied_wrench;
+  ASSERT_NO_THROW(
+    applied_wrench = affordance_primitives::calculateAppliedWrench(
+      affordance_wrench, tf_moving_to_task, screw_msg));
+
+  // Expect forces and torques to apply this wrench
+  checkVector(applied_wrench.head(3), 0, 0, -2 * impedance_rotation);
+  checkVector(applied_wrench.tail(3), 0, -1 * impedance_rotation, 0);
 }
 
 int main(int argc, char ** argv)

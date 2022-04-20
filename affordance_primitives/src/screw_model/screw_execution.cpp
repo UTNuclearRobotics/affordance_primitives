@@ -4,7 +4,6 @@
 
 namespace affordance_primitives
 {
-// TODO: add test
 Eigen::Matrix<double, 6, 1> calculateAffordanceTwist(const ScrewStamped & screw, double theta_dot)
 {
   // ScrewAxis does most of the heavy lifting
@@ -18,7 +17,6 @@ Eigen::Matrix<double, 6, 1> calculateAffordanceTwist(const ScrewStamped & screw,
   return affordance_twist;
 }
 
-// TODO: add test
 Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
   const ScrewStamped & screw, const Eigen::Matrix<double, 6, 1> & twist,
   double impedance_translation, double impedance_rotation)
@@ -36,7 +34,6 @@ Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
   return affordance_wrench;
 }
 
-// TODO: add test
 Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
   const Eigen::Matrix<double, 6, 1> & affordance_wrench,
   const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw)
