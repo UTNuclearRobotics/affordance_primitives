@@ -81,14 +81,14 @@ public:
 
   bool getScrewTwist(const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback);
 
-private:
   /**
    * @brief Gets the TF from the moving frame to task frame, either by looking it up or checking the passed one
    * @param req The AP request containing frame information
    * @return If request invalid or lookup failed, returns nullopt. Otherwise, the TF is the location of the task frame with respect to the moving frame
    */
-  std::optional<Eigen::Isometry3d> getTFInfo(const AffordancePrimitiveGoal & req);
+  std::optional<TransformStamped> getTFInfo(const AffordancePrimitiveGoal & req);
 
+private:
   // TF Lookup
   tf2_ros::Buffer tfBuffer_;
   tf2_ros::TransformListener tfListener_;

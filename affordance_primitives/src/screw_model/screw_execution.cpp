@@ -61,6 +61,42 @@ APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_) {}
 bool APScrewExecutor::getScrewTwist(
   const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback)
 {
+  // Lookup or check passed TF info
+  std::optional<TransformStamped> tfmsg_moving_to_task = getTFInfo(req);
+  if (!tfmsg_moving_to_task.has_value()) {
+    return false;
+  }
+  Eigen::Isometry3d tf_moving_to_task = tf2::transformToEigen(*tfmsg_moving_to_task);
+
+  // Set the sign of the velocity cmd to be same as requested delta
+  const double theta_dot = copysign(req.theta_dot, req.screw_distance);
+
+  // Calculate the twist and wrench in the task frame
+  const Eigen::Matrix<double, 6, 1> affordance_twist =
+    calculateAffordanceTwist(req.screw, theta_dot);
+  const Eigen::Matrix<double, 6, 1> affordance_wrench = calculateAffordanceWrench(
+    req.screw, affordance_twist, req.task_impedance_translation, req.task_impedance_rotation);
+
+  // Convert twist in task frame to be twist in moving frame
+  const Eigen::Matrix<double, 6, 1> moving_twist =
+    transformTwist(affordance_twist, tf_moving_to_task);
+
+  // Calculate the wrench to apply in the moving frame
+  const Eigen::Matrix<double, 6, 1> moving_wrench =
+    calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw);
+
+  // Package for response
+  feedback.moving_frame_twist.header.frame_id = tfmsg_moving_to_task->header.frame_id;
+  feedback.moving_frame_twist.twist = tf2::toMsg(moving_twist);
+  feedback.expected_wrench.header.frame_id = tfmsg_moving_to_task->header.frame_id;
+  feedback.expected_wrench.wrench = VectorToWrench(moving_wrench);
+  feedback.tf_moving_to_task = *tfmsg_moving_to_task;
+
+  return true;
+}
+
+std::optional<TransformStamped> APScrewExecutor::getTFInfo(const AffordancePrimitiveGoal & req)
+{
   TransformStamped tfmsg_moving_to_task_frame;
 
   // Check if we can transform the Task frame to the Moving frame
@@ -71,7 +107,7 @@ bool APScrewExecutor::getScrewTwist(
         tfBuffer_.lookupTransform(req.moving_frame_name, req.screw.header.frame_id, ros::Time(0));
     } catch (tf2::TransformException & ex) {
       ROS_WARN_THROTTLE(1, "%s", ex.what());
-      return false;
+      return std::nullopt;
     }
   } else if (req.moving_frame_source == req.PROVIDED) {
     // Set it
@@ -82,62 +118,13 @@ bool APScrewExecutor::getScrewTwist(
         1,
         "Provided 'moving_to_task_frame' child frame "
         "name does not match screw header (task) frame, ending...");
-      return false;
+      return std::nullopt;
     }
   } else {
     ROS_WARN_STREAM_THROTTLE(1, "Unexpected 'moving_frame_source' requested, ending...");
-    return false;
+    return std::nullopt;
   }
 
-  // Set the sign of the velocity cmd to be same as requested delta
-  const double theta_dot = copysign(req.theta_dot, req.screw_distance);
-
-  // Calculate commanded twist in Task frame
-  ScrewAxis screw_axis;
-  screw_axis.setScrewAxis(req.screw);
-  TwistStamped twist_in_task_frame = screw_axis.getTwist(theta_dot);
-
-  // Convert twist to EE frame using the adjoint
-  Eigen::Matrix<double, 6, 1> eigen_twist_task_frame;
-  tf2::fromMsg(twist_in_task_frame.twist, eigen_twist_task_frame);
-  Eigen::Matrix<double, 6, 1> eigen_twist_moving_frame =
-    getAdjointMatrix(tfmsg_moving_to_task_frame.transform) * eigen_twist_task_frame;
-
-  // Figure out estimated wrench
-  Eigen::Matrix<double, 6, 1> eigen_wrench_task_frame;
-  if (req.screw.is_pure_translation) {
-    eigen_wrench_task_frame.head(3) =
-      req.task_impedance_translation * eigen_twist_task_frame.head(3);
-    eigen_wrench_task_frame.tail(3).setZero();
-  } else {
-    eigen_wrench_task_frame.head(3) =
-      req.task_impedance_translation * req.screw.pitch * eigen_twist_task_frame.tail(3);
-    eigen_wrench_task_frame.tail(3) = req.task_impedance_rotation * eigen_twist_task_frame.tail(3);
-  }
-
-  // Convert wrench to moving frame
-  Eigen::Isometry3d tf_eigen_moving_to_task_frame =
-    tf2::transformToEigen(tfmsg_moving_to_task_frame);
-  Eigen::Matrix<double, 6, 1> eigen_wrench_moving_frame =
-    getAdjointMatrix(tf_eigen_moving_to_task_frame.inverse()).transpose() * eigen_wrench_task_frame;
-
-  // Calculate wrench to apply
-  Eigen::Matrix<double, 6, 1> wrench_to_apply;
-  wrench_to_apply.tail(3) = eigen_wrench_moving_frame.tail(3);
-  Eigen::Vector3d screw_origin;
-  tf2::fromMsg(req.screw.origin, screw_origin);
-  Eigen::Vector3d radius = tf_eigen_moving_to_task_frame.translation() +
-                           tf_eigen_moving_to_task_frame.linear() * screw_origin;
-  wrench_to_apply.head(3) = eigen_wrench_moving_frame.head(3) +
-                            radius.cross(Eigen::Vector3d(eigen_wrench_moving_frame.tail(3)));
-
-  // Package for response
-  feedback.moving_frame_twist.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  feedback.moving_frame_twist.twist = tf2::toMsg(eigen_twist_moving_frame);
-  feedback.expected_wrench.header.frame_id = tfmsg_moving_to_task_frame.header.frame_id;
-  feedback.expected_wrench.wrench = VectorToWrench(wrench_to_apply);
-  feedback.tf_moving_to_task = tfmsg_moving_to_task_frame;
-
-  return true;
+  return tfmsg_moving_to_task_frame;
 }
 }  // namespace affordance_primitives
