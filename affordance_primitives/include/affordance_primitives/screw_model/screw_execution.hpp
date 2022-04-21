@@ -80,7 +80,7 @@ public:
   ~APScrewExecutor(){};
 
   bool getScrewTwist(const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback);
-  std::vector<PoseStamped> getScrewWaypoints(const AffordancePrimitiveGoal & req, double num_steps);
+  std::vector<AffordanceWaypoint> getScrewWaypoints(const AffordancePrimitiveGoal & req, size_t num_steps);
 
   /**
    * @brief Gets the TF from the moving frame to task frame, either by looking it up or checking the passed one
