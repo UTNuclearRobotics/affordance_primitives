@@ -94,7 +94,7 @@ TEST(ScrewExecution, providedTF)
   // Check for bogus input case
   ap_goal.moving_frame_source = -1;
   bool bool_result = true;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_FALSE(bool_result);
 
   // Set up Screw msg
@@ -110,7 +110,7 @@ TEST(ScrewExecution, providedTF)
   ap_goal.moving_to_task_frame = tf_msg;
   ap_goal.screw = screw_msg;
   bool_result = true;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_FALSE(bool_result);
 
   // Set up transform msg
@@ -125,7 +125,7 @@ TEST(ScrewExecution, providedTF)
   ap_goal.screw.is_pure_translation = false;
   ap_goal.screw.pitch = 0;
   bool_result = false;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_TRUE(bool_result);
   checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, 0, -2 * ap_goal.theta_dot);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, -1 * ap_goal.theta_dot, 0);
@@ -140,7 +140,7 @@ TEST(ScrewExecution, providedTF)
   // Check valid screw motion case
   ap_goal.screw.pitch = 1.5;
   bool_result = false;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_TRUE(bool_result);
   checkVector(
     ap_feedback.moving_frame_twist.twist.linear, 0, -1 * ap_goal.screw.pitch * ap_goal.theta_dot,
@@ -150,7 +150,7 @@ TEST(ScrewExecution, providedTF)
   // Check valid translation case
   ap_goal.screw.is_pure_translation = true;
   bool_result = false;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_TRUE(bool_result);
   checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, -1 * ap_goal.theta_dot, 0);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, 0, 0);
@@ -175,7 +175,7 @@ TEST(ScrewExecution, lookupTF)
   // If we look up a bogus frame, we expect no exception but a false return
   ap_goal.moving_frame_name = "some_bogus_frame";
   bool bool_result = true;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_FALSE(bool_result);
 
   // If we lookup the correct frame, we should get good results
@@ -186,7 +186,7 @@ TEST(ScrewExecution, lookupTF)
   ap_goal.screw.is_pure_translation = false;
   ap_goal.screw.pitch = 0;
   bool_result = false;
-  ASSERT_NO_THROW(bool_result = exec.getScrewTwist(ap_goal, ap_feedback));
+  ASSERT_NO_THROW(bool_result = exec.setStreamingCommands(ap_goal, ap_feedback));
   EXPECT_TRUE(bool_result);
   checkVector(ap_feedback.moving_frame_twist.twist.linear, 0, 0, -2 * ap_goal.theta_dot);
   checkVector(ap_feedback.moving_frame_twist.twist.angular, 0, -1 * ap_goal.theta_dot, 0);

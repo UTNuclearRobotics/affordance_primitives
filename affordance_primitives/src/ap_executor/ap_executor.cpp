@@ -163,7 +163,7 @@ AffordancePrimitiveResult APExecutor::execute(
     // Otherwise, send commands
     else {
       AffordancePrimitiveFeedback ap_feedback;
-      if (!screw_executor_->getScrewTwist(*goal, ap_feedback)) {
+      if (!screw_executor_->setStreamingCommands(*goal, ap_feedback)) {
         ap_result.result = ap_result.KIN_VIOLATION;
         break;
       }

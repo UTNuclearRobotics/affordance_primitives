@@ -58,7 +58,7 @@ Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
 
 APScrewExecutor::APScrewExecutor() : tfListener_(tfBuffer_) {}
 
-bool APScrewExecutor::getScrewTwist(
+bool APScrewExecutor::setStreamingCommands(
   const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback)
 {
   // Lookup or check passed TF info
@@ -95,7 +95,7 @@ bool APScrewExecutor::getScrewTwist(
   return true;
 }
 
-std::vector<AffordanceWaypoint> APScrewExecutor::getScrewWaypoints(
+std::vector<AffordanceWaypoint> APScrewExecutor::getTrajectoryCommands(
   const AffordancePrimitiveGoal & req, size_t num_steps)
 {
   // Lookup or check passed TF info
