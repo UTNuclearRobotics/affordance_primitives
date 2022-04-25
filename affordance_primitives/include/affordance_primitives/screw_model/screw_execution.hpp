@@ -81,7 +81,7 @@ public:
 
   bool setStreamingCommands(
     const AffordancePrimitiveGoal & req, AffordancePrimitiveFeedback & feedback);
-  std::vector<AffordanceWaypoint> getTrajectoryCommands(
+  std::optional<AffordanceTrajectory> getTrajectoryCommands(
     const AffordancePrimitiveGoal & req, size_t num_steps);
 
   /**

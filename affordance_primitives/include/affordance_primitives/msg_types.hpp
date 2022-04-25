@@ -42,6 +42,7 @@
 
 #include <affordance_primitive_msgs/APRobotParameter.h>
 #include <affordance_primitive_msgs/AffordancePrimitiveAction.h>
+#include <affordance_primitive_msgs/AffordanceTrajectory.h>
 #include <affordance_primitive_msgs/AffordanceWaypoint.h>
 #include <affordance_primitive_msgs/CartesianFloat.h>
 #include <affordance_primitive_msgs/ScrewStamped.h>
@@ -60,6 +61,7 @@ using AffordancePrimitiveAction = affordance_primitive_msgs::AffordancePrimitive
 using AffordancePrimitiveGoal = affordance_primitive_msgs::AffordancePrimitiveGoal;
 using AffordancePrimitiveFeedback = affordance_primitive_msgs::AffordancePrimitiveFeedback;
 using AffordancePrimitiveResult = affordance_primitive_msgs::AffordancePrimitiveResult;
+using AffordanceTrajectory = affordance_primitive_msgs::AffordanceTrajectory;
 using AffordanceWaypoint = affordance_primitive_msgs::AffordanceWaypoint;
 using CartesianFloat = affordance_primitive_msgs::CartesianFloat;
 using ScrewStamped = affordance_primitive_msgs::ScrewStamped;

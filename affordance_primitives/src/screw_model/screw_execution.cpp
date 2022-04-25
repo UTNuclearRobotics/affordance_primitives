@@ -95,77 +95,81 @@ bool APScrewExecutor::setStreamingCommands(
   return true;
 }
 
-std::vector<AffordanceWaypoint> APScrewExecutor::getTrajectoryCommands(
+std::optional<AffordanceTrajectory> APScrewExecutor::getTrajectoryCommands(
   const AffordancePrimitiveGoal & req, size_t num_steps)
 {
   // Lookup or check passed TF info
   std::optional<TransformStamped> tfmsg_moving_to_task = getTFInfo(req);
   if (!tfmsg_moving_to_task.has_value()) {
-    return std::vector<AffordanceWaypoint>();
+    return std::nullopt;
   }
   Eigen::Isometry3d tf_moving_to_task = tf2::transformToEigen(*tfmsg_moving_to_task);
 
   // Set the sign of the velocity cmd to be same as requested delta
   const double theta_dot = copysign(req.theta_dot, req.screw_distance);
 
-  // Transform screw to be in initial moving frame
-  ScrewStamped screw_moving_frame;
-  TransformStamped tfmsg_task_to_moving = tf2::eigenToTransform(tf_moving_to_task.inverse());
-  tfmsg_task_to_moving.header.frame_id = tfmsg_moving_to_task->child_frame_id;
-  tfmsg_task_to_moving.child_frame_id = tfmsg_moving_to_task->header.frame_id;
-  try {
-    screw_moving_frame = transformScrew(req.screw, tfmsg_task_to_moving);
-  } catch (std::runtime_error) {
-    return std::vector<AffordanceWaypoint>();
-  }
-
-  // Calculate the twist and wrench in the initial moving frame
+  // Calculate the twist and wrench of the affordance frame
   const Eigen::Matrix<double, 6, 1> affordance_twist =
-    calculateAffordanceTwist(screw_moving_frame, theta_dot);
+    calculateAffordanceTwist(req.screw, theta_dot);
   const Eigen::Matrix<double, 6, 1> affordance_wrench = calculateAffordanceWrench(
-    screw_moving_frame, affordance_twist, req.task_impedance_translation,
-    req.task_impedance_rotation);
+    req.screw, affordance_twist, req.task_impedance_translation, req.task_impedance_rotation);
 
-  // Use ScrewAxis to generate a list of waypoints (defined w.r.t. initial moving frame)
+  // Convert these to be the initial moving frame and find the wrench to apply
+  // The twist and applied wrench remains constant (in the moving frame) through the motion
+  // So later we only need to rotate these to be in the affordance frame
+  const Eigen::Matrix<double, 6, 1> initial_moving_twist =
+    transformTwist(affordance_twist, tf_moving_to_task);
+  const Eigen::Matrix<double, 6, 1> applied_wrench =
+    calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw);
+
+  // Use ScrewAxis to generate a list of waypoints (defined w.r.t. affordance frame)
   const double theta_step = req.screw_distance / num_steps;
   ScrewAxis screw_axis;
-  screw_axis.setScrewAxis(screw_moving_frame);
+  screw_axis.setScrewAxis(req.screw);
   std::vector<Eigen::Isometry3d> waypoints = screw_axis.getWaypoints(theta_step, num_steps);
 
-  // Set up outputs
-  std::vector<AffordanceWaypoint> waypoints_msgs;
-  waypoints_msgs.reserve(num_steps + 1);
+  // Set up output
+  AffordanceTrajectory ap_trajectory;
+  ap_trajectory.trajectory.reserve(num_steps + 1);
+
+  // Put all the information in the task frame
+  ap_trajectory.header.frame_id = tfmsg_moving_to_task->child_frame_id;
 
   // Fill pose, twist, wrench info from generated waypoints
   const double time_step = theta_step / theta_dot;
   double this_time = 0;
   for (auto wp : waypoints) {
-    // TODO: The twist/wrench is the same in every waypoint (we have assumed a constant screw axis). Could skip these calculations
-    // Convert affordance twist to this frame
-    const Eigen::Matrix<double, 6, 1> moving_twist = transformTwist(affordance_twist, wp.inverse());
-
-    // Calculate wrench to apply in this frame
-    const Eigen::Matrix<double, 6, 1> moving_wrench =
-      calculateAppliedWrench(affordance_wrench, wp.inverse(), screw_moving_frame);
-
-    // Set the outputs
+    // Set up this waypoint
     AffordanceWaypoint this_waypoint;
-    this_waypoint.pose.pose = tf2::toMsg(wp);
-    this_waypoint.pose.header.frame_id = tfmsg_moving_to_task->header.frame_id;
-    this_waypoint.twist = tf2::toMsg(moving_twist);
-    this_waypoint.wrench = VectorToWrench(moving_wrench);
     this_waypoint.time_from_start = ros::Duration().fromSec(this_time);
-    waypoints_msgs.push_back(this_waypoint);
-
-    // Update the time for the next waypoint
     this_time += time_step;
+
+    // Find the pose in the task frame as:
+    // task_to_now = waypoint_in_affordance_frame * affordance_to_moving
+    // We consider affordance_to_moving constant and the inverse of given tf_moving_to_task
+    Eigen::Isometry3d tf_task_to_this_wp = wp * tf_moving_to_task.inverse();
+    this_waypoint.pose = tf2::toMsg(tf_task_to_this_wp);
+
+    // Now rotate the twist and wrench vectors to be in the affordance frame
+    Eigen::MatrixXd rotator(6, 6);
+    rotator.setZero();
+    rotator.block<3, 3>(0, 0) = tf_task_to_this_wp.linear();
+    rotator.block<3, 3>(3, 3) = tf_task_to_this_wp.linear();
+
+    const Eigen::Matrix<double, 6, 1> this_twist = rotator * initial_moving_twist;
+    this_waypoint.twist = tf2::toMsg(this_twist);
+
+    const Eigen::Matrix<double, 6, 1> this_wrench = rotator * applied_wrench;
+    this_waypoint.wrench = VectorToWrench(this_wrench);
+
+    ap_trajectory.trajectory.push_back(this_waypoint);
   }
 
   // We should set the twist/wrench of the last waypoint to be 0
-  waypoints_msgs.back().twist = Twist();
-  waypoints_msgs.back().wrench = Wrench();
+  ap_trajectory.trajectory.back().twist = Twist();
+  ap_trajectory.trajectory.back().wrench = Wrench();
 
-  return waypoints_msgs;
+  return ap_trajectory;
 }
 
 std::optional<TransformStamped> APScrewExecutor::getTFInfo(const AffordancePrimitiveGoal & req)
