@@ -191,7 +191,7 @@ AffordancePrimitiveResult APExecutor::execute(
     // Otherwise, send commands
     else {
       auto ap_feedback = std::make_shared<AffordancePrimitiveFeedback>();
-      if (!screw_executor_->getScrewTwist(*goal, *ap_feedback)) {
+      if (!screw_executor_->setStreamingCommands(*goal, *ap_feedback)) {
         ap_result->result = ap_result->KIN_VIOLATION;
         break;
       }
