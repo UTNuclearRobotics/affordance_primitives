@@ -323,8 +323,8 @@ TEST(ScrewAxis, get_waypoints)
   std::vector<Eigen::Isometry3d> waypoints;
   ASSERT_NO_THROW(waypoints = screw_axis.getWaypoints(theta_step, num_steps));
 
-  // Check output has correct size
-  EXPECT_EQ(waypoints.size(), num_steps);
+  // Check output has correct size (the number of waypoints, plus identity at the start)
+  EXPECT_EQ(waypoints.size(), num_steps + 1);
 
   // Check that the back waypoint matches a 90 degree rotation
   auto last_wp = waypoints.back();
