@@ -31,11 +31,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <gtest/gtest.h>
+#include <tf2_eigen/tf2_eigen.h>
 
 #include <affordance_primitives/ap_executor/ap_executor.hpp>
 #include <affordance_primitives/msg_types.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <tf2_eigen/tf2_eigen.h>
 
 constexpr double EPSILON = 1e-4;
 

@@ -108,6 +108,8 @@ ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformSta
 
   ScrewStamped output;
   output.header.frame_id = transform.child_frame_id;
+  output.is_pure_translation = input_screw.is_pure_translation;
+  output.pitch = input_screw.pitch;
 
   // Convert to Eigen types
   auto tf_new_to_old = (tf2::transformToEigen(transform.transform)).inverse();
@@ -158,6 +160,18 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d & transform)
 Eigen::MatrixXd getAdjointMatrix(const Transform & transform)
 {
   return getAdjointMatrix(tf2::transformToEigen(transform));
+}
+
+Eigen::Matrix<double, 6, 1> transformTwist(
+  const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf)
+{
+  return getAdjointMatrix(tf) * twist;
+}
+
+Eigen::Matrix<double, 6, 1> transformWrench(
+  const Eigen::Matrix<double, 6, 1> & wrench, const Eigen::Isometry3d & tf)
+{
+  return getAdjointMatrix(tf.inverse()).transpose() * wrench;
 }
 
 Eigen::Matrix<double, 6, 1> CartesianFloatToVector(const CartesianFloat & cart_float)

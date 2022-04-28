@@ -33,10 +33,11 @@
 
 #pragma once
 
+#include <tf2_eigen/tf2_eigen.h>
+
 #include <affordance_primitives/msg_types.hpp>
 #include <optional>
 #include <sstream>
-#include <tf2_eigen/tf2_eigen.h>
 
 namespace affordance_primitives
 {
@@ -106,6 +107,26 @@ Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d & transform);
  * from the way tf2_eigen converts between twist messages and Eigen vectors, but is opposite from certain math notation
  */
 Eigen::MatrixXd getAdjointMatrix(const Transform & transform);
+
+/**
+ * @brief Transforms a twist to a new frame
+ * Equation: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
+ * @param twist The twist to transform, with format [linear ; angular]
+ * @param tf The transformation from the new frame to old frame
+ * @return The transformed twist, with format [linear ; angular]
+ */
+Eigen::Matrix<double, 6, 1> transformTwist(
+  const Eigen::Matrix<double, 6, 1> & twist, const Eigen::Isometry3d & tf);
+
+/**
+ * @brief Transforms a wrench to a new frame
+ * Equation: wrench_in_A = Adjoint(tf_from_B_to_A)^T * wrench_in_B
+ * @param wrench The wrench to transform, with format [force ; torque]
+ * @param tf The transformation from the new frame to old frame
+ * @return The transformed wrench, with format [force ; torque]
+ */
+Eigen::Matrix<double, 6, 1> transformWrench(
+  const Eigen::Matrix<double, 6, 1> & wrench, const Eigen::Isometry3d & tf);
 
 /**
  * @brief Gets the pretty string format for a TwistStamped message

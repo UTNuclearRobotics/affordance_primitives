@@ -47,3 +47,7 @@ geometry_msgs/TwistStamped moving_frame_twist
 
 # Wrench required in the EE frame
 geometry_msgs/WrenchStamped expected_wrench
+
+# Just for convenience, we return the TF moving -> task frame
+# This is useful so a client using this feedback doesn't have to look it up again
+geometry_msgs/TransformStamped tf_moving_to_task
