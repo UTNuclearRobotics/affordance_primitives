@@ -31,6 +31,7 @@ catkin_package(
     affordance_primitive_msgs
     geometry_msgs
     pluginlib
+    tf2_eigen
     tf2_ros
 )
 
