@@ -52,19 +52,19 @@ Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
   // If the nominal wrench is within the limits, just return it
   if (
     fabs(limits.max_torque) < 1e-8 ||
-    wrench_moving_frame.head(3).norm() < fabs(limits.max_torque)) {
+    wrench_moving_frame.tail(3).norm() < fabs(limits.max_torque)) {
     return wrench_moving_frame;
   }
 
   // Otherwise, solve for a wrench as close as possible
   // First enforce torque limit
-  wrench_moving_frame.head(3) *= (fabs(limits.max_torque) / wrench_moving_frame.head(3).norm());
+  wrench_moving_frame.tail(3) *= (fabs(limits.max_torque) / wrench_moving_frame.tail(3).norm());
 
   // Figure out how much of the moving frame torque helps achieve the required affordance torque
-  const Eigen::Vector3d affordance_torque = affordance_wrench.head(3);
+  const Eigen::Vector3d affordance_torque = affordance_wrench.tail(3);
   const auto tf_task_to_moving = tf_moving_to_task.inverse();
   const Eigen::Vector3d applied_torque_task_frame =
-    tf_task_to_moving.linear() * wrench_moving_frame.head(3);
+    tf_task_to_moving.linear() * wrench_moving_frame.tail(3);
   const Eigen::Vector3d applied_affordance_torque =
     applied_torque_task_frame.dot(affordance_torque) / affordance_torque.squaredNorm() *
     affordance_torque;
@@ -87,7 +87,7 @@ Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
   }
 
   // Add the calculated force and return
-  wrench_moving_frame.tail(3) += tf_moving_to_task.linear() * force_help;
+  wrench_moving_frame.head(3) += tf_moving_to_task.linear() * force_help;
   return wrench_moving_frame;
 }
 
