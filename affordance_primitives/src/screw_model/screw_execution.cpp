@@ -41,10 +41,6 @@ Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
 {
   Eigen::Matrix<double, 6, 1> wrench_to_apply;
 
-  // Convert screw origin to Eigen types
-  Eigen::Vector3d screw_origin;
-  tf2::fromMsg(screw.origin, screw_origin);
-
   // Convert the affordance_wrench to the moving frame
   Eigen::Matrix<double, 6, 1> wrench_moving_frame =
     transformWrench(affordance_wrench, tf_moving_to_task);
