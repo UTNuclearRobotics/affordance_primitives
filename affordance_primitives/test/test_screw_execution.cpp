@@ -233,10 +233,11 @@ TEST(ScrewExecution, helperFunctions)
   checkVector(affordance_wrench.tail(3), 0, 0, impedance_rotation);
 
   // Finally, we check calculated the wrench we must apply at the moving frame
+  affordance_primitives::APRobotParameter limits;
   Eigen::Matrix<double, 6, 1> applied_wrench;
   ASSERT_NO_THROW(
     applied_wrench = affordance_primitives::calculateAppliedWrench(
-      affordance_wrench, tf_moving_to_task, screw_msg));
+      affordance_wrench, tf_moving_to_task, screw_msg, limits));
 
   // Expect forces and torques to apply this wrench
   checkVector(applied_wrench.head(3), 0, 0, -2 * impedance_rotation);
