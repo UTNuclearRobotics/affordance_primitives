@@ -36,24 +36,55 @@ Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
 
 Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
   const Eigen::Matrix<double, 6, 1> & affordance_wrench,
-  const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw)
+  const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw,
+  const APRobotParameter & limits)
 {
   Eigen::Matrix<double, 6, 1> wrench_to_apply;
 
   // Convert the affordance_wrench to the moving frame
-  Eigen::Matrix<double, 6, 1> moving_wrench = transformWrench(affordance_wrench, tf_moving_to_task);
+  Eigen::Matrix<double, 6, 1> wrench_moving_frame =
+    transformWrench(affordance_wrench, tf_moving_to_task);
 
-  // Convert screw origin to Eigen types
-  Eigen::Vector3d screw_origin;
-  tf2::fromMsg(screw.origin, screw_origin);
+  // If the nominal wrench is within the limits, just return it
+  if (
+    fabs(limits.max_torque) < 1e-8 ||
+    wrench_moving_frame.tail(3).norm() < fabs(limits.max_torque)) {
+    return wrench_moving_frame;
+  }
 
-  // Calculate wrench to apply
-  wrench_to_apply.tail(3) = moving_wrench.tail(3);
-  Eigen::Vector3d radius =
-    tf_moving_to_task.translation() + tf_moving_to_task.linear() * screw_origin;
-  wrench_to_apply.head(3) =
-    moving_wrench.head(3) + radius.cross(Eigen::Vector3d(moving_wrench.tail(3)));
-  return wrench_to_apply;
+  // Otherwise, solve for a wrench as close as possible
+  // First enforce torque limit
+  wrench_moving_frame.tail(3) *= (fabs(limits.max_torque) / wrench_moving_frame.tail(3).norm());
+
+  // Figure out how much of the moving frame torque helps achieve the required affordance torque
+  const Eigen::Vector3d affordance_torque = affordance_wrench.tail(3);
+  const auto tf_task_to_moving = tf_moving_to_task.inverse();
+  const Eigen::Vector3d applied_torque_task_frame =
+    tf_task_to_moving.linear() * wrench_moving_frame.tail(3);
+  const Eigen::Vector3d applied_affordance_torque =
+    applied_torque_task_frame.dot(affordance_torque) / affordance_torque.squaredNorm() *
+    affordance_torque;
+
+  // Find the shortest vector between the screw axis and moving frame
+  Eigen::Vector3d screw_q, screw_axis;
+  tf2::fromMsg(screw.origin, screw_q);
+  tf2::fromMsg(screw.axis, screw_axis);
+  const Eigen::Vector3d vector_axis_to_moving = tf_task_to_moving.translation() - screw_q;
+  const Eigen::Vector3d radius_axis_to_moving =
+    vector_axis_to_moving - (vector_axis_to_moving.dot(screw_axis)) * screw_axis;
+
+  // Calculate force to apply, but check for small radii (results in large force)
+  Eigen::Vector3d force_help;
+  if (radius_axis_to_moving.norm() < 5e-3) {
+    force_help.setZero();
+  } else {
+    force_help = (affordance_torque - applied_affordance_torque).cross(radius_axis_to_moving) /
+                 radius_axis_to_moving.squaredNorm();
+  }
+
+  // Add the calculated force and return
+  wrench_moving_frame.head(3) += tf_moving_to_task.linear() * force_help;
+  return wrench_moving_frame;
 }
 
 APScrewExecutor::APScrewExecutor(rclcpp::Node::SharedPtr node) : node_(node)
@@ -87,7 +118,7 @@ bool APScrewExecutor::setStreamingCommands(
 
   // Calculate the wrench to apply in the moving frame
   const Eigen::Matrix<double, 6, 1> moving_wrench =
-    calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw);
+    calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw, req.robot_params);
 
   // Package for response
   feedback.moving_frame_twist.header.frame_id = tfmsg_moving_to_task->header.frame_id;
@@ -124,7 +155,7 @@ std::optional<AffordanceTrajectory> APScrewExecutor::getTrajectoryCommands(
   const Eigen::Matrix<double, 6, 1> initial_moving_twist =
     transformTwist(affordance_twist, tf_moving_to_task);
   const Eigen::Matrix<double, 6, 1> applied_wrench =
-    calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw);
+    calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw, req.robot_params);
 
   // Use ScrewAxis to generate a list of waypoints (defined w.r.t. affordance frame)
   const double theta_step = req.screw_distance / num_steps;

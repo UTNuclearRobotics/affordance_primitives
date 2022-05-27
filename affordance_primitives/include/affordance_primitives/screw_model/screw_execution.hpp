@@ -68,11 +68,13 @@ Eigen::Matrix<double, 6, 1> calculateAffordanceWrench(
  * @param affordance_wrench The calculated "afforance wrench", from the task velocity and impedance
  * @param tf_moving_to_task The transformation from the moving frame to the task frame (i.e. frame screw is defined in)
  * @param screw The screw message for the AP
+ * @param limits A message containing the force/torque limits for this AP
  * @return Wrench defined with respect to the moving frame, representing the F/T the robot needs to apply
  */
 Eigen::Matrix<double, 6, 1> calculateAppliedWrench(
   const Eigen::Matrix<double, 6, 1> & affordance_wrench,
-  const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw);
+  const Eigen::Isometry3d & tf_moving_to_task, const ScrewStamped & screw,
+  const APRobotParameter & limits);
 
 class APScrewExecutor
 {
