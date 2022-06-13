@@ -91,15 +91,13 @@ int main(int argc, char ** argv)
 
   // To trigger the move, we call the action
   auto send_goal_options = rclcpp_action::Client<AffordancePrimitive>::SendGoalOptions();
-  auto goal_response_callback =
-    [&node](std::shared_future<GoalHandleAffordancePrimitive::SharedPtr> future) {
-      auto goal_handle = future.get();
-      if (!goal_handle) {
-        RCLCPP_ERROR(node->get_logger(), "Goal was rejected by server");
-      } else {
-        RCLCPP_INFO(node->get_logger(), "Goal accepted by server, waiting for result");
-      }
-    };
+  auto goal_response_callback = [&node](GoalHandleAffordancePrimitive::SharedPtr goal_handle) {
+    if (!goal_handle) {
+      RCLCPP_ERROR(node->get_logger(), "Goal was rejected by server");
+    } else {
+      RCLCPP_INFO(node->get_logger(), "Goal accepted by server, waiting for result");
+    }
+  };
   auto feedback_callback = [&node](
                              GoalHandleAffordancePrimitive::SharedPtr,
                              const std::shared_ptr<const AffordancePrimitive::Feedback> feedback) {
