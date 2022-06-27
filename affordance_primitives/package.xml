@@ -16,6 +16,7 @@
   <depend>pluginlib</depend>
   <depend>tf2_eigen</depend>
   <depend>tf2_ros</depend>
+  <depend>moveit_msgs</depend>
 
   <build_depend>rostest</build_depend>
 

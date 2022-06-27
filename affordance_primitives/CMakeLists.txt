@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(catkin REQUIRED COMPONENTS
   affordance_primitive_msgs
   geometry_msgs
+  moveit_msgs
   pluginlib
   tf2_eigen
   tf2_ros
@@ -20,6 +21,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     pluginlib
     tf2_eigen
     tf2_ros
+    moveit_msgs
 )
 
 catkin_package(
@@ -46,6 +48,7 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/configs_interface/parameter_manager.hpp
   include/${PROJECT_NAME}/screw_model/screw_axis.hpp
   include/${PROJECT_NAME}/screw_model/screw_execution.hpp
+  include/${PROJECT_NAME}/screw_planning/screw_planning.hpp
   include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
   include/${PROJECT_NAME}/task_monitor/task_monitor.hpp
@@ -54,6 +57,7 @@ add_library(${PROJECT_NAME} SHARED
   src/screw_model/affordance_utils.cpp
   src/screw_model/screw_axis.cpp
   src/screw_model/screw_execution.cpp
+  src/screw_planning/screw_planning.cpp
   src/task_estimator/kinematic_task_estimator.cpp
   src/task_monitor/task_monitor.cpp
 )
@@ -101,4 +105,7 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_ap_executor test/test_ap_executor.test test/test_ap_executor.cpp)
   target_link_libraries(test_ap_executor ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+  catkin_add_gtest(test_screw_planning test/test_screw_planning.cpp)
+  target_link_libraries(test_screw_planning ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()

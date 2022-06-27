@@ -182,4 +182,16 @@ std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(double theta_step, size_t
   }
   return output;
 }
+
+ScrewStamped ScrewAxis::toMsg()
+{
+  ScrewStamped output;
+  output.header.frame_id = moving_frame_name_;
+  output.is_pure_translation = is_pure_translation_;
+  output.pitch = pitch_;
+  output.origin = tf2::toMsg(origin_);
+  tf2::toMsg(axis_, output.axis);
+
+  return output;
+}
 }  // namespace affordance_primitives

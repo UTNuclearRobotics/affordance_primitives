@@ -84,6 +84,15 @@ Eigen::Isometry3d convertPoseToNewFrame(
 ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformStamped & transform);
 
 /**
+ * @brief Transforms a ScrewStamped msg by the prescribed transform
+ * @param input_screw Screw message to transform
+ * @param transform The transform to perform
+ * @return The transformed ScrewStamped
+ */
+ScrewStamped transformScrew(
+  const ScrewStamped & input_screw, const Eigen::Isometry3d & transform);  // TODO: update test
+
+/**
  * @brief Converts an axis vector to 3x3 skew symmetric matrix, for math
  */
 Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d & vec);

@@ -96,6 +96,29 @@ Eigen::Isometry3d convertPoseToNewFrame(
   return tf_root_to_new_base_frame.inverse() * tf_root_to_transformed_pose;
 }
 
+ScrewStamped transformScrew(const ScrewStamped & input_screw, const Eigen::Isometry3d & transform)
+{
+  ScrewStamped output;
+  output.is_pure_translation = input_screw.is_pure_translation;
+  output.pitch = input_screw.pitch;
+
+  // Convert to Eigen types
+  Eigen::Vector3d screw_axis, screw_origin;
+  tf2::fromMsg(input_screw.axis, screw_axis);
+  tf2::fromMsg(input_screw.origin, screw_origin);
+
+  // Perform the transform
+  auto tf_new_to_old = transform.inverse();
+  Eigen::Vector3d rotated_axis = tf_new_to_old.linear() * screw_axis;
+  Eigen::Vector3d transformed_origin =
+    tf_new_to_old.translation() + tf_new_to_old.linear() * screw_origin;
+
+  // Convert back from Eigen types
+  output.origin = tf2::toMsg(transformed_origin);
+  tf2::toMsg(rotated_axis, output.axis);
+  return output;
+}
+
 ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformStamped & transform)
 {
   if (input_screw.header.frame_id == transform.child_frame_id) {
@@ -106,25 +129,8 @@ ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformSta
       "Cannot transform screw: transform frame does not match incoming screw frame");
   }
 
-  ScrewStamped output;
+  ScrewStamped output = transformScrew(input_screw, tf2::transformToEigen(transform));
   output.header.frame_id = transform.child_frame_id;
-  output.is_pure_translation = input_screw.is_pure_translation;
-  output.pitch = input_screw.pitch;
-
-  // Convert to Eigen types
-  auto tf_new_to_old = (tf2::transformToEigen(transform.transform)).inverse();
-  Eigen::Vector3d screw_axis, screw_origin;
-  tf2::fromMsg(input_screw.axis, screw_axis);
-  tf2::fromMsg(input_screw.origin, screw_origin);
-
-  // Perform the transform
-  Eigen::Vector3d rotated_axis = tf_new_to_old.linear() * screw_axis;
-  Eigen::Vector3d transformed_origin =
-    tf_new_to_old.translation() + tf_new_to_old.linear() * screw_origin;
-
-  // Convert back from Eigen types
-  output.origin = tf2::toMsg(transformed_origin);
-  tf2::toMsg(rotated_axis, output.axis);
   return output;
 }
 
