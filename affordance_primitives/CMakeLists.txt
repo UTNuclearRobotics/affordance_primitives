@@ -32,6 +32,7 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2_eigen REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(moveit_msgs REQUIRED)
 
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -42,6 +43,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     pluginlib
     tf2_eigen
     tf2_ros
+    moveit_msgs
 )
 
 include_directories(
@@ -54,6 +56,7 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/configs_interface/parameter_manager.hpp
   include/${PROJECT_NAME}/screw_model/screw_axis.hpp
   include/${PROJECT_NAME}/screw_model/screw_execution.hpp
+  include/${PROJECT_NAME}/screw_planning/screw_planning.hpp
   include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
   include/${PROJECT_NAME}/task_monitor/task_monitor.hpp
@@ -62,6 +65,7 @@ add_library(${PROJECT_NAME} SHARED
   src/screw_model/affordance_utils.cpp
   src/screw_model/screw_axis.cpp
   src/screw_model/screw_execution.cpp
+  src/screw_planning/screw_planning.cpp
   src/task_estimator/kinematic_task_estimator.cpp
   src/task_monitor/task_monitor.cpp
 )
@@ -129,6 +133,9 @@ if(BUILD_TESTING)
   target_link_libraries(test_task_monitor ${PROJECT_NAME})
   ament_target_dependencies(test_task_monitor ${THIS_PACKAGE_INCLUDE_DEPENDS})
   add_ros_test(test/launch/test_task_monitor.test.py TIMEOUT 120 ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}")
+  
+  ament_add_gtest(test_screw_planning test/test_screw_planning.cpp)
+  target_link_libraries(test_screw_planning ${PROJECT_NAME})
 endif()
 
 ament_package()
