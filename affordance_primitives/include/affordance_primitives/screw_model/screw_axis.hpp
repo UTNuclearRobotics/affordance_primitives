@@ -35,6 +35,7 @@
 
 #include <affordance_primitives/msg_types.hpp>
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
+#include <vector>
 
 namespace affordance_primitives
 {
@@ -107,6 +108,14 @@ public:
    * @return The calculated transformation, defined with respect to the frame of the Screw Axis
    */
   Eigen::Isometry3d getTF(double delta_theta) const;
+
+  /**
+   * @brief Runs "getTF" a bunch of times to generate a waypoint trajectory
+   * @param theta_step The delta_theta to apply at each step. Larger = coarser trajectory
+   * @param num_steps The number of waypoints. num_steps * theta_steps = total delta_theta
+   * @return A vector of waypoints
+   */
+  std::vector<Eigen::Isometry3d> getWaypoints(double theta_step, size_t num_steps);
 
   // Getters
   std::string getFrame() const { return moving_frame_name_; };

@@ -41,6 +41,8 @@
 */
 
 #include <affordance_primitive_msgs/action/affordance_primitive.hpp>
+#include <affordance_primitive_msgs/msg/affordance_trajectory.hpp>
+#include <affordance_primitive_msgs/msg/affordance_waypoint.hpp>
 #include <affordance_primitive_msgs/msg/ap_robot_parameter.hpp>
 #include <affordance_primitive_msgs/msg/cartesian_float.hpp>
 #include <affordance_primitive_msgs/msg/screw_stamped.hpp>
@@ -54,6 +56,8 @@
 
 namespace affordance_primitives
 {
+using AffordanceTrajectory = affordance_primitive_msgs::msg::AffordanceTrajectory;
+using AffordanceWaypoint = affordance_primitive_msgs::msg::AffordanceWaypoint;
 using APRobotParameter = affordance_primitive_msgs::msg::APRobotParameter;
 using AffordancePrimitive = affordance_primitive_msgs::action::AffordancePrimitive;
 using AffordancePrimitiveGoal = affordance_primitive_msgs::action::AffordancePrimitive::Goal;

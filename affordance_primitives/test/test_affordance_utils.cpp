@@ -222,6 +222,29 @@ TEST(AffordanceUtils, transformScrew)
   checkVector(output_screw_msg.axis, 0, -1, 0);
 }
 
+TEST(AffordanceUtils, transformTwistAndWrench)
+{
+  // Translation [1, 0, 2]
+  // Rotation +90 degrees around X-axis
+  Eigen::Isometry3d tf;
+  tf.translation() = Eigen::Vector3d(1, 0, 2);
+  tf.linear() = Eigen::Quaterniond(sqrt(2) / 2, sqrt(2) / 2, 0, 0).toRotationMatrix();
+
+  // Test twist conversion
+  Eigen::Matrix<double, 6, 1> twist_in_B;
+  twist_in_B << 0, 1.5, -0.5, 0, 0, 1;
+  Eigen::Matrix<double, 6, 1> twist_in_A = affordance_primitives::transformTwist(twist_in_B, tf);
+  checkVector(twist_in_A.head(3), 2, 0.5, 0.5);
+  checkVector(twist_in_A.tail(3), 0, -1, 0);
+
+  // Test wrench conversion
+  Eigen::Matrix<double, 6, 1> wrench_in_B;
+  wrench_in_B << 10, 0, 15, 0, 0, 5;
+  Eigen::Matrix<double, 6, 1> wrench_in_A = affordance_primitives::transformWrench(wrench_in_B, tf);
+  checkVector(wrench_in_A.head(3), 10, -15, 0);
+  checkVector(wrench_in_A.tail(3), 30, 15, -15);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
