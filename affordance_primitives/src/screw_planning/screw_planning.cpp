@@ -173,17 +173,14 @@ std::pair<double, Eigen::Isometry3d> findClosestPoint(
 
 bool constraintFn(
   const Eigen::Isometry3d & current_pose, const Eigen::Isometry3d & start_pose,
-  const ScrewAxis & screw_axis, Eigen::Ref<Eigen::VectorXd> out)
+  const ScrewAxis & screw_axis, double theta_max, double theta_guess,
+  Eigen::Ref<Eigen::VectorXd> out)
 {
   // Find TF q -> starting
   const auto tf_q_to_starting = current_pose.inverse() * start_pose;
 
-  // Other inputs
-  double theta_max = 0.5 * M_PI;
-  double theta_0 = 0.5 * theta_max;
-
   // Find the closest point on the path
-  const auto closest_pt = findClosestPoint(tf_q_to_starting, theta_0, theta_max, screw_axis);
+  const auto closest_pt = findClosestPoint(tf_q_to_starting, theta_guess, theta_max, screw_axis);
 
   // Use closest point to calculate error
   auto error = calcError(closest_pt.second);
