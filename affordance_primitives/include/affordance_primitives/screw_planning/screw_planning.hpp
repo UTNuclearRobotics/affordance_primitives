@@ -49,7 +49,7 @@ bool encodeConstraintsMsg(
 
 bool constraintFn(
   const Eigen::Isometry3d & current_pose, const Eigen::Isometry3d & start_pose,
-  const ScrewAxis & screw_axis, Eigen::Ref<Eigen::VectorXd> out);
+  const ScrewAxis & screw_axis, double theta_max, double theta_guess, Eigen::Ref<Eigen::VectorXd> out);
 
 Eigen::VectorXd calcError(const Eigen::Isometry3d & tf_err);
 
