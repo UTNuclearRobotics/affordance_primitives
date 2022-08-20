@@ -180,8 +180,20 @@ Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1> & vector);
 std::string poseToStr(const PoseStamped & pose);
 
 /**
+ * @brief Gets a PoseStamped message from a pretty string format
+ * @return The optional is null if the pose was not found
+ */
+std::optional<PoseStamped> strToPose(const std::string & string_in);
+
+/**
  * @brief Gets the pretty string format for a ScrewStamped message
  */
 std::string screwMsgToStr(const ScrewStamped & screw);
+
+/**
+ * @brief Gets a ScrewStamped message from a pretty string format
+ * @return The optional is null if the screw was not found
+ */
+std::optional<ScrewStamped> strToScrewMsg(const std::string & string_in);
 
 }  // namespace affordance_primitives

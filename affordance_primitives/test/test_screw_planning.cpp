@@ -30,7 +30,7 @@ TEST(ScrewAxis, test_encode_decode)
   start_pose.linear() = (Eigen::Quaterniond(0.707, 0.707, 0, 0).normalized()).toRotationMatrix();
 
   // This information will be encoded into a moveit constraints message
-  moveit_msgs::msg::Constraints constraints_msg;
+  moveit_msgs::Constraints constraints_msg;
   ASSERT_TRUE(affordance_primitives::encodeConstraintsMsg(
     input_screw, start_pose, LINK_NAME, constraints_msg));
 
@@ -66,7 +66,7 @@ TEST(ScrewAxis, test_encode_decode)
   input_screw2.setScrewAxis(origin_tf, axis);
 
   // Encode-decode
-  moveit_msgs::msg::Constraints constraints_msg2;
+  moveit_msgs::Constraints constraints_msg2;
   ASSERT_TRUE(affordance_primitives::encodeConstraintsMsg(
     input_screw2, start_pose, LINK_NAME, constraints_msg2));
   ASSERT_TRUE(affordance_primitives::decodeConstraintsMsg(

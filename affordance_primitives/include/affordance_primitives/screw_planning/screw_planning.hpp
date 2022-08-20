@@ -32,9 +32,10 @@
 
 #pragma once
 
+#include <moveit_msgs/Constraints.h>
+
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_axis.hpp>
-#include <moveit_msgs/Constraints.h>
 #include <utility>
 
 namespace affordance_primitives
@@ -49,7 +50,8 @@ bool encodeConstraintsMsg(
 
 bool constraintFn(
   const Eigen::Isometry3d & current_pose, const Eigen::Isometry3d & start_pose,
-  const ScrewAxis & screw_axis, double theta_max, double theta_guess, Eigen::Ref<Eigen::VectorXd> out);
+  const ScrewAxis & screw_axis, double theta_max, double theta_guess,
+  Eigen::Ref<Eigen::VectorXd> out);
 
 Eigen::VectorXd calcError(const Eigen::Isometry3d & tf_err);
 

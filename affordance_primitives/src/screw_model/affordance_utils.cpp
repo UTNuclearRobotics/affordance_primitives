@@ -241,11 +241,44 @@ std::string twistToStr(const TwistStamped & twist)
 std::string poseToStr(const PoseStamped & pose)
 {
   std::stringstream stream;
-  stream << "\nHeader: " << pose.header.frame_id << "\nX: " << pose.pose.position.x
+  stream << "Header: " << pose.header.frame_id << "\nX: " << pose.pose.position.x
          << "\nY: " << pose.pose.position.y << "\nZ: " << pose.pose.position.z
          << "\nQX: " << pose.pose.orientation.x << "\nQY: " << pose.pose.orientation.y
          << "\nQZ: " << pose.pose.orientation.z << "\nQW: " << pose.pose.orientation.w;
   return stream.str();
+}
+
+std::optional<PoseStamped> strToPose(const std::string & string_in)
+{
+  geometry_msgs::PoseStamped output;
+
+  std::stringstream ss(string_in);
+  std::vector<std::string> lines;
+  std::string delimiter = ": ";
+
+  for (std::string line; std::getline(ss, line, '\n');) {
+    line.erase(0, line.find(delimiter) + delimiter.length());
+    lines.push_back(line);
+  }
+
+  try {
+    output.header.frame_id = lines.at(0);
+    output.pose.position.x = std::stod(lines.at(1));
+    output.pose.position.y = std::stod(lines.at(2));
+    output.pose.position.z = std::stod(lines.at(3));
+    output.pose.orientation.x = std::stod(lines.at(4));
+    output.pose.orientation.y = std::stod(lines.at(5));
+    output.pose.orientation.z = std::stod(lines.at(6));
+    output.pose.orientation.w = std::stod(lines.at(7));
+  } catch (const std::invalid_argument & e) {
+    std::cerr << e.what() << '\n';
+    return std::nullopt;
+  } catch (const std::out_of_range & e) {
+    std::cerr << e.what() << '\n';
+    return std::nullopt;
+  }
+
+  return output;
 }
 
 std::string screwMsgToStr(const ScrewStamped & screw)
@@ -257,10 +290,47 @@ std::string screwMsgToStr(const ScrewStamped & screw)
     pitch = std::to_string(screw.pitch);
 
   std::stringstream stream;
-  stream << "\nHeader: " << screw.header.frame_id << "\nOrigin X: " << screw.origin.x
+  stream << "Header: " << screw.header.frame_id << "\nOrigin X: " << screw.origin.x
          << "\nOrigin Y: " << screw.origin.y << "\nOrigin Z: " << screw.origin.z
          << "\nAxis X: " << screw.axis.x << "\nAxis Y: " << screw.axis.y
          << "\nAxis Z: " << screw.axis.z << "\nPitch: " << pitch;
   return stream.str();
+}
+
+std::optional<ScrewStamped> strToScrewMsg(const std::string & string_in)
+{
+  affordance_primitive_msgs::ScrewStamped output;
+
+  std::stringstream ss(string_in);
+  std::vector<std::string> lines;
+  std::string delimiter = ": ";
+
+  for (std::string line; std::getline(ss, line, '\n');) {
+    line.erase(0, line.find(delimiter) + delimiter.length());
+    lines.push_back(line);
+  }
+
+  try {
+    output.header.frame_id = lines.at(0);
+    output.origin.x = std::stod(lines.at(1));
+    output.origin.y = std::stod(lines.at(2));
+    output.origin.z = std::stod(lines.at(3));
+    output.axis.x = std::stod(lines.at(4));
+    output.axis.y = std::stod(lines.at(5));
+    output.axis.z = std::stod(lines.at(6));
+
+    output.is_pure_translation = lines.at(7) == "Infinity";
+    if (!output.is_pure_translation) {
+      output.pitch = std::stod(lines.at(7));
+    }
+  } catch (const std::invalid_argument e) {
+    std::cerr << e.what() << '\n';
+    return std::nullopt;
+  } catch (const std::out_of_range & e) {
+    std::cerr << e.what() << '\n';
+    return std::nullopt;
+  }
+
+  return output;
 }
 }  // namespace affordance_primitives

@@ -40,6 +40,13 @@ inline void checkVector(const affordance_primitives::Vector3 & vec, double x, do
   EXPECT_NEAR(vec.y, y, EPSILON);
   EXPECT_NEAR(vec.z, z, EPSILON);
 }
+inline void checkVector(
+  const affordance_primitives::Vector3 & vec1, const affordance_primitives::Vector3 & vec2)
+{
+  EXPECT_NEAR(vec1.x, vec2.x, EPSILON);
+  EXPECT_NEAR(vec1.y, vec2.y, EPSILON);
+  EXPECT_NEAR(vec1.z, vec2.z, EPSILON);
+}
 inline void checkVector(const Eigen::Vector3d & vec, double x, double y, double z)
 {
   EXPECT_NEAR(vec.x(), x, EPSILON);
@@ -51,6 +58,21 @@ inline void checkPoint(const affordance_primitives::Point & point, double x, dou
   EXPECT_NEAR(point.x, x, EPSILON);
   EXPECT_NEAR(point.y, y, EPSILON);
   EXPECT_NEAR(point.z, z, EPSILON);
+}
+inline void checkPoint(
+  const affordance_primitives::Point & point1, const affordance_primitives::Point & point2)
+{
+  EXPECT_NEAR(point1.x, point2.x, EPSILON);
+  EXPECT_NEAR(point1.y, point2.y, EPSILON);
+  EXPECT_NEAR(point1.z, point2.z, EPSILON);
+}
+inline void checkQuaternion(
+  const affordance_primitives::Quaternion & quat1, const affordance_primitives::Quaternion & quat2)
+{
+  EXPECT_NEAR(quat1.x, quat2.x, EPSILON);
+  EXPECT_NEAR(quat1.y, quat2.y, EPSILON);
+  EXPECT_NEAR(quat1.z, quat2.z, EPSILON);
+  EXPECT_NEAR(quat1.w, quat2.w, EPSILON);
 }
 inline void checkQuaternion(
   const affordance_primitives::Quaternion & quat, double x, double y, double z, double w)
@@ -243,6 +265,79 @@ TEST(AffordanceUtils, transformTwistAndWrench)
   Eigen::Matrix<double, 6, 1> wrench_in_A = affordance_primitives::transformWrench(wrench_in_B, tf);
   checkVector(wrench_in_A.head(3), 10, -15, 0);
   checkVector(wrench_in_A.tail(3), 30, 15, -15);
+}
+
+TEST(AffordanceUtils, poseAndStrConversions)
+{
+  // Create a valid pose message
+  affordance_primitives::PoseStamped pose_msg;
+  pose_msg.header.frame_id = "some_frame";
+  pose_msg.pose.position.x = 1.5;
+  pose_msg.pose.position.z = -2;
+  pose_msg.pose.orientation.y = 0.5 * sqrt(2);
+  pose_msg.pose.orientation.w = 0.5 * sqrt(2);
+
+  // convert to string and back again
+  std::string pose_str;
+  std::optional<affordance_primitives::PoseStamped> out_pose;
+  ASSERT_NO_THROW(pose_str = affordance_primitives::poseToStr(pose_msg));
+  EXPECT_EQ(
+    pose_str, "Header: some_frame\nX: 1.5\nY: 0\nZ: -2\nQX: 0\nQY: 0.707107\nQZ: 0\nQW: 0.707107");
+  ASSERT_NO_THROW(out_pose = affordance_primitives::strToPose(pose_str));
+  ASSERT_TRUE(out_pose.has_value());
+
+  // Check for equality
+  EXPECT_EQ(pose_msg.header.frame_id, out_pose->header.frame_id);
+  checkPoint(pose_msg.pose.position, out_pose->pose.position);
+  checkQuaternion(pose_msg.pose.orientation, out_pose->pose.orientation);
+
+  // Now check a bogus string input
+  ASSERT_NO_THROW(out_pose = affordance_primitives::strToPose("some_bogus"));
+  EXPECT_FALSE(out_pose.has_value());
+}
+
+TEST(AffordanceUtils, screwAndStrConversions)
+{
+  // Create valid screw message
+  affordance_primitives::ScrewStamped screw_msg;
+  screw_msg.header.frame_id = "some_frame";
+  screw_msg.origin.x = 1.3;
+  screw_msg.axis.z = -1;
+  screw_msg.is_pure_translation = false;
+  screw_msg.pitch = 0.5;
+
+  // convert to string and back again
+  std::string screw_str;
+  std::optional<affordance_primitives::ScrewStamped> out_screw;
+  ASSERT_NO_THROW(screw_str = affordance_primitives::screwMsgToStr(screw_msg));
+  EXPECT_EQ(
+    screw_str,
+    "Header: some_frame\nOrigin X: 1.3\nOrigin Y: 0\nOrigin Z: 0\nAxis X: 0\nAxis Y: 0\nAxis Z: "
+    "-1\nPitch: 0.500000");
+  ASSERT_NO_THROW(out_screw = affordance_primitives::strToScrewMsg(screw_str));
+  ASSERT_TRUE(out_screw.has_value());
+
+  // check for equality
+  EXPECT_EQ(screw_msg.header.frame_id, out_screw->header.frame_id);
+  checkVector(screw_msg.axis, out_screw->axis);
+  checkPoint(screw_msg.origin, out_screw->origin);
+  EXPECT_EQ(screw_msg.is_pure_translation, out_screw->is_pure_translation);
+  EXPECT_NEAR(screw_msg.pitch, out_screw->pitch, EPSILON);
+
+  // Try again with the pure translation case
+  screw_msg.is_pure_translation = true;
+  ASSERT_NO_THROW(screw_str = affordance_primitives::screwMsgToStr(screw_msg));
+  ASSERT_NO_THROW(out_screw = affordance_primitives::strToScrewMsg(screw_str));
+  ASSERT_TRUE(out_screw.has_value());
+  EXPECT_EQ(screw_msg.header.frame_id, out_screw->header.frame_id);
+  checkVector(screw_msg.axis, out_screw->axis);
+  checkPoint(screw_msg.origin, out_screw->origin);
+  EXPECT_EQ(screw_msg.is_pure_translation, out_screw->is_pure_translation);
+  EXPECT_NEAR(0.0, out_screw->pitch, EPSILON);  // No pitch in pure tranlation
+
+  // Try with bogus input
+  ASSERT_NO_THROW(out_screw = affordance_primitives::strToScrewMsg("some_bogus"));
+  EXPECT_FALSE(out_screw.has_value());
 }
 
 int main(int argc, char ** argv)
