@@ -84,6 +84,15 @@ Eigen::Isometry3d convertPoseToNewFrame(
 ScrewStamped transformScrew(const ScrewStamped & input_screw, const TransformStamped & transform);
 
 /**
+ * @brief Transforms a ScrewStamped msg by the prescribed transform
+ * @param input_screw Screw message to transform
+ * @param transform The transform to perform
+ * @return The transformed ScrewStamped
+ */
+ScrewStamped transformScrew(
+  const ScrewStamped & input_screw, const Eigen::Isometry3d & transform);  // TODO: update test
+
+/**
  * @brief Converts an axis vector to 3x3 skew symmetric matrix, for math
  */
 Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d & vec);
@@ -171,8 +180,20 @@ Wrench VectorToWrench(const Eigen::Matrix<double, 6, 1> & vector);
 std::string poseToStr(const PoseStamped & pose);
 
 /**
+ * @brief Gets a PoseStamped message from a pretty string format
+ * @return The optional is null if the pose was not found
+ */
+std::optional<PoseStamped> strToPose(const std::string & string_in);
+
+/**
  * @brief Gets the pretty string format for a ScrewStamped message
  */
 std::string screwMsgToStr(const ScrewStamped & screw);
+
+/**
+ * @brief Gets a ScrewStamped message from a pretty string format
+ * @return The optional is null if the screw was not found
+ */
+std::optional<ScrewStamped> strToScrewMsg(const std::string & string_in);
 
 }  // namespace affordance_primitives
