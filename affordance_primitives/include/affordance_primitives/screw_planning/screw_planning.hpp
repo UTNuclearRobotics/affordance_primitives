@@ -47,19 +47,11 @@ bool constraintFn(
 
 Eigen::VectorXd calcError(const Eigen::Isometry3d & tf_err);
 
-//double calcErrorDerivative(
-//  const Eigen::Isometry3d & tf_current_to_start, const double current_theta,
-//const ScrewAxis & screw_axis);
-
 double calcErrorDerivative(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e, const double current_theta,
-  const ScrewAxis & screw_axis);
-
-//std::pair<double, Eigen::Isometry3d> findClosestPoint(
-//  const Eigen::Isometry3d & tf_q_to_e, const double theta_start, const double theta_max,
-//  const ScrewAxis & screw_axis);
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,
+  const double current_theta, const ScrewAxis & screw_axis);
 
 std::pair<double, Eigen::Isometry3d> findClosestPoint(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,const double theta_start, const double theta_max,
-  const ScrewAxis & screw_axis);
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,
+  const double theta_start, const double theta_max, const ScrewAxis & screw_axis);
 }  // namespace affordance_primitives
