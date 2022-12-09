@@ -106,7 +106,4 @@ if(CATKIN_ENABLE_TESTING)
 
   add_rostest_gtest(test_ap_executor test/test_ap_executor.test test/test_ap_executor.cpp)
   target_link_libraries(test_ap_executor ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-  catkin_add_gtest(test_screw_planning test/test_screw_planning.cpp)
-  target_link_libraries(test_screw_planning ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
