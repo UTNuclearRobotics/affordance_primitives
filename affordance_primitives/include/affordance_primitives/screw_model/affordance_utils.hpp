@@ -98,6 +98,11 @@ ScrewStamped transformScrew(
 Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d & vec);
 
 /**
+ * @brief Converts a screw axis vector to 4x4 skew symmetric matrix
+ */
+Eigen::Matrix4d getSkewSymmetricMatrix(const Eigen::Matrix<double,6,1> & vec)
+
+/**
  * @brief Converts a transformation into an adjoint matrix for transforming twists and wrenches
  *
  * Usage: twist_in_A = Adjoint(tf_from_A_to_B) * twist_in_B
