@@ -148,16 +148,6 @@ Eigen::Matrix3d getSkewSymmetricMatrix(const Eigen::Vector3d & vec)
   return output;
 }
 
-Eigen::Matrix4d getSkewSymmetricMatrix(const Eigen::Matrix<double,6,1> & vec)
-{
-  Eigen::MatrixXd output(4,4);
-  output.block(0,0,3,3) = getSkewSymmetricMatrix(vec.head(3));
-  output.block(0,3,3,1) = vec.tail(3);
-  output.block(3,0,1,4) = Eigen::MatrixXd::Zero(1,4);
-
-  return output;
-}
-
 Eigen::MatrixXd getAdjointMatrix(const Eigen::Isometry3d & transform)
 {
   Eigen::MatrixXd adjoint(6, 6);
