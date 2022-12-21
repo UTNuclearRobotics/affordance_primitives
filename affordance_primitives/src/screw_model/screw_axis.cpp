@@ -183,6 +183,16 @@ std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(double theta_step, size_t
   return output;
 }
 
+Eigen::Matrix4d getScrewSkewSymmetricMatrix(const Eigen::Matrix<double,6,1> & vec)
+{
+  Eigen::Matrix4d output(4,4);
+  output.block(0,0,3,3) = getSkewSymmetricMatrix(vec.head(3));
+  output.block(0,3,3,1) = vec.tail(3);
+  output.block(3,0,1,4) = Eigen::MatrixXd::Zero(1,4);
+
+  return output;
+}
+
 ScrewStamped ScrewAxis::toMsg()
 {
   ScrewStamped output;

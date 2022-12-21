@@ -118,6 +118,11 @@ public:
   std::vector<Eigen::Isometry3d> getWaypoints(double theta_step, size_t num_steps);
 
   /**
+   * @brief Converts a screw axis vector to 4x4 skew symmetric matrix
+   */
+  Eigen::Matrix4d getScrewSkewSymmetricMatrix(const Eigen::Matrix<double,6,1> & vec);
+
+  /**
    * @brief Creates a screw message from this axis
    * @return The screw message
    */
