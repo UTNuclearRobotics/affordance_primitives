@@ -78,13 +78,11 @@ bool constraintFn(
   const std::vector<ScrewAxis> & screwAxisSet, std::vector<double> phi_max,
   std::vector<double> phi_guess, Eigen::Ref<Eigen::VectorXd> phi_out);
 
-Eigen::Isometry3d productOfExponentials(
-  const std::vector<ScrewAxis> & screwAxisSet, const std::vector<double> phi, int size, int start,
-  int end);
+Eigen::Isometry3d productOfExponentials (const std::vector<Eigen::VectorXd>& screwAxisSet, const std::vector<double> phi, int size, int start, int end);
 
 double calcErrorDerivative(
   const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s,
-  const std::vector<double> current_phi, const std::vector<ScrewAxis> & screw_axis_set);
+  const std::vector<double> current_phi, const std::vector<Eigen::VectorXd> & screw_axis_set);
 
 Eigen::VectorXd eta(const Eigen::Isometry3d & tf);
 }  // namespace affordance_primitives
