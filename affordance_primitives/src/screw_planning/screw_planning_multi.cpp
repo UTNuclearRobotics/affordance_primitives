@@ -15,7 +15,7 @@ Eigen::VectorXd calcError(const Eigen::Isometry3d & tf_err)
 
 Eigen::VectorXd calcErrorDerivative(
   const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s,
-  const std::vector<double> phi_current, const std::vector<Eigen::VectorXd> screw_axis_set)
+  const Eigen::VectorXd phi_current, const std::vector<ScrewAxis>& screw_axis_set)
 {
 //Algorithm
 //Require: Set of screw axes in frame M, screw_axis_set
@@ -39,7 +39,9 @@ for (int j=0; j<=screw_axis_set.size(); j++)
 E.row(j)<< xi.transpose(), Eigen::MatrixXd::Zero(1,m-6*j);
 Eigen::Isometry3d pOE_left = productOfExponentials (screw_axis_set, phi_current, screw_axis_set.size(), 0, j );//TODO: Move declaration out of the loop
 Eigen::Isometry3d pOE_right = productOfExponentials (screw_axis_set, phi_current, screw_axis_set.size(), j+1, m );
-Eigen::Isometry3d meu = tf_q_to_m*pOE_left*affordance_primitives::getSkewSymmetricMatrix(screw_axis_set[j])*pOE_right*tf_m_to_s; 
+Eigen::VectorXd jScrewAxis(6,1);
+jScrewAxis <<screw_axis_set[j].getAxis(), screw_axis_set[j].getLinearVector();
+Eigen::Isometry3d meu = tf_q_to_m*pOE_left*affordance_primitives::getSkewSymmetricMatrix(jScrewAxis)*pOE_right*tf_m_to_s; 
 Psi.segment(6*j,6) = eta(meu);
 }
 
@@ -49,20 +51,22 @@ Lambda = E*Psi;
   return Lambda;
 }
 
-std::pair<double, Eigen::Isometry3d> findClosestPoint(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const std::vector<double> phi_start, const std::vector<double> phi_max, const std::vector<ScrewAxis> & screw_axis_set)
+std::pair<Eigen::VectorXd, Eigen::Isometry3d> findClosestPoint(
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const Eigen::VectorXd phi_start, const std::vector<double> phi_max, const std::vector<ScrewAxis> & screw_axis_set)
 {
   // TODO: tune these
-  const std::vector<double> gamma(phi_start.size(), 0.05);
+  /* const std::vector<double> gamma(phi_start.size(), 0.05); */
+  const Eigen::MatrixXd gamma = Eigen::MatrixXd::Constant(phi_start.size(), 1, 0.05);
   const size_t max_steps = 100;
   const double converge_limit = 0.001;
 
-  std::vector<double> phi = phi_start;
+ Eigen::VectorXd phi = phi_start;
+  /* Eigen::VectorXd phi (phi_start.data()); */
   size_t i = 0;
 
-  const Eigen::Isometry3d pOE = productOfExponentials (screw_axis_set, phi_start, screw_axis_set.size(), 0);
+  const Eigen::Isometry3d pOE = productOfExponentials (screw_axis_set, phi_start, screw_axis_set.size(), 0,screw_axis_set.size()-1);
   Eigen::Isometry3d tf_q_to_p = tf_m_to_q.inverse() * pOE * tf_m_to_s;
-  Eigen::VectorXd error = calcError(tf_q_to_p);
+  Eigen::VectorXd error = eta(tf_q_to_p);
   double error_norm_diff = 2 * converge_limit;
 
   // TODO: use squaredNorm() instead of norm() for faster performance
@@ -70,24 +74,19 @@ std::pair<double, Eigen::Isometry3d> findClosestPoint(
     i++;
     const double last_error_norm = error.norm();
     phi -= gamma * calcErrorDerivative(tf_m_to_q, tf_m_to_s, phi, screw_axis_set);
-    error = calcError(tf_m_to_q.inverse() * screw_axis.getTF(theta) * tf_m_to_e);
+    phi = clamp_arr_in_range(phi,0,phi.size(),phi_max[0]); 
+    Eigen::Isometry3d pOE = productOfExponentials (screw_axis_set, phi, screw_axis_set.size(), 0,screw_axis_set.size()-1);
+    Eigen::Isometry3d tf_q_to_p = tf_m_to_q.inverse() * pOE * tf_m_to_s;
+    error = eta(tf_q_to_p);
     error_norm_diff = last_error_norm - error.norm();
-
-    if (theta < 0) {
-      theta = 0;
-      break;
-    }
-    if (theta > theta_max) {
-      theta = theta_max;
-      break;
-    }
   }
-  tf_q_to_path = tf_m_to_q.inverse() * screw_axis.getTF(theta) * tf_m_to_e;
-  return std::make_pair(theta, tf_q_to_path);
+    Eigen::Isometry3d pOE2 = productOfExponentials (screw_axis_set, phi, screw_axis_set.size(), 0,screw_axis_set.size()-1);
+    Eigen::Isometry3d tf_q_to_p2 = tf_m_to_q.inverse() * pOE * tf_m_to_s;
+  return std::make_pair(phi, tf_q_to_p2);
 }
 
 bool constraintFn(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const std::vector<Eigen::VectorXd> & screwAxisSet, std::vector<double> phi_max, std::vector<double> phi_guess,
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const std::vector<ScrewAxis>& screwAxisSet, std::vector<double> phi_max, Eigen::VectorXd phi_guess,
   Eigen::Ref<Eigen::VectorXd> phi_out)//Data type of phi_out?
 {
   // Find the closest point on the path
@@ -102,9 +101,9 @@ bool constraintFn(
 }
 
 
-Eigen::Isometry3d productOfExponentials (const std::vector<Eigen::VectorXd>& screwAxisSet, const std::vector<double> phi, int size, int start, int end)
+Eigen::Isometry3d productOfExponentials (const std::vector<ScrewAxis>& screwAxisSet, const std::vector<double> phi, int size, int start, int end)
 {
-assert(screwAxisSet != NULL && size > 0);
+assert(&screwAxisSet != NULL && size > 0);
 if ((size > 1) && (start<=end))
     return screwAxisSet[start].getTF(phi[start])*productOfExponentials(screwAxisSet, phi, size-1, start+1, end);
 else
@@ -120,5 +119,13 @@ Eigen::VectorXd eta (const Eigen::Isometry3d & tf){
   eta.tail(3) = axisAngleRep.angle()* axisAngleRep.axis();
   return eta;
 
+}
+
+// Function to clamp the elements in given range
+Eigen::VectorXd clamp_arr_in_range(Eigen::VectorXd arr, const int n, const double low, const double high)
+{
+	for(int i = 0; i <n; i++)
+		arr[i] = std::clamp(arr[i], low, high);
+	return arr;
 }
     }  // namespace affordance_primitives
