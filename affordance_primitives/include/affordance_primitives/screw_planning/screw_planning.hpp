@@ -38,7 +38,7 @@
 #include <affordance_primitives/screw_model/screw_axis.hpp>
 #include <queue>
 #include <utility>
-
+#include <algorithm>
 namespace affordance_primitives
 {
 //1D screw axes
@@ -78,11 +78,16 @@ bool constraintFn(
   const std::vector<ScrewAxis> & screwAxisSet, std::vector<double> phi_max,
   std::vector<double> phi_guess, Eigen::Ref<Eigen::VectorXd> phi_out);
 
-Eigen::Isometry3d productOfExponentials (const std::vector<Eigen::VectorXd>& screwAxisSet, const std::vector<double> phi, int size, int start, int end);
+Eigen::Isometry3d productOfExponentials (const std::vector<ScrewAxis>& screwAxisSet, const Eigen::VectorXd phi, int size, int start, int end);
 
 double calcErrorDerivative(
   const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s,
-  const std::vector<double> current_phi, const std::vector<Eigen::VectorXd> & screw_axis_set);
+  const Eigen::VectorXd current_phi, const std::vector<Eigen::VectorXd> & screw_axis_set);
 
-Eigen::VectorXd eta(const Eigen::Isometry3d & tf);
+
+Eigen::VectorXd eta (const Eigen::Isometry3d & tf);
+
+Eigen::VectorXd clamp_arr_in_range(Eigen::VectorXd arr, const int n, const double low, const double high);
 }  // namespace affordance_primitives
+
+
