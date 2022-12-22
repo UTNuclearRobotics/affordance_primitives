@@ -1,50 +1,76 @@
-#include <affordance_primitives/screw_planning/screw_planning.hpp>
-
+#include <affordance_primitives/screw_planning/screw_planning.hpp> 
 namespace affordance_primitives
 {
-Eigen::VectorXd calcError(const Eigen::Isometry3d & tf_err)
+Eigen::VectorXd errorDerivative(
+  const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
+  const Eigen::VectorXd phi_current, const std::vector<ScrewAxis>& screw_axis_set)
 {
-  Eigen::VectorXd error(6);
-  error.setZero();
+//Algorithm
+//Require: Set of screw axes in frame M, screw_axis_set
+//Require: Set of screw angles, phi
+//Require: Transforms, tf_q_to_m and tf_m_to_s
+//Compute lambda
 
-  const Eigen::AngleAxisd angle_err(tf_err.linear());
-  error.head(3) = tf_err.translation();
-  error.tail(3) = angle_err.angle() * angle_err.axis();
+//Compute tf_q_to_p
+  const Eigen::Isometry3d pOE = productOfExponentials (screw_axis_set, phi_current, screw_axis_set.size(), 0, screw_axis_set.size()-1);
+  const Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * tf_m_to_s;
+//Get eta of tf_q_to_p
+  const Eigen::VectorXd xi = eta(tf_q_to_p);
+//Construct E and psi matrices
+  int m = screw_axis_set.size();
+  Eigen::MatrixXd E(m,6*m);
+  Eigen::VectorXd Psi(6*m,1);
 
-  return error;
+for (int j=0; j<=screw_axis_set.size(); j++)
+{
+E.row(j)<< xi.transpose(), Eigen::MatrixXd::Zero(1,m-6*j);
+Eigen::Isometry3d pOE_left = productOfExponentials (screw_axis_set, phi_current, screw_axis_set.size(), 0, j );//TODO: Move declaration out of the loop
+Eigen::Isometry3d pOE_right = productOfExponentials (screw_axis_set, phi_current, screw_axis_set.size(), j+1, m );
+Eigen::VectorXd jScrewAxis(6,1);
+jScrewAxis <<screw_axis_set[j].getAxis(), screw_axis_set[j].getLinearVector();
+Eigen::Isometry3d meu = tf_q_to_m*pOE_left*affordance_primitives::getSkewSymmetricMatrix(jScrewAxis)*pOE_right*tf_m_to_s; 
+Psi.segment(6*j,6) = eta(meu);
 }
 
-double calcErrorDerivative(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,
-  const double current_theta, const ScrewAxis & screw_axis)
-{
-  const Eigen::Isometry3d tf_q_to_path =
-    tf_m_to_q.inverse() * screw_axis.getTF(current_theta) * tf_m_to_e;
-  const Eigen::Vector3d v = screw_axis.getLinearVector();
-  const Eigen::Vector3d w = screw_axis.getAxis();
-  const Eigen::AngleAxisd angle_error(
-    tf_q_to_path.linear() * affordance_primitives::getSkewSymmetricMatrix(w));
+Eigen::VectorXd Lambda(m,1);
+Lambda = E*Psi;
 
-  Eigen::VectorXd d_error(6);
-  d_error.head(3) = tf_q_to_path.linear() * v;
-  d_error.tail(3) = angle_error.angle() * angle_error.axis();
-
-  return calcError(tf_q_to_path).dot(d_error);
+  return Lambda;
 }
 
+<<<<<<< HEAD
 std::pair<double, Eigen::Isometry3d> runGradientDescent(
   const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,
   const double theta_start, const std::pair<double, double> theta_limits,
   const ScrewAxis & screw_axis)
+=======
+
+bool constraintFn(
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const std::vector<ScrewAxis>& screw_axis_set, const Eigen::VectorXd phi_max, const Eigen::VectorXd phi_start,
+  Eigen::Ref<Eigen::VectorXd> final_error)
+>>>>>>> 6c6b11c... clean up and redef constraintFn to match paper algorithm
 {
+//Gradient descent parameters
   // TODO: tune these
+  /* const Eigen::VectorXd gamma = Eigen::MatrixXd::Constant(phi_start.size(), 1, 0.05); */
   const double gamma = 0.05;
-  const size_t max_steps = 100;
-  const double converge_limit = 0.001;
+  const size_t nmax = 100;//max steps
+  const double epsilon = 0.001;//converge limit
+//Compute tf_q_to_m
+  const Eigen::Isometry3d tf_q_to_m = tf_m_to_q.inverse();
+//Sample random phi
+  Eigen::VectorXd phi = phi_start; //phi_start is already randomly sampled and fed to this function
+//Compute tf_q_to_p
+  Eigen::Isometry3d pOE = productOfExponentials (screw_axis_set, phi_start, screw_axis_set.size(), 0,screw_axis_set.size()-1);
+  Eigen::Isometry3d tf_q_to_p = tf_m_to_q.inverse() * pOE * tf_m_to_s;
+//Compute alpha, the 1/2 squared norm we want to minimize
+  double alpha = 0.5 * eta(tf_q_to_p).squaredNorm();
 
-  double theta = theta_start;
+//Initialize iterating parameters
   size_t i = 0;
+  double delta = epsilon;
 
+<<<<<<< HEAD
   Eigen::Isometry3d tf_q_to_path = tf_m_to_q.inverse() * screw_axis.getTF(theta) * tf_m_to_e;
   Eigen::VectorXd error = calcError(tf_q_to_path);
   double error_norm_diff = std::numeric_limits<double>::max();
@@ -65,11 +91,29 @@ std::pair<double, Eigen::Isometry3d> runGradientDescent(
       theta = theta_limits.second;
       break;
     }
+=======
+  while (i < nmax && fabs(delta) >= epsilon ) {
+//Compute phi
+	 phi = phi - gamma * errorDerivative(tf_q_to_m, tf_m_to_s, phi, screw_axis_set); 
+//Clamp phi
+    phi = clamp(phi,phi.size(), phi_max); 
+//Compute tf_q_to_p
+  Eigen::Isometry3d pOE = productOfExponentials (screw_axis_set, phi_start, screw_axis_set.size(), 0,screw_axis_set.size()-1);
+  Eigen::Isometry3d tf_q_to_p = tf_m_to_q.inverse() * pOE * tf_m_to_s;
+//Compute new delta
+	 delta = alpha - 0.5 * eta(tf_q_to_p).squaredNorm();
+//store last squared norm as alpha
+  alpha = 0.5 * eta(tf_q_to_p).squaredNorm();
+  i++;
+>>>>>>> 6c6b11c... clean up and redef constraintFn to match paper algorithm
   }
-  tf_q_to_path = tf_m_to_q.inverse() * screw_axis.getTF(theta) * tf_m_to_e;
-  return std::make_pair(theta, tf_q_to_path);
+
+  final_error = eta(tf_q_to_p);
+
+  return true;
 }
 
+<<<<<<< HEAD
 std::queue<double> getGradStarts(const std::pair<double, double> & limits, double max_dist)
 {
   std::queue<double> output;
@@ -111,7 +155,37 @@ bool screwConstraint(
   // Use closest point to calculate error
   auto error = calcError(best_output.second);
   out = error;
+=======
 
-  return true;
+Eigen::Isometry3d productOfExponentials (const std::vector<ScrewAxis>& screwAxisSet, const std::vector<double> phi, int size, int start, int end)
+{
+assert(&screwAxisSet != NULL && size > 0);
+if ((size > 1) && (start<=end))
+    return screwAxisSet[start].getTF(phi[start])*productOfExponentials(screwAxisSet, phi, size-1, start+1, end);
+else
+    return screwAxisSet[0].getTF(0.0);//identity
 }
-}  // namespace affordance_primitives
+
+>>>>>>> 6c6b11c... clean up and redef constraintFn to match paper algorithm
+
+Eigen::VectorXd eta (const Eigen::Isometry3d & tf){
+  const Eigen::AngleAxisd axisAngleRep(tf.rotation());
+  const Eigen::Vector3d lin = tf.linear();
+  Eigen::VectorXd eta(6);
+  eta.head(3) = lin;
+  eta.tail(3) = axisAngleRep.angle()* axisAngleRep.axis();
+  return eta;
+
+}
+
+// Function to clamp the elements in given range
+Eigen::VectorXd clamp(const Eigen::VectorXd arr, const int size, const Eigen::VectorXd arr_high)
+{
+	Eigen::VectorXd arr_clamped(size);
+	//function assumes lows are zeros. TODO: implement arbitrary lows
+	Eigen::VectorXd arr_low = Eigen::VectorXd::Zero(size,1);
+	for(int i = 0; i < size; i++)
+		arr_clamped[i] = std::clamp(arr[i], arr_low[i], arr_high[i]);
+	return arr_clamped;
+}
+    }  // namespace affordance_primitives

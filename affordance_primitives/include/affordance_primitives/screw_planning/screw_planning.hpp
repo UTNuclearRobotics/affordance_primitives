@@ -41,53 +41,32 @@
 #include <algorithm>
 namespace affordance_primitives
 {
-//1D screw axes
+
+/**
+ * @brief 
+ *
+ * @param tf_m_to_q Forward kinematics of the robot
+ * @param tf_m_to_s Start pose
+ * @param screw_axis_set Set of screw axes (S1,...Sm) in frame M
+ * @param phi_max Set of screw distances to move
+ * @param phi_guess Set of initial random guesses for screw angles
+ * @param phi_out Set of screw angles that satisfy the constraint function
+ *
+ * @return 
+ */
 bool constraintFn(
-  const Eigen::Isometry3d & current_pose, const Eigen::Isometry3d & start_pose,
-  const ScrewAxis & screw_axis, const std::pair<double, double> theta_limits, double theta_guess,
-  Eigen::Ref<Eigen::VectorXd> out);
-
-/** Calculates the error vector from a given transformation
-   *
-   * @param tf_err The transformation between two poses
-   * @return A vector representing the error where the first 3 values are the 
-   * translation, and the last 3 are the orientation error in axis-angle format
-   */
-Eigen::VectorXd calcError(const Eigen::Isometry3d & tf_err);
-
-double calcErrorDerivative(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,
-  const double current_theta, const ScrewAxis & screw_axis);
-
-/** Runs gradient descent one time
-   *
-   * @param tf_m_to_q The TF from planning frame to the pose to check
-   * @param tf_m_to_e The TF from planning frame to the starting path pose (when theta = 0)
-   * @param theta_start The theta to start from
-   * @param theta_limits The (lower, upper) bounds on theta
-   * @param screw_axis The screw axis defining the path
-   * @return First: the found theta. Second: the TF from passed pose to closest point on path
-   */
-std::pair<double, Eigen::Isometry3d> runGradientDescent(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_e,
-  const double theta_start, const double theta_max, const ScrewAxis & screw_axis);
-
-//multi-dimensional screw axes
-bool constraintFn(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s,
-  const std::vector<ScrewAxis> & screwAxisSet, std::vector<double> phi_max,
-  std::vector<double> phi_guess, Eigen::Ref<Eigen::VectorXd> phi_out);
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd phi_max, const Eigen::VectorXd phi_start,
+  Eigen::Ref<Eigen::VectorXd> phi_out);
 
 Eigen::Isometry3d productOfExponentials (const std::vector<ScrewAxis>& screwAxisSet, const Eigen::VectorXd phi, int size, int start, int end);
 
-double calcErrorDerivative(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s,
-  const Eigen::VectorXd current_phi, const std::vector<Eigen::VectorXd> & screw_axis_set);
-
+Eigen::VectorXd errorDerivative(
+  const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
+  const Eigen::VectorXd phi_current, const std::vector<ScrewAxis>& screw_axis_set);
 
 Eigen::VectorXd eta (const Eigen::Isometry3d & tf);
 
-Eigen::VectorXd clamp_arr_in_range(Eigen::VectorXd arr, const int n, const double low, const double high);
+Eigen::VectorXd clamp(const Eigen::VectorXd arr, const int size, const Eigen::VectorXd arr_high);
 }  // namespace affordance_primitives
 
 
