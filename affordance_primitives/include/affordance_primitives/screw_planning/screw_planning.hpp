@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //      Title     : screw_planning.hpp
 //      Project   : affordance_primitives
-//      Created   : 06/24/2022
-//      Author    : Adam Pettinger
+//      Created   : 12/24/2022
+//      Author    : Janak Panthi
 //      Copyright : Copyright© The University of Texas at Austin, 2014-2021. All
 //      rights reserved.
 //
@@ -36,37 +36,71 @@
 
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_axis.hpp>
-#include <queue>
-#include <utility>
 #include <algorithm>
+#include <utility>
 namespace affordance_primitives
 {
+/**
+* @brief Computes the set of screw angles that minimize the error between EE pose and screw path 
+*
+* @param tf_m_to_q Forward kinematics of the robot
+* @param tf_m_to_s Start pose
+* @param screw_axis_set Set of screw axes (S1,...,Sm) in frame M
+* @param phi_max Set of screw distances to move
+* @param phi_start Set of initial random guesses for screw angles
+*
+* @return Constraint function success, error, and corresponding screw angles
+*/
+std::tuple<bool, Eigen::VectorXd, Eigen::VectorXd> constraintFn(
+  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s,
+  const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd phi_max,
+  const Eigen::VectorXd phi_start);
 
 /**
- * @brief 
+ * @brief Computes the partial derivative of error between EE pose and screw path
  *
- * @param tf_m_to_q Forward kinematics of the robot
- * @param tf_m_to_s Start pose
- * @param screw_axis_set Set of screw axes (S1,...Sm) in frame M
- * @param phi_max Set of screw distances to move
- * @param phi_guess Set of initial random guesses for screw angles
- * @param phi_out Set of screw angles that satisfy the constraint function
+ * @param tf_q_to_m Inverse of the forward kinematics matrix, tf_m_to_q
+ * @param tf_m_to_s Transform from base frame, M to screw path
+ * @param phi_current Current set of screw angles
+ * @param screw_axis_set Set of screw axes (S1,...,Sm) in frame M
  *
- * @return 
+ * @return Vector of partial derivative of error with respect of screw angles
  */
-bool constraintFn(
-  const Eigen::Isometry3d & tf_m_to_q, const Eigen::Isometry3d & tf_m_to_s, const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd phi_max, const Eigen::VectorXd phi_start,
-  Eigen::Ref<Eigen::VectorXd> phi_out);
-
-Eigen::Isometry3d productOfExponentials (const std::vector<ScrewAxis>& screwAxisSet, const Eigen::VectorXd phi, int size, int start, int end);
-
 Eigen::VectorXd errorDerivative(
   const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
-  const Eigen::VectorXd phi_current, const std::vector<ScrewAxis>& screw_axis_set);
+  const Eigen::VectorXd & phi_current, const std::vector<ScrewAxis> & screw_axis_set);
 
-Eigen::VectorXd eta (const Eigen::Isometry3d & tf);
+/**
+ * @brief Computes the 6x1 error vector for a given transformation matrix
+ *
+ * @param tf Transformation matrix
+ *
+ * @return 6x1 Error vector
+ */
+Eigen::VectorXd eta(const Eigen::Isometry3d & tf);
 
-Eigen::VectorXd clamp(const Eigen::VectorXd arr, const int size, const Eigen::VectorXd arr_high);
+/**
+ * @brief Given a set of screw axes and angles, computes the product of exponentials for specified start and end indices
+ *
+ * @param screw_axis_set Set of screw axes (S1,...,Sm)
+ * @param phi Set of screw angles
+ * @param start Start index for the product
+ * @param end End index for the product
+ *
+ * @return Homogenous transformation matrix representing the product of exponentials
+ */
+Eigen::Isometry3d productOfExponentials(
+  const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end);
+
+/**
+ * @brief Clamps the values of array to given highs and lows 
+ *
+ * @param arr array that is to be clamped
+ * @param arr_low array of lows
+ * @param arr_high array of highs
+ *
+ * @return Clamped array 
+ */
+Eigen::VectorXd clamp(
+  const Eigen::VectorXd arr, const Eigen::VectorXd arr_low, const Eigen::VectorXd arr_high);
 }  // namespace affordance_primitives
-
-
