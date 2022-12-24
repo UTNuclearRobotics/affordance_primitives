@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /*
-   Author: Adam Pettinger
+   Author: Adam Pettinger and Janak Panthi
    Desc: Defines a library used to calculate screw motion affordance parameters
  */
 
