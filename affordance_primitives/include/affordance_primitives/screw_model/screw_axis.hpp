@@ -124,7 +124,7 @@ public:
    *
    * @return Skew-symmetric HTM of the 6x1 Screw vector
    */
-  Eigen::Matrix4d getScrewSkewSymmetricMatrix(const Eigen::Matrix<double, 6, 1> & vec);
+  Eigen::Matrix4d getScrewSkewSymmetricMatrix();
 
   /**
    * @brief Creates a screw message from this axis
