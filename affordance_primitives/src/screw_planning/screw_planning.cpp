@@ -66,6 +66,7 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
   //Retrieve bounds
   const Eigen::VectorXd & phi_min = screw_constraint_info.phi_bounds.first;
   const Eigen::VectorXd & phi_max = screw_constraint_info.phi_bounds.second;
+  std::queue<Eigen::VectorXd> & phi_starts = screw_constraint_info.phi_starts;
 
   //Compute tf_q_to_p
   const int m = screw_constraint_info.screw_axis_set.size();
@@ -93,24 +94,31 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
     //Compute new delta
     delta = alpha - 0.5 * calculateEta(tf_q_to_p).squaredNorm();
 
-    //store last squared norm as alpha
+    //Store last squared norm as alpha
     alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
 
-    //increment iteration
+    //Increment iteration
     i++;
   }
 
-  //return true, final error, and corresponding phi
+  //Compute error and update best_error
   screw_constraint_info.error = calculateEta(tf_q_to_p);
-  return true;
+
+  if (screw_constraint_info.error.norm() < screw_constraint_info.best_error.norm())
+    screw_constraint_info.best_error = screw_constraint_info.error;
+
+  //Recursively call this function with a new guess for phi until the following conditions are met
+  if (!phi_starts.empty() && (screw_constraint_info.best_error.norm() > 5e-3)) {
+    phi = phi_starts.front();
+    phi_starts.pop();
+    return constraintFn(ScrewConstraintInfo & screw_constraint_info);
+  } else
+    return true;
 }
 
 Eigen::Isometry3d productOfExponentials(
   const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end)
 {
-  //assert screw_axis_set ref is not null and size is positive and non-zero
-  assert(&screw_axis_set != NULL && screw_Axis_set.size() > 0 && phi.size() > 0);
-
   //recursively compute product of exponentials until the POE size is reduced to 1
   if (start < end)
     return screw_axis_set[start].getTF(phi[start]) *
@@ -146,5 +154,23 @@ Eigen::VectorXd clamp(
   //clamp and return
   for (int i = 0; i < arr.size(); i++) arr_clamped[i] = std::clamp(arr[i], arr_low[i], arr_high[i]);
   return arr_clamped;
+}
+
+std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
+  const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist)
+{
+  std::queue<Eigen::VectorXd> output;
+
+  const Eigen::VectorXd span = (phi_bounds.second - phi_bounds.first).cwiseAbs();
+  const size_t num_starts =
+    ceil(span.maxCoeff() / max_dist) + 1;  //use the max span to determine number of starts
+  const Eigen::VectorXd real_step = span / num_starts;
+
+  for (size_t i = 0; i < num_starts; ++i) {
+    output.push(phi_bounds.first + i * real_step);
+  }
+  output.push(phi_bounds.second);
+
+  return output;
 }
 }  // namespace affordance_primitives

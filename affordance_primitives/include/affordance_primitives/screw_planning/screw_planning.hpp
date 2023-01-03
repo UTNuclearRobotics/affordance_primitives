@@ -37,6 +37,7 @@
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_axis.hpp>
 #include <algorithm>
+#include <queue>
 #include <utility>
 namespace affordance_primitives
 {
@@ -62,12 +63,19 @@ struct ScrewConstraintInfo
   //Inputs
   std::vector<ScrewAxis> screw_axis_set;
   const std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
+  std::queue<Eigen::VectorXd> phi_starts = getGradStarts(phi_bounds);
   const Eigen::Isometry3d tf_m_to_s;
   const Eigen::Isometry3d tf_m_to_q;
 
   //Outputs
   Eigen::VectorXd phi;
   Eigen::VectorXd error;
+  Eigen::VectorXd best_error = Eigen::VectorXd::Constant(6, 1, 1);
+  //error is sqrt(6) unless otherwise explicitly determined
+
+private:
+  std::queue<Eigen::VectorXd> getGradStarts(
+    const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist = 0.5 * M_PI);
 };
 
 //Functions
@@ -139,4 +147,5 @@ Eigen::Isometry3d productOfExponentials(
  */
 Eigen::VectorXd clamp(
   const Eigen::VectorXd & arr, const Eigen::VectorXd & arr_low, const Eigen::VectorXd & arr_high);
+
 }  // namespace affordance_primitives
