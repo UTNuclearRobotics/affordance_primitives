@@ -20,7 +20,7 @@ Eigen::VectorXd errorDerivative(
   //Helper variables declaration
   Eigen::Isometry3d nu_pOE_left;
   Eigen::Isometry3d nu_pOE_right;
-  Eigen::Isometry3d nu;
+  Eigen::Matrix4d nu;
   Eigen::VectorXd jScrewAxis(6, 1);
 
   for (int j = 0; j < m; j++) {
@@ -30,8 +30,9 @@ Eigen::VectorXd errorDerivative(
     //Compute 6x1 segments of Psi
     nu_pOE_left = productOfExponentials(screw_axis_set, phi_current, 0, j);
     nu_pOE_right = productOfExponentials(screw_axis_set, phi_current, j + 1, m - 1);
-    nu = tf_q_to_m * nu_pOE_left * screw_axis_set[j].getScrewSkewSymmetricMatrix() * nu_pOE_right *
-         tf_m_to_s;
+    nu = tf_q_to_m.matrix() * nu_pOE_left.matrix() *
+         screw_axis_set[j].getScrewSkewSymmetricMatrix() * nu_pOE_right.matrix() *
+         tf_m_to_s.matrix();
     Psi.segment(6 * j, 6) = calculateEta(nu);
   }
 
@@ -84,8 +85,12 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
     //Compute phi
     phi = phi - gamma * errorDerivative(tf_q_to_m, tf_m_to_s, phi, screw_axis_set);
 
-    //Clamp phi between zeros and phi_max
-    phi = clamp(phi, phi_min, phi_max);
+    //Clamp phi between phi_min and phi_max
+    auto eigen_clamp = [&phi](const Eigen::VectorXd & phi_min, const Eigen::VectorXd & phi_max) {
+      for (int i = 0; i < phi.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
+      return phi;
+    };
+    eigen_clamp(phi_min, phi_max);
 
     //Compute tf_q_to_p
     pOE = productOfExponentials(screw_axis_set, phi, 0, m - 1);
@@ -111,7 +116,7 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
   if (!phi_starts.empty() && (screw_constraint_info.best_error.norm() > 5e-3)) {
     phi = phi_starts.front();
     phi_starts.pop();
-    return constraintFn(ScrewConstraintInfo & screw_constraint_info);
+    return constraintFn(screw_constraint_info);
   } else
     return true;
 }
@@ -129,6 +134,22 @@ Eigen::Isometry3d productOfExponentials(
     return screw_axis_set[0].getTF(0.0);
 }
 
+Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf)
+{
+  //variable declaration
+  const Eigen::AngleAxisd axisAngleRep(tf.block<3, 3>(0, 0));
+  const Eigen::Vector3d lin = tf.block<3, 1>(0, 3);
+  Eigen::VectorXd eta(6);
+
+  //First three elements denote the translation part
+  eta.head(3) = lin;
+
+  //Last three for axis*angle
+  eta.tail(3) = axisAngleRep.angle() * axisAngleRep.axis();
+
+  return eta;
+}
+
 Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf)
 {
   //variable declaration
@@ -143,17 +164,6 @@ Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf)
   eta.tail(3) = axisAngleRep.angle() * axisAngleRep.axis();
 
   return eta;
-}
-
-Eigen::VectorXd clamp(
-  const Eigen::VectorXd & arr, const Eigen::VectorXd & arr_low, const Eigen::VectorXd & arr_high)
-{
-  //Declare array of same size to return
-  Eigen::VectorXd arr_clamped(arr.size());
-
-  //clamp and return
-  for (int i = 0; i < arr.size(); i++) arr_clamped[i] = std::clamp(arr[i], arr_low[i], arr_high[i]);
-  return arr_clamped;
 }
 
 std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(

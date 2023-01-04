@@ -46,9 +46,11 @@ namespace affordance_primitives
 * @brief Use to set constraint info for screw planning 
 *
 * @var ScrewConstraintInfo::screw_axis_set
-* @brief contains set of screw_axes Set of screw axes (S1,...,Sm) in base frame, M
+* @brief Set of screw axes (S1,...,Sm) in base frame, M
 * @var ScrewConstraintInfo::phi_bounds
-* @brief bounds for set of screw angles, phi
+* @brief Bounds for set of screw angles, phi
+* @var ScrewConstraintInfo::phi_starts
+* @brief Queue of initial guesses for phi
 * @var ScrewConstraintInfo::tf_m_to_s
 * @brief Start pose
 * @var ScrewConstraintInfo::tf_m_to_q
@@ -57,6 +59,8 @@ namespace affordance_primitives
 * @brief Initial guess for the set of screw angles, phi. This is modified in constrainFn
 * @var ScrewConstraintInfo::error
 * @brief Final error, set by constraintFn
+* @var ScrewConstraintInfo::best_error
+* @brief Best error after running constraintFn through a queue of initial guesses for phi
 */
 struct ScrewConstraintInfo
 {
@@ -79,17 +83,6 @@ private:
 };
 
 //Functions
-/**
-* @brief Computes the set of screw angles that minimize the error between EE pose and screw path 
-*
-* @param tf_m_to_q Forward kinematics of the robot
-* @param tf_m_to_s Start pose
-* @param screw_axis_set Set of screw axes (S1,...,Sm) in base frame, M
-* @param phi_max Set of screw distances to move
-* @param phi_start Set of initial random guesses for screw angles
-*
-* @return Constraint function success, error, and corresponding screw angles
-*/
 /**
  * @brief Computes the set of screw angles that minimize the error between EE pose and screw path 
  *
@@ -121,6 +114,7 @@ Eigen::VectorXd errorDerivative(
  *
  * @return 6x1 Error vector
  */
+Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf);
 Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
 
 /**
@@ -135,17 +129,5 @@ Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
  */
 Eigen::Isometry3d productOfExponentials(
   const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end);
-
-/**
- * @brief Clamps the values of array to given highs and lows 
- *
- * @param arr array that is to be clamped
- * @param arr_low array of lows
- * @param arr_high array of highs
- *
- * @return Clamped array 
- */
-Eigen::VectorXd clamp(
-  const Eigen::VectorXd & arr, const Eigen::VectorXd & arr_low, const Eigen::VectorXd & arr_high);
 
 }  // namespace affordance_primitives
