@@ -118,9 +118,7 @@ public:
   std::vector<Eigen::Isometry3d> getWaypoints(double theta_step, size_t num_steps);
 
   /**
-   * @brief Computes the 4x4 skew symmetric form of the 6x1 Screw vector
-   *
-   * @param vec 6x1 screw vector with head as omega and tail as v
+   * @brief Computes the 4x4 skew symmetric form of the 6x1 Screw vector as [S]
    *
    * @return Skew-symmetric HTM of the 6x1 Screw vector
    */
