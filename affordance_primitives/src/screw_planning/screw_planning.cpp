@@ -170,16 +170,37 @@ std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
   const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist)
 {
   std::queue<Eigen::VectorXd> output;
+  const size_t & screw_set_size = phi_bounds.first.size();
+  Eigen::MatrixXd
+    cond_grad_starts;  //grad descent starts in condensed form with no regard to series constraint
+  Eigen::MatrixXd
+    dist_grad_starts;  //grad descent starts in distributed form accounting for series constraint
 
   const Eigen::VectorXd span = (phi_bounds.second - phi_bounds.first).cwiseAbs();
   const size_t num_starts =
     ceil(span.maxCoeff() / max_dist) + 1;  //use the max span to determine number of starts
   const Eigen::VectorXd real_step = span / num_starts;
 
-  for (size_t i = 0; i < num_starts; ++i) {
-    output.push(phi_bounds.first + i * real_step);
+  for (size_t i = 0; i <= num_starts; ++i) {
+    cond_grad_starts.col(i) = phi_bounds.first + i * real_step;
   }
-  output.push(phi_bounds.second);
+
+  //reshape to distributed form
+  for (int i = 0; i < screw_set_size; i++) {
+    //fill mins and active screw sample
+    dist_grad_starts.row(i) << Eigen::MatrixXd::Constant(
+      1, (num_starts * i), cond_grad_starts.coeff(i, 0)),
+      cond_grad_starts.row(i);
+    for (int j = 0; j <= i; j++) {
+      //fill max elements
+      dist_grad_starts.row(i) << Eigen::MatrixXd::Constant(
+        1, num_starts * (screw_set_size - 1 - i),
+        cond_grad_starts.coeff(j, cond_grad_starts.row(0).size() - 1));
+    }
+  }
+
+  // output is a queue of columns of dist_grad_starts
+  for (int i = 0; i < dist_grad_starts.col(0).size(); i++) output.push(dist_grad_starts.col(i));
 
   return output;
 }
