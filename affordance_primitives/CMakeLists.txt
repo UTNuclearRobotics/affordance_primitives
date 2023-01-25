@@ -91,6 +91,9 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
   target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
 
+  catkin_add_gtest(test_ap_planning test/test_ap_planning.cpp)
+  target_link_libraries(test_ap_planning ${catkin_LIBRARIES} ${PROJECT_NAME})
+
   # TODO: fix this test and enable it
   # add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)
   # target_link_libraries(test_screw_execution ${catkin_LIBRARIES} ${PROJECT_NAME})

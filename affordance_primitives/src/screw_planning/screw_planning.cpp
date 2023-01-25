@@ -1,4 +1,6 @@
 #include <affordance_primitives/screw_planning/screw_planning.hpp>
+#include <algorithm>
+
 namespace affordance_primitives
 {
 Eigen::VectorXd errorDerivative(
@@ -121,6 +123,94 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
     return true;
 }
 
+bool chainedConstraintFn(ScrewConstraintInfo & sci)
+{
+  //Check if sizes are valid
+  if ((sci.screw_axis_set.size() != sci.phi.size()) || (sci.screw_axis_set.size() <= 0)) {
+    return false;
+  }
+
+  //Gradient descent parameters
+  const double gamma = 0.05;     //learning parameter
+  const size_t nmax = 100;       //max steps
+  const double epsilon = 0.001;  //converge limit
+
+  //Redefine references for readability
+  const Eigen::Isometry3d tf_q_to_m = sci.tf_m_to_q.inverse();
+
+  //Retrieve bounds
+  const Eigen::VectorXd & phi_min = sci.phi_bounds.first;
+  const Eigen::VectorXd & phi_max = sci.phi_bounds.second;
+  const double lambda_max = getLambda(phi_max, sci.phi_bounds);
+
+  //Compute tf_q_to_p
+  const int m = sci.screw_axis_set.size();
+  Eigen::Isometry3d pOE = productOfExponentials(sci.screw_axis_set, sci.phi, 0, m - 1);
+  Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * sci.tf_m_to_s;
+
+  //Compute alpha, the 1/2 squared norm we want to minimize
+  double alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
+
+  //Initialize iterating parameters
+  double delta = epsilon;
+  size_t i = 0;
+
+  while (i < nmax && fabs(delta) >= epsilon) {
+    // Find lambda for this state
+    size_t s_index;
+    double lambda = getLambda(sci.phi, sci.phi_bounds, &s_index);
+
+    // Calculate the derivative
+    auto deriv = computeDerivativeForIndex(
+      sci.screw_axis_set, s_index, sci.phi, tf_q_to_m, sci.tf_m_to_s, tf_q_to_p);
+
+    // Update lambda
+    lambda -= gamma * deriv;
+
+    // Clamp then get phi
+    lambda = std::max(std::min(lambda_max, lambda), 0.0);
+    sci.phi = getPhi(lambda, sci.phi_bounds);
+
+    // Compute tf_q_to_p
+    pOE = productOfExponentials(sci.screw_axis_set, sci.phi, 0, m - 1);
+    tf_q_to_p = tf_q_to_m * pOE * sci.tf_m_to_s;
+
+    // Compute new delta
+    const auto new_alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
+    delta = alpha - new_alpha;
+
+    // Store last squared norm as alpha
+    alpha = new_alpha;
+    i++;
+  }
+
+  //Compute error and update best_error
+  sci.error = calculateEta(tf_q_to_p);
+
+  if (sci.error.norm() < sci.best_error.norm()) sci.best_error = sci.error;
+
+  //Recursively call this function with a new guess for phi until the following conditions are met
+  if (!sci.phi_starts.empty() && (sci.best_error.norm() > 5e-3)) {
+    sci.phi = sci.phi_starts.front();
+    sci.phi_starts.pop();
+    return chainedConstraintFn(sci);
+  } else
+    return true;
+}
+
+double computeDerivativeForIndex(
+  const std::vector<affordance_primitives::ScrewAxis> & axes, size_t index,
+  const Eigen::VectorXd & phi, const Eigen::Isometry3d & tf_q_to_m,
+  const Eigen::Isometry3d & tf_m_to_s, const Eigen::Isometry3d & tf_q_to_p)
+{
+  auto nu_pOE_left = productOfExponentials(axes, phi, 0, index);
+  auto nu_pOE_right = productOfExponentials(axes, phi, index + 1, axes.size() - 1);
+  auto nu = tf_q_to_m.matrix() * nu_pOE_left.matrix() * axes[index].getScrewSkewSymmetricMatrix() *
+            nu_pOE_right.matrix() * tf_m_to_s.matrix();
+
+  return calculateEta(tf_q_to_p).dot(calculateEta(nu));
+}
+
 Eigen::Isometry3d productOfExponentials(
   const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end)
 {
@@ -204,4 +294,59 @@ std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
 
   return output;
 }
+
+double getLambda(
+  const Eigen::VectorXd & phi, const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds,
+  size_t * s_index)
+{
+  double lambda = 0;
+  size_t s = 0;
+  const double EPSILON = 1e-6;
+
+  for (s = 0; s < phi.size(); ++s) {
+    if (fabs(phi(s) - phi_bounds.first(s)) < EPSILON) {
+      if (s_index) {
+        *s_index = std::max(size_t(0), s - 1);
+      }
+      return lambda;
+    } else {
+      lambda += phi(s) - phi_bounds.first(s);
+    }
+  }
+  if (s_index) {
+    *s_index = s;
+  }
+  return lambda;
+}
+
+Eigen::VectorXd getPhi(
+  const double lambda, const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds,
+  size_t * s_index)
+{
+  Eigen::VectorXd phi = phi_bounds.first;
+  size_t s = 0;
+  double b_now = 0;
+  double b_next = phi_bounds.second(0) - phi_bounds.first(0);
+
+  for (size_t i = 0; i < phi.size(); ++i) {
+    if (lambda < b_now) {
+      phi(i) = phi_bounds.first(i);
+    } else if (lambda > b_next) {
+      phi(i) = phi_bounds.second(i);
+    } else {
+      phi(i) = phi_bounds.first(i) + lambda - b_now;
+      s = i;
+    }
+
+    if ((i + 1) < phi.size()) {
+      b_now = b_next;
+      b_next += phi_bounds.second(i + 1) - phi_bounds.first(i + 1);
+    }
+  }
+  if (s_index) {
+    *s_index = s;
+  }
+  return phi;
+}
+
 }  // namespace affordance_primitives

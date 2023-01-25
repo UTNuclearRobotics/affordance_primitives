@@ -64,22 +64,22 @@ namespace affordance_primitives
  */
 struct ScrewConstraintInfo
 {
-    // Inputs
-    const std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
-    const Eigen::Isometry3d tf_m_to_s;
-    const Eigen::Isometry3d tf_m_to_q;
-    std::queue<Eigen::VectorXd> phi_starts = getGradStarts(phi_bounds);
-    std::vector<ScrewAxis> screw_axis_set;
+  // Inputs
+  const std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
+  const Eigen::Isometry3d tf_m_to_s;
+  const Eigen::Isometry3d tf_m_to_q;
+  std::queue<Eigen::VectorXd> phi_starts = getGradStarts(phi_bounds);
+  std::vector<ScrewAxis> screw_axis_set;
 
-    // Outputs
-    Eigen::VectorXd phi;
-    Eigen::VectorXd error;
-    Eigen::VectorXd best_error = Eigen::VectorXd::Constant(6, 1, 1);
-    // error is sqrt(6) unless otherwise explicitly determined
+  // Outputs
+  Eigen::VectorXd phi;
+  Eigen::VectorXd error;
+  Eigen::VectorXd best_error = Eigen::VectorXd::Constant(6, 1, 1);
+  // error is sqrt(6) unless otherwise explicitly determined
 
-  private:
-    std::queue<Eigen::VectorXd> getGradStarts(const std::pair<Eigen::VectorXd, Eigen::VectorXd> &phi_bounds,
-                                              double max_dist = 0.5 * M_PI);
+private:
+  std::queue<Eigen::VectorXd> getGradStarts(
+    const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist = 0.5 * M_PI);
 };
 
 // Functions
@@ -90,9 +90,32 @@ struct ScrewConstraintInfo
  *
  * @return Constraint function success. Additionally error and corresponding screw angles are set in the
  screw_constraint_info struct.
-
  */
-bool constraintFn(ScrewConstraintInfo &screw_constraint_info);
+bool constraintFn(ScrewConstraintInfo & screw_constraint_info);
+
+/**
+ * @brief Computes the set of screw angles that minimize the error between EE pose and screw path for chained APs
+ *
+ * @param screw_constraint_info struct of constraints
+ *
+ * @return Constraint function success. Additionally error and corresponding screw angles are set in the
+ screw_constraint_info struct.
+ */
+bool chainedConstraintFn(ScrewConstraintInfo & screw_constraint_info);
+
+/**
+ * @brief Computes the derivative for a specific screw axis
+ *
+ * @param axes The vector of screw axes
+ * @param index The axis to calculate the derivative for
+ * @param phi The current state
+ *
+ * @return The derivative for the index, as a double
+ */
+double computeDerivativeForIndex(
+  const std::vector<affordance_primitives::ScrewAxis> & axes, size_t index,
+  const Eigen::VectorXd & phi, const Eigen::Isometry3d & tf_q_to_m,
+  const Eigen::Isometry3d & tf_m_to_s, const Eigen::Isometry3d & tf_q_to_p);
 
 /**
  * @brief Computes the partial derivative of error between EE pose and screw path
@@ -104,8 +127,9 @@ bool constraintFn(ScrewConstraintInfo &screw_constraint_info);
  *
  * @return Vector of partial derivative of error with respect of screw angles
  */
-Eigen::VectorXd errorDerivative(const Eigen::Isometry3d &tf_q_to_m, const Eigen::Isometry3d &tf_m_to_s,
-                                const Eigen::VectorXd &phi_current, const std::vector<ScrewAxis> &screw_axis_set);
+Eigen::VectorXd errorDerivative(
+  const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
+  const Eigen::VectorXd & phi_current, const std::vector<ScrewAxis> & screw_axis_set);
 
 /**
  * @brief Computes the 6x1 error vector for a given transformation matrix
@@ -114,8 +138,8 @@ Eigen::VectorXd errorDerivative(const Eigen::Isometry3d &tf_q_to_m, const Eigen:
  *
  * @return 6x1 Error vector
  */
-Eigen::VectorXd calculateEta(const Eigen::Matrix4d &tf);
-Eigen::VectorXd calculateEta(const Eigen::Isometry3d &tf);
+Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf);
+Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
 
 /**
  * @brief Given a set of screw axes and angles, computes the product of exponentials for specified start and end indices
@@ -127,7 +151,32 @@ Eigen::VectorXd calculateEta(const Eigen::Isometry3d &tf);
  *
  * @return Homogenous transformation matrix representing the product of exponentials
  */
-Eigen::Isometry3d productOfExponentials(const std::vector<ScrewAxis> &screw_axis_set, const Eigen::VectorXd &phi,
-                                        int start, int end);
+Eigen::Isometry3d productOfExponentials(
+  const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end);
 
-} // namespace affordance_primitives
+/**
+ * @brief Given a current state phi, this smashes it to 1-DoF for the chained-axis case and gives lambda
+ *
+ * @param phi Set of screw angles
+ * @param phi_bounds The bounds on the angles
+ * @param s_index If passed a value, will set it to the index of the "active" screw
+ *
+ * @return The lambda value that represents the distance along the path
+ */
+double getLambda(
+  const Eigen::VectorXd & phi, const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds,
+  size_t * s_index = nullptr);
+
+/**
+ * @brief Given a current state lambda, this smashes it to m-DoF for the chained-axis case and gives phi
+ *
+ * @param lambda lambda
+ * @param phi_bounds The bounds on the screw angles
+ * @param s_index If passed a value, will set it to the index of the "active" screw
+ *
+ * @return The phi values that represents screw state
+ */
+Eigen::VectorXd getPhi(
+  const double lambda, const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds,
+  size_t * s_index = nullptr);
+}  // namespace affordance_primitives
