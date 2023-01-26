@@ -45,6 +45,22 @@ Eigen::VectorXd errorDerivative(
   return Lambda;
 }
 
+Eigen::Isometry3d getPoseOnPath(
+  const ScrewConstraintInfo & constraints, const Eigen::VectorXd & phi)
+{
+  const size_t m = constraints.screw_axis_set.size();
+  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
+  if (phi.size() != m) {
+    return output;
+  }
+
+  for (size_t i = 0; i < m; ++i) {
+    output = output * constraints.screw_axis_set[i].getTF(phi[i]);
+  }
+  output = output * constraints.tf_m_to_s;
+  return output;
+}
+
 bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
 {
   //Check if sizes are valid
@@ -108,14 +124,14 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
     i++;
   }
 
-  //Compute error and update best_error
-  screw_constraint_info.error = calculateEta(tf_q_to_p);
+  // Compute error and update best_error
+  const auto error_now = calculateEta(tf_q_to_p);
 
-  if (screw_constraint_info.error.norm() < screw_constraint_info.best_error.norm())
-    screw_constraint_info.best_error = screw_constraint_info.error;
+  if (error_now.squaredNorm() < screw_constraint_info.error.squaredNorm())
+    screw_constraint_info.error = error_now;
 
   //Recursively call this function with a new guess for phi until the following conditions are met
-  if (!phi_starts.empty() && (screw_constraint_info.best_error.norm() > 5e-3)) {
+  if (!phi_starts.empty() && (screw_constraint_info.error.norm() > 5e-3)) {
     phi = phi_starts.front();
     phi_starts.pop();
     return constraintFn(screw_constraint_info);
@@ -123,15 +139,22 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
     return true;
 }
 
-bool chainedConstraintFn(ScrewConstraintInfo & sci)
+/**
+ * @brief Recursively computes the error at multiple gradient descent starts
+ *
+ * @param constraints struct of constraints
+ */
+bool computeChainedError(ScrewConstraintInfo & sci)
 {
-  //Check if sizes are valid
-  if ((sci.screw_axis_set.size() != sci.phi.size()) || (sci.screw_axis_set.size() <= 0)) {
+  // Check validity
+  const size_t m = sci.screw_axis_set.size();
+  auto phi_now = sci.phi_starts.front();
+  if (phi_now.size() != m) {
     return false;
   }
 
   //Gradient descent parameters
-  const double gamma = 0.05;     //learning parameter
+  const double gamma = 0.5;      //learning parameter
   const size_t nmax = 100;       //max steps
   const double epsilon = 0.001;  //converge limit
 
@@ -144,12 +167,7 @@ bool chainedConstraintFn(ScrewConstraintInfo & sci)
   const double lambda_max = getLambda(phi_max, sci.phi_bounds);
 
   //Compute tf_q_to_p
-  const int m = sci.screw_axis_set.size();
-  Eigen::Isometry3d pOE = productOfExponentials(sci.screw_axis_set, sci.phi, 0, m - 1);
-  Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * sci.tf_m_to_s;
-
-  //Compute alpha, the 1/2 squared norm we want to minimize
-  double alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
+  Eigen::Isometry3d tf_q_to_p = tf_q_to_m * getPoseOnPath(sci, phi_now);
 
   //Initialize iterating parameters
   double delta = epsilon;
@@ -158,44 +176,99 @@ bool chainedConstraintFn(ScrewConstraintInfo & sci)
   while (i < nmax && fabs(delta) >= epsilon) {
     // Find lambda for this state
     size_t s_index;
-    double lambda = getLambda(sci.phi, sci.phi_bounds, &s_index);
+    double lambda = getLambda(phi_now, sci.phi_bounds, &s_index);
+    double lambda_last = lambda;
 
     // Calculate the derivative
     auto deriv = computeDerivativeForIndex(
-      sci.screw_axis_set, s_index, sci.phi, tf_q_to_m, sci.tf_m_to_s, tf_q_to_p);
+      sci.screw_axis_set, s_index, phi_now, tf_q_to_m, sci.tf_m_to_s, tf_q_to_p);
 
     // Update lambda
     lambda -= gamma * deriv;
 
     // Clamp then get phi
     lambda = std::max(std::min(lambda_max, lambda), 0.0);
-    sci.phi = getPhi(lambda, sci.phi_bounds);
+    phi_now = getPhi(lambda, sci.phi_bounds);
 
     // Compute tf_q_to_p
-    pOE = productOfExponentials(sci.screw_axis_set, sci.phi, 0, m - 1);
-    tf_q_to_p = tf_q_to_m * pOE * sci.tf_m_to_s;
+    tf_q_to_p = tf_q_to_m * getPoseOnPath(sci, phi_now);
 
     // Compute new delta
-    const auto new_alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
-    delta = alpha - new_alpha;
-
-    // Store last squared norm as alpha
-    alpha = new_alpha;
+    delta = lambda_last - lambda;
     i++;
   }
 
   //Compute error and update best_error
-  sci.error = calculateEta(tf_q_to_p);
+  const auto error_now = calculateEta(tf_q_to_p);
+  if (error_now.squaredNorm() < sci.error.squaredNorm()) {
+    sci.phi = phi_now;
+    sci.error = error_now;
+  }
 
-  if (sci.error.norm() < sci.best_error.norm()) sci.best_error = sci.error;
-
-  //Recursively call this function with a new guess for phi until the following conditions are met
-  if (!sci.phi_starts.empty() && (sci.best_error.norm() > 5e-3)) {
-    sci.phi = sci.phi_starts.front();
-    sci.phi_starts.pop();
-    return chainedConstraintFn(sci);
-  } else
+  // Recursively call this function with a new guess for phi until the following conditions are met
+  sci.phi_starts.pop();
+  if (sci.phi_starts.empty() || sci.error.norm() < 5e-3) {
     return true;
+  }
+  return chainedConstraintFn(sci);
+}
+
+bool chainedConstraintFn(ScrewConstraintInfo & sci)
+{
+  //Check if sizes are valid
+  const size_t m = sci.screw_axis_set.size();
+  if (m < 1 || sci.phi_bounds.first.size() != m || sci.phi_bounds.second.size() != m) {
+    return false;
+  }
+
+  // Check if there are starting phi's for the gradient descent searches
+  if (sci.phi_starts.size() < 1) {
+    sci.phi_starts = getChainedStarts(sci);
+  }
+
+  return computeChainedError(sci);
+}
+
+std::queue<Eigen::VectorXd> getChainedStarts(const ScrewConstraintInfo & constraints)
+{
+  std::queue<Eigen::VectorXd> output;
+
+  // If a phi was set, make that the first attempt
+  if (constraints.phi.size() == constraints.screw_axis_set.size()) {
+    output.push(constraints.phi);
+  }
+
+  // Make sure we start twice on each axis
+  const double span_limit = 0.99 * M_PI;
+  double b_now = 0;
+  double b_next = constraints.phi_bounds.second(0) - constraints.phi_bounds.first(0);
+
+  for (size_t ax = 0; ax < constraints.screw_axis_set.size(); ++ax) {
+    const double axis_span = b_next - b_now;
+    const size_t num_starts = ceil(axis_span / span_limit);
+    if (num_starts == 1) {
+      // Start 5% and 95%
+      double start_lambda = b_now + 0.05 * axis_span;
+      output.push(getPhi(start_lambda, constraints.phi_bounds));
+      start_lambda = b_now + 0.95 * axis_span;
+      output.push(getPhi(start_lambda, constraints.phi_bounds));
+    } else {
+      const double spacing = axis_span / (num_starts + 1);
+      double start_lambda = b_now;
+      for (size_t i = 0; i < num_starts; ++i) {
+        start_lambda += spacing;
+        output.push(getPhi(start_lambda, constraints.phi_bounds));
+      }
+    }
+
+    // Update bounds for next axis
+    if ((ax + 1) < constraints.screw_axis_set.size()) {
+      b_now = b_next;
+      b_next += constraints.phi_bounds.second(ax + 1) - constraints.phi_bounds.first(ax + 1);
+    }
+  }
+
+  return output;
 }
 
 double computeDerivativeForIndex(
@@ -203,12 +276,18 @@ double computeDerivativeForIndex(
   const Eigen::VectorXd & phi, const Eigen::Isometry3d & tf_q_to_m,
   const Eigen::Isometry3d & tf_m_to_s, const Eigen::Isometry3d & tf_q_to_p)
 {
-  auto nu_pOE_left = productOfExponentials(axes, phi, 0, index);
-  auto nu_pOE_right = productOfExponentials(axes, phi, index + 1, axes.size() - 1);
-  auto nu = tf_q_to_m.matrix() * nu_pOE_left.matrix() * axes[index].getScrewSkewSymmetricMatrix() *
-            nu_pOE_right.matrix() * tf_m_to_s.matrix();
+  // Calculate the partial derivative of the ``index'' variable
+  Eigen::Matrix4d psi = tf_q_to_m.matrix();
+  for (size_t i = 0; i < index; ++i) {
+    psi = psi * axes.at(i).getTF(phi[i]).matrix();
+  }
+  psi = psi * axes.at(index).getScrewSkewSymmetricMatrix();
+  for (size_t i = index; i < axes.size(); ++i) {
+    psi = psi * axes.at(i).getTF(phi[i]).matrix();
+  }
+  psi = psi * tf_m_to_s.matrix();
 
-  return calculateEta(tf_q_to_p).dot(calculateEta(nu));
+  return calculateEta(tf_q_to_p).dot(calculateEta(psi));
 }
 
 Eigen::Isometry3d productOfExponentials(
@@ -256,44 +335,44 @@ Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf)
   return eta;
 }
 
-std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
-  const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist)
-{
-  std::queue<Eigen::VectorXd> output;
-  const size_t & screw_set_size = phi_bounds.first.size();
-  Eigen::MatrixXd
-    cond_grad_starts;  //grad descent starts in condensed form with no regard to series constraint
-  Eigen::MatrixXd
-    dist_grad_starts;  //grad descent starts in distributed form accounting for series constraint
+// std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
+//   const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist)
+// {
+//   std::queue<Eigen::VectorXd> output;
+//   const size_t & screw_set_size = phi_bounds.first.size();
+//   Eigen::MatrixXd
+//     cond_grad_starts;  //grad descent starts in condensed form with no regard to series constraint
+//   Eigen::MatrixXd
+//     dist_grad_starts;  //grad descent starts in distributed form accounting for series constraint
 
-  const Eigen::VectorXd span = (phi_bounds.second - phi_bounds.first).cwiseAbs();
-  const size_t num_starts =
-    ceil(span.maxCoeff() / max_dist) + 1;  //use the max span to determine number of starts
-  const Eigen::VectorXd real_step = span / num_starts;
+//   const Eigen::VectorXd span = (phi_bounds.second - phi_bounds.first).cwiseAbs();
+//   const size_t num_starts =
+//     ceil(span.maxCoeff() / max_dist) + 1;  //use the max span to determine number of starts
+//   const Eigen::VectorXd real_step = span / num_starts;
 
-  for (size_t i = 0; i <= num_starts; ++i) {
-    cond_grad_starts.col(i) = phi_bounds.first + i * real_step;
-  }
+//   for (size_t i = 0; i <= num_starts; ++i) {
+//     cond_grad_starts.col(i) = phi_bounds.first + i * real_step;
+//   }
 
-  //reshape to distributed form
-  for (int i = 0; i < screw_set_size; i++) {
-    //fill mins and active screw sample
-    dist_grad_starts.row(i) << Eigen::MatrixXd::Constant(
-      1, (num_starts * i), cond_grad_starts.coeff(i, 0)),
-      cond_grad_starts.row(i);
-    for (int j = 0; j <= i; j++) {
-      //fill max elements
-      dist_grad_starts.row(i) << Eigen::MatrixXd::Constant(
-        1, num_starts * (screw_set_size - 1 - i),
-        cond_grad_starts.coeff(j, cond_grad_starts.row(0).size() - 1));
-    }
-  }
+//   //reshape to distributed form
+//   for (int i = 0; i < screw_set_size; i++) {
+//     //fill mins and active screw sample
+//     dist_grad_starts.row(i) << Eigen::MatrixXd::Constant(
+//       1, (num_starts * i), cond_grad_starts.coeff(i, 0)),
+//       cond_grad_starts.row(i);
+//     for (int j = 0; j <= i; j++) {
+//       //fill max elements
+//       dist_grad_starts.row(i) << Eigen::MatrixXd::Constant(
+//         1, num_starts * (screw_set_size - 1 - i),
+//         cond_grad_starts.coeff(j, cond_grad_starts.row(0).size() - 1));
+//     }
+//   }
 
-  // output is a queue of columns of dist_grad_starts
-  for (int i = 0; i < dist_grad_starts.col(0).size(); i++) output.push(dist_grad_starts.col(i));
+//   // output is a queue of columns of dist_grad_starts
+//   for (int i = 0; i < dist_grad_starts.col(0).size(); i++) output.push(dist_grad_starts.col(i));
 
-  return output;
-}
+//   return output;
+// }
 
 double getLambda(
   const Eigen::VectorXd & phi, const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds,
@@ -306,7 +385,7 @@ double getLambda(
   for (s = 0; s < phi.size(); ++s) {
     if (fabs(phi(s) - phi_bounds.first(s)) < EPSILON) {
       if (s_index) {
-        *s_index = std::max(size_t(0), s - 1);
+        *s_index = s == 0 ? 0 : s - 1;
       }
       return lambda;
     } else {
@@ -314,7 +393,7 @@ double getLambda(
     }
   }
   if (s_index) {
-    *s_index = s;
+    *s_index = s == 0 ? 0 : s - 1;
   }
   return lambda;
 }

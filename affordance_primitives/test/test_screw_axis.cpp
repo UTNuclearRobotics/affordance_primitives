@@ -342,6 +342,39 @@ TEST(ScrewAxis, get_waypoints)
   EXPECT_TRUE(waypoints2.empty());
 }
 
+TEST(ScrewAxis, skew_symmetric_matrix)
+{
+  // Test with linear case
+  affordance_primitives::ScrewAxis screw_axis1;
+  affordance_primitive_msgs::ScrewStamped msg1;
+  msg1.header.frame_id = MOVING_FRAME_NAME;
+  msg1.axis.x = 1.6;
+  msg1.origin.y = 0.5;
+  msg1.is_pure_translation = true;
+  screw_axis1.setScrewAxis(msg1);
+
+  Eigen::Matrix4d out;
+  ASSERT_NO_THROW(out = screw_axis1.getScrewSkewSymmetricMatrix());
+  EXPECT_TRUE(out.block(0, 0, 3, 3).isZero());
+  EXPECT_TRUE(out.row(3).isZero());
+  checkVector(out.col(3).head(3), 1, 0, 0);
+
+  // Test with rotational case
+  affordance_primitives::ScrewAxis screw_axis2;
+  affordance_primitive_msgs::ScrewStamped msg2;
+  msg2.header.frame_id = MOVING_FRAME_NAME;
+  msg2.origin.x = 0.5;
+  msg2.axis.z = 1;
+  msg2.is_pure_translation = false;
+  screw_axis2.setScrewAxis(msg2);
+
+  ASSERT_NO_THROW(out = screw_axis2.getScrewSkewSymmetricMatrix());
+  EXPECT_TRUE(out.row(3).isZero());
+  checkVector(out.col(3).head(3), 0, -0.5, 0);
+  EXPECT_EQ(
+    out.block(0, 0, 3, 3), affordance_primitives::getSkewSymmetricMatrix(screw_axis2.getAxis()));
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

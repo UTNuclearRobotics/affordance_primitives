@@ -137,7 +137,7 @@ TwistStamped ScrewAxis::getTwist(double theta_dot) const
 
 Eigen::Isometry3d ScrewAxis::getTF(double delta_theta) const
 {
-  Eigen::Isometry3d output;
+  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
 
   // The translation case is easy:
   if (is_pure_translation_) {

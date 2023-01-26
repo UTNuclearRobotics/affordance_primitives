@@ -74,26 +74,32 @@ TEST(ScrewPlanning, chainConversions)
 
   // Try other cases
   phi_in = lower_bounds;
-  ASSERT_NO_THROW(lambda_out = affordance_primitives::getLambda(phi_in, bounds));
+  ASSERT_NO_THROW(lambda_out = affordance_primitives::getLambda(phi_in, bounds, &s_index));
   EXPECT_NEAR(lambda_out, 0.0, EPSILON);
-  ASSERT_NO_THROW(phi_out = affordance_primitives::getPhi(lambda_out, bounds));
+  EXPECT_EQ(s_index, 0);
+  ASSERT_NO_THROW(phi_out = affordance_primitives::getPhi(lambda_out, bounds, &s_index));
   checkVector(phi_out, -1, 0, -1);
+  EXPECT_EQ(s_index, 0);
 
   phi_in(0) = 2;
   phi_in(1) = 1;
   phi_in(2) = -1;
-  ASSERT_NO_THROW(lambda_out = affordance_primitives::getLambda(phi_in, bounds));
+  ASSERT_NO_THROW(lambda_out = affordance_primitives::getLambda(phi_in, bounds, &s_index));
   EXPECT_NEAR(lambda_out, 4.0, EPSILON);
-  ASSERT_NO_THROW(phi_out = affordance_primitives::getPhi(lambda_out, bounds));
+  EXPECT_EQ(s_index, 1);
+  ASSERT_NO_THROW(phi_out = affordance_primitives::getPhi(lambda_out, bounds, &s_index));
   checkVector(phi_out, 2, 1, -1);
+  EXPECT_EQ(s_index, 1);
 
   phi_in(0) = 2;
   phi_in(1) = 2;
   phi_in(2) = -0.5;
-  ASSERT_NO_THROW(lambda_out = affordance_primitives::getLambda(phi_in, bounds));
+  ASSERT_NO_THROW(lambda_out = affordance_primitives::getLambda(phi_in, bounds, &s_index));
   EXPECT_NEAR(lambda_out, 5.5, EPSILON);
-  ASSERT_NO_THROW(phi_out = affordance_primitives::getPhi(lambda_out, bounds));
+  EXPECT_EQ(s_index, 2);
+  ASSERT_NO_THROW(phi_out = affordance_primitives::getPhi(lambda_out, bounds, &s_index));
   checkVector(phi_out, 2, 2, -0.5);
+  EXPECT_EQ(s_index, 2);
 }
 
 int main(int argc, char ** argv)

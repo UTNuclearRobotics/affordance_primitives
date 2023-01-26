@@ -65,22 +65,33 @@ namespace affordance_primitives
 struct ScrewConstraintInfo
 {
   // Inputs
-  const std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
-  const Eigen::Isometry3d tf_m_to_s;
-  const Eigen::Isometry3d tf_m_to_q;
-  std::queue<Eigen::VectorXd> phi_starts = getGradStarts(phi_bounds);
+  std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
+  Eigen::Isometry3d tf_m_to_s;
+  Eigen::Isometry3d tf_m_to_q;
+  std::queue<Eigen::VectorXd> phi_starts;
+  // std::queue<Eigen::VectorXd> phi_starts = getGradStarts(phi_bounds);
   std::vector<ScrewAxis> screw_axis_set;
 
   // Outputs
   Eigen::VectorXd phi;
-  Eigen::VectorXd error;
-  Eigen::VectorXd best_error = Eigen::VectorXd::Constant(6, 1, 1);
+  Eigen::VectorXd error = Eigen::VectorXd::Constant(6, 1, 1);
   // error is sqrt(6) unless otherwise explicitly determined
 
-private:
-  std::queue<Eigen::VectorXd> getGradStarts(
-    const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist = 0.5 * M_PI);
+  // private:
+  //   std::queue<Eigen::VectorXd> getGradStarts(
+  //     const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist = 0.5 * M_PI);
 };
+
+/**
+ * @brief Gets a pose on the path for a given state
+ *
+ * @param screw_constraint_info struct of constraints. The phi is the state we will calculate for
+ * @param phi The state to calculate for
+ *
+ * @return The pose given with respect to frame m
+ */
+Eigen::Isometry3d getPoseOnPath(
+  const ScrewConstraintInfo & constraints, const Eigen::VectorXd & phi);
 
 // Functions
 /**
@@ -102,6 +113,14 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info);
  screw_constraint_info struct.
  */
 bool chainedConstraintFn(ScrewConstraintInfo & screw_constraint_info);
+
+/**
+ * @brief Calculates a set of phi's to kick gradiet descent off from
+ *
+ * @param constraints struct of constraints
+ * @return A queue of constraints
+ */
+std::queue<Eigen::VectorXd> getChainedStarts(const ScrewConstraintInfo & constraints);
 
 /**
  * @brief Computes the derivative for a specific screw axis
