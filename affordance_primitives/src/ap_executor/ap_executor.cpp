@@ -116,7 +116,7 @@ AffordancePrimitiveResult APExecutor::execute(
     action_server_.setSucceeded(ap_result);
     return ap_result;
   }
-  if (fabs(goal->screw_distance) < epislon) {
+  if (fabs(goal->theta_end - goal->theta_start) < epislon) {
     ap_result.result = ap_result.SUCCESS;
     action_server_.setSucceeded(ap_result);
     return ap_result;
@@ -130,7 +130,7 @@ AffordancePrimitiveResult APExecutor::execute(
 
   // Start the execution monitor
   const double timeout =
-    2 * fabs(goal->screw_distance / goal->theta_dot);  // Allow 2x expected time
+    2 * fabs((goal->theta_end - goal->theta_start) / goal->theta_dot);  // Allow 2x expected time
   monitor_->startMonitor(goal->robot_params, timeout);
 
   // Execute commands while monitoring
@@ -173,7 +173,7 @@ AffordancePrimitiveResult APExecutor::execute(
       if (!total_delta_theta.has_value()) {
         ap_result.result = ap_result.KIN_VIOLATION;
         break;
-      } else if (total_delta_theta.value() >= fabs(goal->screw_distance)) {
+      } else if (total_delta_theta.value() >= fabs(goal->theta_end)) {
         ap_result.result = ap_result.SUCCESS;
         break;
       }

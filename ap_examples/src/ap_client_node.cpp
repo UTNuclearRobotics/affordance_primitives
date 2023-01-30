@@ -90,7 +90,8 @@ int main(int argc, char ** argv)
   ap_goal.robot_params.max_ee_velocity.rot_y = 0.25;
 
   // Finally, we request how far to move and how quickly
-  ap_goal.screw_distance = 0.5 * M_PI;
+  ap_goal.theta_start = 0.0;
+  ap_goal.theta_end = 0.5 * M_PI;
   ap_goal.theta_dot = 0.05;
 
   // To trigger the move, we call the action

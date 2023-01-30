@@ -183,6 +183,27 @@ std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(double theta_step, size_t
   return output;
 }
 
+std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(
+  double theta_start, double theta_end, size_t num_steps)
+{
+  std::vector<Eigen::Isometry3d> output;
+
+  // Check for invalid inputs
+  if (num_steps < 1 || theta_start > theta_end) {
+    return output;
+  }
+
+  // Iterate over number of steps to generate waypoints
+  const double theta_step = (theta_end - theta_start) / num_steps;
+  double theta_now = theta_start;
+  output.reserve(num_steps + 1);
+  for (size_t i = 0; i < num_steps + 1; i++) {
+    output.push_back(getTF(theta_start));
+    theta_start += theta_step;
+  }
+  return output;
+}
+
 Eigen::Matrix4d ScrewAxis::getScrewSkewSymmetricMatrix() const
 {
   Eigen::Matrix4d output(4, 4);

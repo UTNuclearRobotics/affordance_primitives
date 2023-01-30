@@ -340,6 +340,20 @@ TEST(ScrewAxis, get_waypoints)
 
   ASSERT_NO_THROW(waypoints2 = screw_axis.getWaypoints(0.0, num_steps));
   EXPECT_TRUE(waypoints2.empty());
+
+  // Now check for different call to getWaypoints
+  ASSERT_NO_THROW(waypoints = screw_axis.getWaypoints(-0.5 * M_PI, 0, num_steps));
+  EXPECT_EQ(waypoints.size(), num_steps + 1);
+
+  // Check that the front waypoint matches a -90 degree rotation
+  auto first_wp = waypoints.front();
+  checkVector(first_wp.translation(), 1.0, 1.0, 0.0);  // With respect to starting position
+  checkVector(first_wp.linear().col(0), 0, -1, 0);     // New x axis faces old -y axis
+  checkVector(first_wp.linear().col(1), 1, 0, 0);      // New y axis faces old x axis
+  checkVector(first_wp.linear().col(2), 0, 0, 1);      // z axis did not change
+
+  ASSERT_NO_THROW(waypoints2 = screw_axis.getWaypoints(0.0, -1.0, num_steps));
+  EXPECT_TRUE(waypoints2.empty());
 }
 
 TEST(ScrewAxis, skew_symmetric_matrix)

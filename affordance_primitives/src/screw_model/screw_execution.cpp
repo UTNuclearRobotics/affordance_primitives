@@ -100,7 +100,7 @@ bool APScrewExecutor::setStreamingCommands(
   Eigen::Isometry3d tf_moving_to_task = tf2::transformToEigen(*tfmsg_moving_to_task);
 
   // Set the sign of the velocity cmd to be same as requested delta
-  const double theta_dot = copysign(req.theta_dot, req.screw_distance);
+  const double theta_dot = copysign(req.theta_dot, (req.theta_end - req.theta_start));
 
   // Calculate the twist and wrench in the task frame
   const Eigen::Matrix<double, 6, 1> affordance_twist =
@@ -137,7 +137,7 @@ std::optional<AffordanceTrajectory> APScrewExecutor::getTrajectoryCommands(
   Eigen::Isometry3d tf_moving_to_task = tf2::transformToEigen(*tfmsg_moving_to_task);
 
   // Set the sign of the velocity cmd to be same as requested delta
-  const double theta_dot = copysign(req.theta_dot, req.screw_distance);
+  const double theta_dot = copysign(req.theta_dot, (req.theta_end - req.theta_start));
 
   // Calculate the twist and wrench of the affordance frame
   const Eigen::Matrix<double, 6, 1> affordance_twist =
@@ -154,10 +154,11 @@ std::optional<AffordanceTrajectory> APScrewExecutor::getTrajectoryCommands(
     calculateAppliedWrench(affordance_wrench, tf_moving_to_task, req.screw, req.robot_params);
 
   // Use ScrewAxis to generate a list of waypoints (defined w.r.t. affordance frame)
-  const double theta_step = req.screw_distance / num_steps;
+  const double theta_step = fabs(req.theta_end - req.theta_start) / num_steps;
   ScrewAxis screw_axis;
   screw_axis.setScrewAxis(req.screw);
-  std::vector<Eigen::Isometry3d> waypoints = screw_axis.getWaypoints(theta_step, num_steps);
+  std::vector<Eigen::Isometry3d> waypoints =
+    screw_axis.getWaypoints(req.theta_start, req.theta_end, num_steps);
 
   // Set up output
   AffordanceTrajectory ap_trajectory;
