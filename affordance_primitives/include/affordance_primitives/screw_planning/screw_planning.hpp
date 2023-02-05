@@ -157,8 +157,8 @@ Eigen::VectorXd errorDerivative(
  *
  * @return 6x1 Error vector
  */
-Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf);
-Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
+// Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf);
+// Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
 
 /**
  * @brief Given a set of screw axes and angles, computes the product of exponentials for specified start and end indices

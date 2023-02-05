@@ -1,3 +1,4 @@
+#include <affordance_primitives/screw_planning/screw_constraint.hpp>
 #include <affordance_primitives/screw_planning/screw_planning.hpp>
 #include <algorithm>
 
@@ -303,37 +304,37 @@ Eigen::Isometry3d productOfExponentials(
     return screw_axis_set[0].getTF(0.0);
 }
 
-Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf)
-{
-  //variable declaration
-  const Eigen::AngleAxisd axisAngleRep(tf.block<3, 3>(0, 0));
-  const Eigen::Vector3d lin = tf.block<3, 1>(0, 3);
-  Eigen::VectorXd eta(6);
+// Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf)
+// {
+//   //variable declaration
+//   const Eigen::AngleAxisd axisAngleRep(tf.block<3, 3>(0, 0));
+//   const Eigen::Vector3d lin = tf.block<3, 1>(0, 3);
+//   Eigen::VectorXd eta(6);
 
-  //First three elements denote the translation part
-  eta.head(3) = lin;
+//   //First three elements denote the translation part
+//   eta.head(3) = lin;
 
-  //Last three for axis*angle
-  eta.tail(3) = axisAngleRep.angle() * axisAngleRep.axis();
+//   //Last three for axis*angle
+//   eta.tail(3) = axisAngleRep.angle() * axisAngleRep.axis();
 
-  return eta;
-}
+//   return eta;
+// }
 
-Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf)
-{
-  //variable declaration
-  const Eigen::AngleAxisd axisAngleRep(tf.rotation());
-  const Eigen::Vector3d lin = tf.translation();
-  Eigen::VectorXd eta(6);
+// Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf)
+// {
+//   //variable declaration
+//   const Eigen::AngleAxisd axisAngleRep(tf.rotation());
+//   const Eigen::Vector3d lin = tf.translation();
+//   Eigen::VectorXd eta(6);
 
-  //First three elements denote the translation part
-  eta.head(3) = lin;
+//   //First three elements denote the translation part
+//   eta.head(3) = lin;
 
-  //Last three for axis*angle
-  eta.tail(3) = axisAngleRep.angle() * axisAngleRep.axis();
+//   //Last three for axis*angle
+//   eta.tail(3) = axisAngleRep.angle() * axisAngleRep.axis();
 
-  return eta;
-}
+//   return eta;
+// }
 
 // std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
 //   const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist)
