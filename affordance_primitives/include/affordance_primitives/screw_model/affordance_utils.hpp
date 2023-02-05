@@ -191,9 +191,22 @@ std::optional<PoseStamped> strToPose(const std::string & string_in);
 std::string screwMsgToStr(const ScrewStamped & screw);
 
 /**
+ * @brief Gets the pretty string format for a vector of screws
+ *
+ * Delimitted by ";"
+ */
+std::string screwMsgVectorToStr(const std::vector<ScrewStamped> & screws);
+
+/**
  * @brief Gets a ScrewStamped message from a pretty string format
  * @return The optional is null if the screw was not found
  */
 std::optional<ScrewStamped> strToScrewMsg(const std::string & string_in);
+
+/**
+ * @brief Gets a vector of ScrewStamped message from a pretty string format
+ * @return The return is empty if no screws were found
+ */
+std::vector<ScrewStamped> strToScrewMsgVector(std::string string_in);
 
 }  // namespace affordance_primitives

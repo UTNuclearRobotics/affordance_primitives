@@ -297,6 +297,15 @@ std::string screwMsgToStr(const ScrewStamped & screw)
   return stream.str();
 }
 
+std::string screwMsgVectorToStr(const std::vector<ScrewStamped> & screws)
+{
+  std::stringstream stream;
+  for (const auto & screw : screws) {
+    stream << screwMsgToStr(screw) << ";";
+  }
+  return stream.str();
+}
+
 std::optional<ScrewStamped> strToScrewMsg(const std::string & string_in)
 {
   affordance_primitive_msgs::ScrewStamped output;
@@ -329,6 +338,35 @@ std::optional<ScrewStamped> strToScrewMsg(const std::string & string_in)
   } catch (const std::out_of_range & e) {
     std::cerr << e.what() << '\n';
     return std::nullopt;
+  }
+
+  return output;
+}
+
+std::vector<ScrewStamped> strToScrewMsgVector(std::string string_in)
+{
+  std::vector<ScrewStamped> output;
+  std::string delimiter = ";";
+
+  // Loop through string by delimiter
+  size_t pos = 0;
+  std::string token;
+  while ((pos = string_in.find(delimiter)) != std::string::npos) {
+    token = string_in.substr(0, pos);
+
+    // Extract this screw
+    auto screw_msg = strToScrewMsg(token);
+    if (screw_msg.has_value()) {
+      output.push_back(*screw_msg);
+    }
+
+    string_in.erase(0, pos + delimiter.length());
+  }
+
+  // Get the last one
+  auto screw_msg = strToScrewMsg(string_in);
+  if (screw_msg.has_value()) {
+    output.push_back(*screw_msg);
   }
 
   return output;

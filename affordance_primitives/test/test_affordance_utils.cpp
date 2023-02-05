@@ -340,6 +340,53 @@ TEST(AffordanceUtils, screwAndStrConversions)
   EXPECT_FALSE(out_screw.has_value());
 }
 
+TEST(AffordanceUtils, multiStrConversions)
+{
+  // Create valid screw message
+  affordance_primitives::ScrewStamped screw_msg;
+  screw_msg.header.frame_id = "some_frame";
+  screw_msg.origin.x = 1.3;
+  screw_msg.axis.z = -1;
+  screw_msg.is_pure_translation = false;
+  screw_msg.pitch = 0.5;
+
+  // Make vector
+  std::vector<affordance_primitives::ScrewStamped> screws;
+  screws.push_back(screw_msg);
+
+  // Add 2 more elements
+  screw_msg.origin.y = -1.4;
+  screws.push_back(screw_msg);
+  screw_msg.is_pure_translation = true;
+  screws.push_back(screw_msg);
+
+  std::string correct_output =
+    "Header: some_frame\nOrigin X: 1.3\nOrigin Y: 0\nOrigin Z: 0\nAxis X: 0\nAxis Y: 0\nAxis Z: "
+    "-1\nPitch: 0.500000;Header: some_frame\nOrigin X: 1.3\nOrigin Y: -1.4\nOrigin Z: 0\nAxis X: "
+    "0\nAxis Y: 0\nAxis Z: -1\nPitch: 0.500000;Header: some_frame\nOrigin X: 1.3\nOrigin Y: "
+    "-1.4\nOrigin Z: 0\nAxis X: 0\nAxis Y: 0\nAxis Z: -1\nPitch: Infinity;";
+
+  // convert to string and back again
+  std::string screw_str;
+  std::vector<affordance_primitives::ScrewStamped> out_screws;
+  ASSERT_NO_THROW(screw_str = affordance_primitives::screwMsgVectorToStr(screws));
+  EXPECT_EQ(screw_str, correct_output);
+  ASSERT_NO_THROW(out_screws = affordance_primitives::strToScrewMsgVector(screw_str));
+  ASSERT_EQ(out_screws.size(), 3);
+
+  // check for equality
+  EXPECT_EQ(screw_msg.header.frame_id, out_screws.at(0).header.frame_id);
+  checkVector(screw_msg.axis, out_screws.at(0).axis);
+  checkPoint(screw_msg.origin, out_screws.at(2).origin);
+  EXPECT_EQ(screw_msg.is_pure_translation, out_screws.at(2).is_pure_translation);
+  EXPECT_NEAR(out_screws.at(1).pitch, 0.5, EPSILON);
+
+  // Try with single element
+  screw_str = affordance_primitives::screwMsgToStr(screw_msg);
+  ASSERT_NO_THROW(out_screws = affordance_primitives::strToScrewMsgVector(screw_str));
+  ASSERT_EQ(out_screws.size(), 1);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
