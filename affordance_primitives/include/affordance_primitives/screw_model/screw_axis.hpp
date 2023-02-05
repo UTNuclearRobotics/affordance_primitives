@@ -138,12 +138,12 @@ public:
    * @brief Creates a screw message from this axis
    * @return The screw message
    */
-  ScrewStamped toMsg();  // TODO: test
+  ScrewStamped toMsg() const;
 
   // Getters
   std::string getFrame() const { return moving_frame_name_; };
   Eigen::Vector3d getQVector() const { return origin_; };
-  Eigen::Vector3d getAxis() const { return axis_; };
+  Eigen::Vector3d getAxis() const;
   Eigen::Vector3d getLinearVector() const { return translation_component_; };
   double getPitch() const { return pitch_; };
   bool isPureTranslation() const { return is_pure_translation_; };

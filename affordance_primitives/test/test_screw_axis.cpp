@@ -47,6 +47,14 @@ void checkVector(
   EXPECT_NEAR(vec.z, z, EPSILON);
 }
 
+void checkVector(
+  const affordance_primitives::Point & vec, const double x, const double y, const double z)
+{
+  EXPECT_NEAR(vec.x, x, EPSILON);
+  EXPECT_NEAR(vec.y, y, EPSILON);
+  EXPECT_NEAR(vec.z, z, EPSILON);
+}
+
 TEST(ScrewAxis, test_constructor)
 {
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME);
@@ -138,7 +146,6 @@ TEST(ScrewAxis, two_pose_setter_linear)
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, second_pose));
   checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
   checkVector(screw_axis.getLinearVector(), 0.0, 0.0, 1.0);
-  EXPECT_TRUE(screw_axis.getAxis().isZero());
 }
 
 TEST(ScrewAxis, pose_axis_setter_rotation)
@@ -189,7 +196,6 @@ TEST(ScrewAxis, pose_axis_setter_linear)
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, wonky_axis));
   checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
   checkVector(screw_axis.getLinearVector(), 0.5 * sqrt(2), 0.0, 0.5 * sqrt(2));
-  EXPECT_TRUE(screw_axis.getAxis().isZero());
 
   // Setting the pitch doesn't matter internally, but shouldn't cause problems
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, wonky_axis, 42));
@@ -239,7 +245,6 @@ TEST(ScrewAxis, screw_msg_setter_linear)
   ASSERT_TRUE(screw_axis.setScrewAxis(screw_msg));
   checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
   checkVector(screw_axis.getLinearVector(), 0.5 * sqrt(2), 0.0, 0.5 * sqrt(2));
-  EXPECT_TRUE(screw_axis.getAxis().isZero());
 
   // Setting the pitch doesn't matter internally, but shouldn't cause problems
   screw_msg.pitch = 42.0;
@@ -387,6 +392,26 @@ TEST(ScrewAxis, skew_symmetric_matrix)
   checkVector(out.col(3).head(3), 0, -0.5, 0);
   EXPECT_EQ(
     out.block(0, 0, 3, 3), affordance_primitives::getSkewSymmetricMatrix(screw_axis2.getAxis()));
+}
+
+TEST(ScrewAxis, toMsg)
+{
+  // Test with linear case
+  affordance_primitives::ScrewAxis screw_axis1;
+  affordance_primitive_msgs::ScrewStamped msg1;
+  msg1.header.frame_id = MOVING_FRAME_NAME;
+  msg1.axis.x = 1.6;
+  msg1.origin.y = 0.5;
+  msg1.is_pure_translation = true;
+  screw_axis1.setScrewAxis(msg1);
+
+  affordance_primitive_msgs::ScrewStamped msg_out;
+  ASSERT_NO_THROW(msg_out = screw_axis1.toMsg());
+  checkVector(msg_out.axis, 1.0, 0, 0);
+  checkVector(msg_out.origin, 0, 0.5, 0);
+  EXPECT_EQ(msg_out.header.frame_id, MOVING_FRAME_NAME);
+  EXPECT_TRUE(msg_out.is_pure_translation);
+  EXPECT_NEAR(msg_out.pitch, 0.0, EPSILON);
 }
 
 int main(int argc, char ** argv)

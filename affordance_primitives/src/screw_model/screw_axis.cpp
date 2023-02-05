@@ -117,6 +117,15 @@ bool ScrewAxis::setScrewAxis(const ScrewStamped & screw_msg)
   return setScrewAxis(origin_pose, eigen_axis, screw_msg.pitch);
 }
 
+Eigen::Vector3d ScrewAxis::getAxis() const
+{
+  if (is_pure_translation_) {
+    return translation_component_;
+  } else {
+    return axis_;
+  }
+}
+
 TwistStamped ScrewAxis::getTwist(double theta_dot) const
 {
   TwistStamped output;
@@ -214,14 +223,14 @@ Eigen::Matrix4d ScrewAxis::getScrewSkewSymmetricMatrix() const
   return output;
 }
 
-ScrewStamped ScrewAxis::toMsg()
+ScrewStamped ScrewAxis::toMsg() const
 {
   ScrewStamped output;
   output.header.frame_id = moving_frame_name_;
   output.is_pure_translation = is_pure_translation_;
   output.pitch = pitch_;
   output.origin = tf2::toMsg(origin_);
-  tf2::toMsg(axis_, output.axis);
+  tf2::toMsg(getAxis(), output.axis);
 
   return output;
 }
