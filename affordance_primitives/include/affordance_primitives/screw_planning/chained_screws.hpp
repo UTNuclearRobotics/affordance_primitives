@@ -68,31 +68,57 @@ public:
   * @param sol The solution, to be filled in by this function
   * @return True if successful, false if there was a problem
   */
-  virtual bool constraintFn(const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol);
+  virtual bool constraintFn(
+    const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol) override;
   virtual bool constraintFn(
     const Eigen::Isometry3d & tf_m_to_q, const std::vector<double> & phi_0,
-    ScrewConstraintSolution & sol);
-
-  /**
-  * @brief Adds a screw axis, to the end of the chain
-  */
-  virtual void addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound);
-  virtual void addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound);
-
-  // Getters
-  const double lambdaMax() const { return lambda_max_; }
-  const double lambdaMin() const { return 0.0; }
+    ScrewConstraintSolution & sol) override;
 
   /**
   * @brief Gets a pose on the path
   * @param phi State vector
   */
-  Eigen::Isometry3d getPose(const std::vector<double> & phi) const;
+  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const override;
   /**
   * @brief Gets a pose on the path
   * @param lambda lambda value
   */
-  Eigen::Isometry3d getPose(double lambda) const;
+  virtual Eigen::Isometry3d getPose(double lambda) const;
+
+  /**
+  * @brief Adds a screw axis, to the end of the chain
+  */
+  virtual void addScrewAxis(
+    const ScrewStamped & axis, double lower_bound, double upper_bound) override;
+  virtual void addScrewAxis(
+    const ScrewAxis & axis, double lower_bound, double upper_bound) override;
+
+  /**
+  * @brief Samples a random valid screw state
+  */
+  virtual std::vector<double> sampleUniformState() const override;
+
+  /**
+  * @brief Samples a random valid screw state near another state
+  * 
+  * @param near the state to sample near
+  * @param distance how far away to sample
+  */
+  virtual std::vector<double> sampleUniformStateNear(
+    const std::vector<double> & near, double distance) const override;
+
+  /**
+  * @brief Samples a random valid screw state via Normal distribution
+  * 
+  * @param mean the mean state to sample around
+  * @param stdDev standard deviation
+  */
+  virtual std::vector<double> sampleGaussianStateNear(
+    const std::vector<double> & mean, double stdDev) const override;
+
+  // Getters
+  const double lambdaMax() const { return lambda_max_; }
+  const double lambdaMin() const { return 0.0; }
 
   /**
   * @brief Calculates lambda from a state

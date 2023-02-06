@@ -162,6 +162,47 @@ void ChainedScrews::addScrewAxis(const ScrewAxis & axis, double lower_bound, dou
   lambda_max_ = getLambda(upper_bounds_);
 }
 
+std::vector<double> ChainedScrews::sampleUniformState() const
+{
+  // Draw a sample along the path
+  std::uniform_real_distribution<> dis(0, lambda_max_);
+  return getPhi(dis(*random_gen_));
+}
+
+std::vector<double> ChainedScrews::sampleUniformStateNear(
+  const std::vector<double> & near, double distance) const
+{
+  // Check input
+  if (near.size() != size_) {
+    return sampleUniformState();
+  }
+
+  // Sample near the passed state
+  const double lambda = getLambda(near);
+  std::uniform_real_distribution<> dis(lambda - 0.5 * distance, lambda + 0.5 * distance);
+  const double val = dis(*random_gen_);
+
+  // Enforce bounds
+  return getPhi(std::clamp(val, 0.0, lambda_max_));
+}
+
+std::vector<double> ChainedScrews::sampleGaussianStateNear(
+  const std::vector<double> & mean, double stdDev) const
+{
+  // Check input
+  if (mean.size() != size_) {
+    return sampleUniformState();
+  }
+
+  // Sample near the passed state (mean, stddev)
+  const double lambda = getLambda(mean);
+  std::normal_distribution<> dis{lambda, stdDev};
+  const double val = dis(*random_gen_);
+
+  // Enforce bounds
+  return getPhi(std::clamp(val, 0.0, lambda_max_));
+}
+
 Eigen::Isometry3d ChainedScrews::getPose(const std::vector<double> & phi) const
 {
   Eigen::Isometry3d output = Eigen::Isometry3d::Identity();

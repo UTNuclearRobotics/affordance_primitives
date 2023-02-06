@@ -37,6 +37,7 @@
 #include <affordance_primitives/screw_model/affordance_utils.hpp>
 #include <affordance_primitives/screw_model/screw_axis.hpp>
 #include <limits>
+#include <random>
 #include <vector>
 
 namespace affordance_primitives
@@ -74,7 +75,7 @@ struct ScrewConstraintSolution
  * @brief Manages all operations with screw constrained paths
  *
  * Is used as a base class for various methods of handling multiple screws
- * You must implement constraintFn()!!
+ * You must implement constraintFn() AND getPose()
  */
 class ScrewConstraint
 {
@@ -111,6 +112,16 @@ public:
   virtual bool constraintFn(const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol) = 0;
 
   /**
+  * @brief Gets a pose on the path at some state
+  * 
+  * You must implement this function!
+  * 
+  * @param phi State vector
+  * @return The pose in the affordance frame at state phi
+  */
+  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const = 0;
+
+  /**
   * @brief Sets the path reference frame tf_m_to_s
   */
   virtual void setReferenceFrame(const Eigen::Isometry3d & tf_m_to_s);
@@ -120,6 +131,29 @@ public:
   */
   virtual void addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound);
   virtual void addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound);
+
+  /**
+  * @brief Samples a random valid screw state
+  */
+  virtual std::vector<double> sampleUniformState() const;
+
+  /**
+  * @brief Samples a random valid screw state near another state
+  * 
+  * @param near the state to sample near
+  * @param distance how far away to sample
+  */
+  virtual std::vector<double> sampleUniformStateNear(
+    const std::vector<double> & near, double distance) const;
+
+  /**
+  * @brief Samples a random valid screw state via Normal distribution
+  * 
+  * @param mean the mean state to sample around
+  * @param stdDev standard deviation
+  */
+  virtual std::vector<double> sampleGaussianStateNear(
+    const std::vector<double> & mean, double stdDev) const;
 
   // Getters
   const std::vector<ScrewAxis> & axes() const { return axes_; }
@@ -137,6 +171,9 @@ protected:
   Eigen::Isometry3d tf_m_to_s_;
   size_t size_;             // Any inheritors should keep this up to date
   double tolerance_{5e-3};  // TODO tinker with this
+
+  // Random number generation
+  std::unique_ptr<std::mt19937> random_gen_;
 };
 
 }  // namespace affordance_primitives
