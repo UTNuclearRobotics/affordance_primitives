@@ -118,15 +118,32 @@ public:
   std::vector<Eigen::Isometry3d> getWaypoints(double theta_step, size_t num_steps);
 
   /**
+   * @brief Runs "getTF" a bunch of times to generate a waypoint trajectory
+   * @param theta_start The theta to start at
+   * @param theta_end The theta to end at
+   * @param num_steps The number of waypoints
+   * @return A vector of waypoints
+   */
+  std::vector<Eigen::Isometry3d> getWaypoints(
+    double theta_start, double theta_end, size_t num_steps);
+
+  /**
+   * @brief Computes the 4x4 skew symmetric form of the 6x1 Screw vector as [S]
+   *
+   * @return Skew-symmetric HTM of the 6x1 Screw vector
+   */
+  Eigen::Matrix4d getScrewSkewSymmetricMatrix() const;
+
+  /**
    * @brief Creates a screw message from this axis
    * @return The screw message
    */
-  ScrewStamped toMsg();  // TODO: test
+  ScrewStamped toMsg() const;
 
   // Getters
   std::string getFrame() const { return moving_frame_name_; };
   Eigen::Vector3d getQVector() const { return origin_; };
-  Eigen::Vector3d getAxis() const { return axis_; };
+  Eigen::Vector3d getAxis() const;
   Eigen::Vector3d getLinearVector() const { return translation_component_; };
   double getPitch() const { return pitch_; };
   bool isPureTranslation() const { return is_pure_translation_; };

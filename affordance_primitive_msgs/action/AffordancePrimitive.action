@@ -22,8 +22,9 @@ float64 task_impedance_rotation
 # Maximum velocity to move along the screw. It is unsigned and will be considered same sign as "screw_distance"
 float64 theta_dot
 
-# The (signed) distance to move along the screw. Meters (pure translation case), Radians (otherwise)
-float64 screw_distance
+# The starting and ending screw theta's. Meters (pure translation case), Radians (otherwise)
+float64 theta_start
+float64 theta_end
 
 # The robot configs/parameters to use during this AP move
 affordance_primitive_msgs/APRobotParameter robot_params

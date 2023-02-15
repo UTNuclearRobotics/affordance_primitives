@@ -47,6 +47,14 @@ void checkVector(
   EXPECT_NEAR(vec.z, z, EPSILON);
 }
 
+void checkVector(
+  const affordance_primitives::Point & vec, const double x, const double y, const double z)
+{
+  EXPECT_NEAR(vec.x, x, EPSILON);
+  EXPECT_NEAR(vec.y, y, EPSILON);
+  EXPECT_NEAR(vec.z, z, EPSILON);
+}
+
 TEST(ScrewAxis, test_constructor)
 {
   affordance_primitives::ScrewAxis screw_axis(MOVING_FRAME_NAME);
@@ -138,7 +146,6 @@ TEST(ScrewAxis, two_pose_setter_linear)
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, second_pose));
   checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
   checkVector(screw_axis.getLinearVector(), 0.0, 0.0, 1.0);
-  EXPECT_TRUE(screw_axis.getAxis().isZero());
 }
 
 TEST(ScrewAxis, pose_axis_setter_rotation)
@@ -189,7 +196,6 @@ TEST(ScrewAxis, pose_axis_setter_linear)
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, wonky_axis));
   checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
   checkVector(screw_axis.getLinearVector(), 0.5 * sqrt(2), 0.0, 0.5 * sqrt(2));
-  EXPECT_TRUE(screw_axis.getAxis().isZero());
 
   // Setting the pitch doesn't matter internally, but shouldn't cause problems
   ASSERT_TRUE(screw_axis.setScrewAxis(first_pose, wonky_axis, 42));
@@ -239,7 +245,6 @@ TEST(ScrewAxis, screw_msg_setter_linear)
   ASSERT_TRUE(screw_axis.setScrewAxis(screw_msg));
   checkVector(screw_axis.getQVector(), 1.0, 0.0, 0.0);
   checkVector(screw_axis.getLinearVector(), 0.5 * sqrt(2), 0.0, 0.5 * sqrt(2));
-  EXPECT_TRUE(screw_axis.getAxis().isZero());
 
   // Setting the pitch doesn't matter internally, but shouldn't cause problems
   screw_msg.pitch = 42.0;
@@ -340,6 +345,73 @@ TEST(ScrewAxis, get_waypoints)
 
   ASSERT_NO_THROW(waypoints2 = screw_axis.getWaypoints(0.0, num_steps));
   EXPECT_TRUE(waypoints2.empty());
+
+  // Now check for different call to getWaypoints
+  ASSERT_NO_THROW(waypoints = screw_axis.getWaypoints(-0.5 * M_PI, 0, num_steps));
+  EXPECT_EQ(waypoints.size(), num_steps + 1);
+
+  // Check that the front waypoint matches a -90 degree rotation
+  auto first_wp = waypoints.front();
+  checkVector(first_wp.translation(), 1.0, 1.0, 0.0);  // With respect to starting position
+  checkVector(first_wp.linear().col(0), 0, -1, 0);     // New x axis faces old -y axis
+  checkVector(first_wp.linear().col(1), 1, 0, 0);      // New y axis faces old x axis
+  checkVector(first_wp.linear().col(2), 0, 0, 1);      // z axis did not change
+
+  ASSERT_NO_THROW(waypoints2 = screw_axis.getWaypoints(0.0, -1.0, num_steps));
+  EXPECT_TRUE(waypoints2.empty());
+}
+
+TEST(ScrewAxis, skew_symmetric_matrix)
+{
+  // Test with linear case
+  affordance_primitives::ScrewAxis screw_axis1;
+  affordance_primitive_msgs::ScrewStamped msg1;
+  msg1.header.frame_id = MOVING_FRAME_NAME;
+  msg1.axis.x = 1.6;
+  msg1.origin.y = 0.5;
+  msg1.is_pure_translation = true;
+  screw_axis1.setScrewAxis(msg1);
+
+  Eigen::Matrix4d out;
+  ASSERT_NO_THROW(out = screw_axis1.getScrewSkewSymmetricMatrix());
+  EXPECT_TRUE(out.block(0, 0, 3, 3).isZero());
+  EXPECT_TRUE(out.row(3).isZero());
+  checkVector(out.col(3).head(3), 1, 0, 0);
+
+  // Test with rotational case
+  affordance_primitives::ScrewAxis screw_axis2;
+  affordance_primitive_msgs::ScrewStamped msg2;
+  msg2.header.frame_id = MOVING_FRAME_NAME;
+  msg2.origin.x = 0.5;
+  msg2.axis.z = 1;
+  msg2.is_pure_translation = false;
+  screw_axis2.setScrewAxis(msg2);
+
+  ASSERT_NO_THROW(out = screw_axis2.getScrewSkewSymmetricMatrix());
+  EXPECT_TRUE(out.row(3).isZero());
+  checkVector(out.col(3).head(3), 0, -0.5, 0);
+  EXPECT_EQ(
+    out.block(0, 0, 3, 3), affordance_primitives::getSkewSymmetricMatrix(screw_axis2.getAxis()));
+}
+
+TEST(ScrewAxis, toMsg)
+{
+  // Test with linear case
+  affordance_primitives::ScrewAxis screw_axis1;
+  affordance_primitive_msgs::ScrewStamped msg1;
+  msg1.header.frame_id = MOVING_FRAME_NAME;
+  msg1.axis.x = 1.6;
+  msg1.origin.y = 0.5;
+  msg1.is_pure_translation = true;
+  screw_axis1.setScrewAxis(msg1);
+
+  affordance_primitive_msgs::ScrewStamped msg_out;
+  ASSERT_NO_THROW(msg_out = screw_axis1.toMsg());
+  checkVector(msg_out.axis, 1.0, 0, 0);
+  checkVector(msg_out.origin, 0, 0.5, 0);
+  EXPECT_EQ(msg_out.header.frame_id, MOVING_FRAME_NAME);
+  EXPECT_TRUE(msg_out.is_pure_translation);
+  EXPECT_NEAR(msg_out.pitch, 0.0, EPSILON);
 }
 
 int main(int argc, char ** argv)

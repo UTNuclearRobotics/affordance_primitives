@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /*
-   Author: Adam Pettinger
+   Author: Adam Pettinger and Janak Panthi
    Desc: Defines a library used to calculate screw motion affordance parameters
  */
 
@@ -117,6 +117,15 @@ bool ScrewAxis::setScrewAxis(const ScrewStamped & screw_msg)
   return setScrewAxis(origin_pose, eigen_axis, screw_msg.pitch);
 }
 
+Eigen::Vector3d ScrewAxis::getAxis() const
+{
+  if (is_pure_translation_) {
+    return translation_component_;
+  } else {
+    return axis_;
+  }
+}
+
 TwistStamped ScrewAxis::getTwist(double theta_dot) const
 {
   TwistStamped output;
@@ -137,7 +146,7 @@ TwistStamped ScrewAxis::getTwist(double theta_dot) const
 
 Eigen::Isometry3d ScrewAxis::getTF(double delta_theta) const
 {
-  Eigen::Isometry3d output;
+  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
 
   // The translation case is easy:
   if (is_pure_translation_) {
@@ -183,14 +192,45 @@ std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(double theta_step, size_t
   return output;
 }
 
-ScrewStamped ScrewAxis::toMsg()
+std::vector<Eigen::Isometry3d> ScrewAxis::getWaypoints(
+  double theta_start, double theta_end, size_t num_steps)
+{
+  std::vector<Eigen::Isometry3d> output;
+
+  // Check for invalid inputs
+  if (num_steps < 1 || theta_start > theta_end) {
+    return output;
+  }
+
+  // Iterate over number of steps to generate waypoints
+  const double theta_step = (theta_end - theta_start) / num_steps;
+  double theta_now = theta_start;
+  output.reserve(num_steps + 1);
+  for (size_t i = 0; i < num_steps + 1; i++) {
+    output.push_back(getTF(theta_start));
+    theta_start += theta_step;
+  }
+  return output;
+}
+
+Eigen::Matrix4d ScrewAxis::getScrewSkewSymmetricMatrix() const
+{
+  Eigen::Matrix4d output(4, 4);
+  output.block(0, 0, 3, 3) = getSkewSymmetricMatrix(axis_);
+  output.block(0, 3, 3, 1) = translation_component_;
+  output.block(3, 0, 1, 4) = Eigen::MatrixXd::Zero(1, 4);
+
+  return output;
+}
+
+ScrewStamped ScrewAxis::toMsg() const
 {
   ScrewStamped output;
   output.header.frame_id = moving_frame_name_;
   output.is_pure_translation = is_pure_translation_;
   output.pitch = pitch_;
   output.origin = tf2::toMsg(origin_);
-  tf2::toMsg(axis_, output.axis);
+  tf2::toMsg(getAxis(), output.axis);
 
   return output;
 }
