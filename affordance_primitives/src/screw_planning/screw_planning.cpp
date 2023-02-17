@@ -114,8 +114,8 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
   /* std::cout << "Error is: " << screw_constraint_info.error.norm() << std::endl; */
 
   if (screw_constraint_info.error.norm() < screw_constraint_info.best_error) {
-    std::cout << "Inside error changer: Error is: " << screw_constraint_info.error.norm()
-              << " and Best Error is: " << screw_constraint_info.best_error << std::endl;
+    /* std::cout << "Inside error changer: Error is: " << screw_constraint_info.error.norm() */
+    /*           << " and Best Error is: " << screw_constraint_info.best_error << std::endl; */
     screw_constraint_info.best_error = screw_constraint_info.error.norm();
   }
 
@@ -126,14 +126,14 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info)
     /* std::cout << "Recursive calls" << std::endl; */
     return constraintFn(screw_constraint_info);
   } else {
-    std::cout << "Hit end of recursion with error: " << screw_constraint_info.error.norm()
-              << " and Best Error: " << screw_constraint_info.best_error << std::endl;
+    /* std::cout << "Hit end of recursion with error: " << screw_constraint_info.error.norm() */
+    /* << " and Best Error: " << screw_constraint_info.best_error << std::endl; */
     return true;
   }
 }
 
 Eigen::Isometry3d productOfExponentials(
-  const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end)
+  std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end)
 {
   //recursively compute product of exponentials until the POE size is reduced to 1
   if (start < end)
@@ -207,7 +207,7 @@ std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
   }
 
   /* size_t row_init_size; */
-  bool chained = true;
+  bool chained = false;
 
   if (chained) {
     //reshape to distributed form

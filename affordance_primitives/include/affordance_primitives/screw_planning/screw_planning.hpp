@@ -108,7 +108,7 @@ bool constraintFn(ScrewConstraintInfo & screw_constraint_info);
  */
 Eigen::VectorXd errorDerivative(
   const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
-  const Eigen::VectorXd & phi_current, const std::vector<ScrewAxis> & screw_axis_set);
+  const Eigen::VectorXd & phi_current, std::vector<ScrewAxis> & screw_axis_set);
 
 /**
  * @brief Computes the 6x1 error vector for a given transformation matrix
@@ -131,6 +131,6 @@ Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
  * @return Homogenous transformation matrix representing the product of exponentials
  */
 Eigen::Isometry3d productOfExponentials(
-  const std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end);
+  std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end);
 
 }  // namespace affordance_primitives
