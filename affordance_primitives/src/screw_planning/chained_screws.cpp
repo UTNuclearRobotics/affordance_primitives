@@ -205,19 +205,7 @@ std::vector<double> ChainedScrews::sampleGaussianStateNear(
 
 Eigen::Isometry3d ChainedScrews::getPose(const std::vector<double> & phi) const
 {
-  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
-
-  // Check input
-  if (phi.size() != size_) {
-    return output;
-  }
-
-  // Step through each axis and calculate
-  for (size_t i = 0; i < size_; ++i) {
-    output = output * axes_.at(i).getTF(phi[i]);
-  }
-  output = output * tf_m_to_s_;
-  return output;
+  return ScrewConstraint::getPose(phi);
 }
 
 Eigen::Isometry3d ChainedScrews::getPose(double lambda) const

@@ -60,6 +60,23 @@ ScrewConstraint::ScrewConstraint(
   }
 }
 
+Eigen::Isometry3d ScrewConstraint::getPose(const std::vector<double> & phi) const
+{
+  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
+
+  // Check input
+  if (phi.size() != size_) {
+    return output;
+  }
+
+  // Step through each axis and calculate
+  for (size_t i = 0; i < size_; ++i) {
+    output = output * axes_.at(i).getTF(phi[i]);
+  }
+  output = output * tf_m_to_s_;
+  return output;
+}
+
 void ScrewConstraint::setReferenceFrame(const Eigen::Isometry3d & tf_m_to_s)
 {
   tf_m_to_s_ = tf_m_to_s;

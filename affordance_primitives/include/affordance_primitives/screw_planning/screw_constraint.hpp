@@ -119,7 +119,7 @@ public:
   * @param phi State vector
   * @return The pose in the affordance frame at state phi
   */
-  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const = 0;
+  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const;
 
   /**
   * @brief Sets the path reference frame tf_m_to_s
