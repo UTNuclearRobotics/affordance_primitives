@@ -49,6 +49,7 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/screw_model/screw_axis.hpp
   include/${PROJECT_NAME}/screw_model/screw_execution.hpp
   include/${PROJECT_NAME}/screw_planning/chained_screws.hpp
+  include/${PROJECT_NAME}/screw_planning/unchained_screws.hpp
   include/${PROJECT_NAME}/screw_planning/screw_constraint.hpp
   include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
@@ -59,6 +60,7 @@ add_library(${PROJECT_NAME} SHARED
   src/screw_model/screw_axis.cpp
   src/screw_model/screw_execution.cpp
   src/screw_planning/chained_screws.cpp
+  src/screw_planning/unchained_screws.cpp
   src/screw_planning/screw_constraint.cpp
   src/task_estimator/kinematic_task_estimator.cpp
   src/task_monitor/task_monitor.cpp

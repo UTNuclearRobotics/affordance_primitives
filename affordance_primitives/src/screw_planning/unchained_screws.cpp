@@ -1,13 +1,25 @@
 #include <affordance_primitives/screw_planning/unchained_screws.hpp>
 namespace affordance_primitives
 {
+UnchainedScrews::UnchainedScrews(
+  const std::vector<ScrewAxis> & screws, const std::vector<double> & lower_bounds,
+  const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
+: ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
+{
+  //Temporary, TODO
+  Eigen::VectorXd phi_low = Eigen::VectorXd::Map(lower_bounds.data(), lower_bounds.size());
+  Eigen::VectorXd phi_high = Eigen::VectorXd::Map(upper_bounds.data(), upper_bounds.size());
+  phi_bounds = {phi_low, phi_high};
+
+  phi_starts = getGradStarts(phi_bounds);
+}
 Eigen::VectorXd UnchainedScrews::errorDerivative(
   const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
-  const Eigen::VectorXd & phi_current, std::vector<ScrewAxis> & screw_axis_set)
+  const Eigen::VectorXd & phi_current, std::vector<ScrewAxis> & screws)
 {
   //Compute tf_q_to_p
-  const int m = screw_axis_set.size();
-  const Eigen::Isometry3d pOE = productOfExponentials(screw_axis_set, phi_current, 0, m - 1);
+  const int m = screws.size();  //TODO
+  const Eigen::Isometry3d pOE = productOfExponentials(screws, phi_current, 0, m - 1);
   const Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * tf_m_to_s;
 
   //Get eta of tf_q_to_p
@@ -29,11 +41,10 @@ Eigen::VectorXd UnchainedScrews::errorDerivative(
       Eigen::MatrixXd::Zero(1, (m - 1 - j) * 6);
 
     //Compute 6x1 segments of Psi
-    nu_pOE_left = productOfExponentials(screw_axis_set, phi_current, 0, j);
-    nu_pOE_right = productOfExponentials(screw_axis_set, phi_current, j + 1, m - 1);
-    nu = tf_q_to_m.matrix() * nu_pOE_left.matrix() *
-         screw_axis_set[j].getScrewSkewSymmetricMatrix() * nu_pOE_right.matrix() *
-         tf_m_to_s.matrix();
+    nu_pOE_left = productOfExponentials(screws, phi_current, 0, j);
+    nu_pOE_right = productOfExponentials(screws, phi_current, j + 1, m - 1);
+    nu = tf_q_to_m.matrix() * nu_pOE_left.matrix() * screws[j].getScrewSkewSymmetricMatrix() *
+         nu_pOE_right.matrix() * tf_m_to_s.matrix();
     Psi.segment(6 * j, 6) = calculateEta(nu);
   }
 
@@ -44,12 +55,12 @@ Eigen::VectorXd UnchainedScrews::errorDerivative(
   return Lambda;
 }
 
-bool UnchainedScrews::constraintFn(ScrewConstraintInfo & screw_constraint_info)
+bool UnchainedScrews::constraintFn(ScrewConstraintInfo & sol)
 {
-  //Check if sizes are valid
-  if (
-    (screw_constraint_info.screw_axis_set.size() != screw_constraint_info.phi.size()) ||
-    (screw_constraint_info.screw_axis_set.size() <= 0)) {
+  Eigen::VectorXd & phi = phi_starts.front();
+
+  //Check if sizes are valid, TODO: Might not need to implement this. Base class has it?
+  if ((screws.size() != phi.size()) || (screws.size() <= 0)) {
     return false;
   }
 
@@ -58,21 +69,16 @@ bool UnchainedScrews::constraintFn(ScrewConstraintInfo & screw_constraint_info)
   const size_t nmax = 100;       //max steps
   const double epsilon = 0.001;  //converge limit
 
-  //Redefine references for readability
-  const Eigen::Isometry3d & tf_q_to_m = screw_constraint_info.tf_m_to_q.inverse();
-  std::vector<ScrewAxis> & screw_axis_set = screw_constraint_info.screw_axis_set;
-  const Eigen::Isometry3d & tf_m_to_s = screw_constraint_info.tf_m_to_s;
-  Eigen::VectorXd & phi =
-    screw_constraint_info.phi;  //initial phi set in the screw_constraint_info struct
+  //Helper parameters
+  const Eigen::Isometry3d & tf_q_to_m = tf_m_to_q.inverse();
 
   //Retrieve bounds
-  const Eigen::VectorXd & phi_min = screw_constraint_info.phi_bounds.first;
-  const Eigen::VectorXd & phi_max = screw_constraint_info.phi_bounds.second;
-  std::queue<Eigen::VectorXd> & phi_starts = screw_constraint_info.phi_starts;
+  const Eigen::VectorXd & phi_min = phi_bounds.first;
+  const Eigen::VectorXd & phi_max = phi_bounds.second;
 
   //Compute tf_q_to_p
-  const int m = screw_constraint_info.screw_axis_set.size();
-  Eigen::Isometry3d pOE = productOfExponentials(screw_axis_set, phi, 0, m - 1);
+  const int m = screws.size();  //TODO
+  Eigen::Isometry3d pOE = productOfExponentials(screws, phi, 0, m - 1);
   Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * tf_m_to_s;
 
   //Compute alpha, the 1/2 squared norm we want to minimize
@@ -82,19 +88,20 @@ bool UnchainedScrews::constraintFn(ScrewConstraintInfo & screw_constraint_info)
   double delta = epsilon;
   size_t i = 0;
 
+  //To clamp phi in the loop
+  auto eigen_clamp = [&phi](const Eigen::VectorXd & phi_min, const Eigen::VectorXd & phi_max) {
+    for (int i = 0; i < phi.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
+    return phi;
+  };
+
   while (i < nmax && fabs(delta) >= epsilon) {
     //Compute phi
-    phi = phi - gamma * errorDerivative(tf_q_to_m, tf_m_to_s, phi, screw_axis_set);
+    phi = phi - gamma * errorDerivative(tf_q_to_m, tf_m_to_s, phi, screws);
 
-    //Clamp phi between phi_min and phi_max
-    auto eigen_clamp = [&phi](const Eigen::VectorXd & phi_min, const Eigen::VectorXd & phi_max) {
-      for (int i = 0; i < phi.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
-      return phi;
-    };
     eigen_clamp(phi_min, phi_max);
 
     //Compute tf_q_to_p
-    pOE = productOfExponentials(screw_axis_set, phi, 0, m - 1);
+    pOE = productOfExponentials(screws, phi, 0, m - 1);
     tf_q_to_p = tf_q_to_m * pOE * tf_m_to_s;
 
     //Compute new delta
@@ -107,34 +114,35 @@ bool UnchainedScrews::constraintFn(ScrewConstraintInfo & screw_constraint_info)
     i++;
   }
 
-  //Compute error and update best_error
-  screw_constraint_info.error = calculateEta(tf_q_to_p);
+  //Compute error and update best_error and corresponding solved_phi
+  current_error = calculateEta(tf_q_to_p);
 
-  if (screw_constraint_info.error.norm() < screw_constraint_info.best_error) {
-    screw_constraint_info.best_error = screw_constraint_info.error.norm();
+  if (current_error.norm() < sol.error) {
+    sol.error_vector = current_error;
+    sol.error = current_error.norm();
+    std::vector<double> solved_phi_svec(phi.data(), phi.data() + phi.size());  // Temporary, TODO
+    sol.solved_phi = solved_phi_svec;
   }
 
   //Pop last phi guess and recursively call this function with a new guess until all guesses are exhausted
   phi_starts.pop();
   if (!phi_starts.empty()) {
-    phi = phi_starts.front();
-    return constraintFn(screw_constraint_info);
+    return constraintFn(sol);
   } else {
     return true;
   }
 }
 
 Eigen::Isometry3d UnchainedScrews::productOfExponentials(
-  std::vector<ScrewAxis> & screw_axis_set, const Eigen::VectorXd & phi, int start, int end)
+  std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, int start, int end)
 {
   //recursively compute product of exponentials until the POE size is reduced to 1
   if (start < end)
-    return screw_axis_set[start].getTF(phi[start]) *
-           productOfExponentials(screw_axis_set, phi, start + 1, end);
+    return screws[start].getTF(phi[start]) * productOfExponentials(screws, phi, start + 1, end);
 
   //when size is 1 return identity
   else
-    return screw_axis_set[0].getTF(0.0);
+    return screws[0].getTF(0.0);
 }
 
 Eigen::VectorXd UnchainedScrews::calculateEta(const Eigen::Matrix4d & tf)
@@ -215,4 +223,21 @@ std::queue<Eigen::VectorXd> ScrewConstraintInfo::getGradStarts(
 
   return output;
 }
+
+// TODO, This function is unused at the moment
+Eigen::Isometry3d UnchainedScrews::getPose(const std::vector<double> & phi) const
+{
+  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
+
+  // Check input
+  if (phi.size() != size_) {
+    return output;
+  }
+
+  // Step through each axis and calculate
+  for (size_t i = 0; i < size_; ++i) {
+    output = output * axes_.at(i).getTF(phi[i]);
+  }
+  output = output * tf_m_to_s_;
+  return output;
 }  // namespace affordance_primitives
