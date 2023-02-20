@@ -48,31 +48,60 @@ public:
   //Variables
   std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
   std::queue<Eigen::VectorXd> phi_starts;
-  const std::vector<ScrewAxis> & screws;
+  // const std::vector<ScrewAxis> & screws;
 
   //Constructor
+  UnchainedScrews();
   UnchainedScrews(
     const std::vector<ScrewAxis> & screws, const std::vector<double> & lower_bounds,
     const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s);
+  UnchainedScrews(
+    const std::vector<ScrewStamped> & screws, const std::vector<double> & lower_bounds,
+    const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s);
 
   //Mandatory implementations
+  // virtual bool constraintFn(
+  //   const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol);
+
   virtual bool constraintFn(
-    const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol) override;
+    const Eigen::Isometry3d & tf_m_to_q, const std::vector<double> & phi_0,
+    ScrewConstraintSolution & sol);
+  virtual bool constraintFn(const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol);
 
-  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const override;
+  // virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const override;
 
-  Eigen::VectorXd errorDerivative(
-    const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
-    const Eigen::VectorXd & phi_current);
+  // Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf);
+  // Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
 
-  Eigen::VectorXd calculateEta(const Eigen::Matrix4d & tf);
-  Eigen::VectorXd calculateEta(const Eigen::Isometry3d & tf);
+  /**
+  * @brief Adds a screw axis. Pushes back to the vectors
+  */
+  virtual void addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound);
+  virtual void addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound);
 
-  Eigen::Isometry3d productOfExponentials(
-    std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, int start, int end);
+  /**
+  * @brief Get the screw set for visualizing
+  * 
+  * Each screw is w.r.t. the affordance (map) frame
+  * 
+  * @return A vector of screws, all defined in the affordance frame
+  */
+  std::vector<ScrewStamped> getVisualScrews() const;
 
-private:
+protected:
   std::queue<Eigen::VectorXd> getGradStarts(
-    const std::pair<Eigen::VectorXd, Eigen::VectorXd> & phi_bounds, double max_dist = 0.5 * M_PI);
+    const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds,
+    double max_dist = 0.5 * M_PI);
 };
+
+bool recursiveSearch(
+  const UnchainedScrews * constraint, const Eigen::Isometry3d & tf_m_to_q, std::queue<Eigen::VectorXd> & phi_starts,
+  ScrewConstraintSolution & sol);
+
+Eigen::Isometry3d productOfExponentials(
+    const std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, size_t start, size_t end);
+
+Eigen::VectorXd errorDerivative(
+  const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,
+  const Eigen::VectorXd & phi_current, const std::vector<ScrewAxis> & screws);
 }  // namespace affordance_primitives

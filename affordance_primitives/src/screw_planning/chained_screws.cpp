@@ -321,6 +321,10 @@ std::vector<ScrewStamped> ChainedScrews::getVisualScrews() const
 
 bool ChainedScrews::constraintFn(const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol)
 {
+  if (size_ < 1) {
+    return false;
+  }
+
   sol.reset();
 
   // Create a list of gradient descent starts
@@ -335,6 +339,10 @@ bool ChainedScrews::constraintFn(
   const Eigen::Isometry3d & tf_m_to_q, const std::vector<double> & phi_0,
   ScrewConstraintSolution & sol)
 {
+  if (size_ < 1) {
+    return false;
+  }
+
   sol.reset();
 
   // Make sure the guess goes first in the gradient descent starts
