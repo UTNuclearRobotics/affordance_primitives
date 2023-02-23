@@ -135,31 +135,47 @@ double computeDerivativeForIndex(
 ChainedScrews::ChainedScrews() : ScrewConstraint(), lambda_max_{0} {};
 
 ChainedScrews::ChainedScrews(
-  const std::vector<ScrewStamped> & screws, const std::vector<double> & lower_bounds,
-  const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
-: ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
+  const std::vector<ScrewStamped> & screws, const std::vector<double> & start_phi,
+  const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+  const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds)
+: ScrewConstraint(screws, start_phi, goal_phi, tf_m_to_s, lower_bounds, upper_bounds)
 {
-  lambda_max_ = getLambda(upper_bounds);
+  lambda_max_ = getLambda(goal_phi);
 }
 
 ChainedScrews::ChainedScrews(
-  const std::vector<ScrewAxis> & screws, const std::vector<double> & lower_bounds,
-  const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
-: ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
+  const std::vector<ScrewAxis> & screws, const std::vector<double> & start_phi,
+  const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+  const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds)
+: ScrewConstraint(screws, start_phi, goal_phi, tf_m_to_s, lower_bounds, upper_bounds)
 {
-  lambda_max_ = getLambda(upper_bounds);
+  lambda_max_ = getLambda(goal_phi);
 }
 
-void ChainedScrews::addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound)
+void ChainedScrews::addScrewAxis(const ScrewStamped & axis, double start_theta, double end_theta)
 {
-  ScrewConstraint::addScrewAxis(axis, lower_bound, upper_bound);
-  lambda_max_ = getLambda(upper_bounds_);
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
+  lambda_max_ = getLambda(goal_phi_);
 }
 
-void ChainedScrews::addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound)
+void ChainedScrews::addScrewAxis(
+  const ScrewStamped & axis, double start_theta, double end_theta, double lower_bound,
+  double upper_bound)
 {
-  ScrewConstraint::addScrewAxis(axis, lower_bound, upper_bound);
-  lambda_max_ = getLambda(upper_bounds_);
+  addScrewAxis(axis, start_theta, end_theta);
+}
+
+void ChainedScrews::addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta)
+{
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
+  lambda_max_ = getLambda(goal_phi_);
+}
+
+void ChainedScrews::addScrewAxis(
+  const ScrewAxis & axis, double start_theta, double end_theta, double lower_bound,
+  double upper_bound)
+{
+  addScrewAxis(axis, start_theta, end_theta);
 }
 
 std::vector<double> ChainedScrews::sampleUniformState() const

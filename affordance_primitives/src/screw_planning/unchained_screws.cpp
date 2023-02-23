@@ -41,7 +41,8 @@ bool recursiveSearch(
   size_t i = 0;
 
   /* To clamp phi in the loop */
-  auto eigen_clamp = [&phi](const Eigen::VectorXd & phi_min, const Eigen::VectorXd & phi_max) {
+  auto eigen_clamp = [&phi](
+                       const std::vector<double> & phi_min, const std::vector<double> & phi_max) {
     for (int i = 0; i < phi_min.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
     return phi;
   };
@@ -59,7 +60,7 @@ bool recursiveSearch(
     std::cout << "Clamping between: " << phi_min_e[0] << " and " << phi_max_e[0] << std::endl;
     std::cout << "Clamping between: " << phi_min_e[1] << " and " << phi_max_e[1] << std::endl;
     /* eigen_clamp(constraint->lowerBounds(), constraint->upperBounds()); */
-    eigen_clamp(phi_min_e, phi_max_e);
+    eigen_clamp(constraint->lowerBounds(), constraint->upperBounds());
     /* for (size_t j = 0; j < phi.size(); j++) { */
     /*   phi[j] = std::clamp(phi[j], constraint->lowerBounds().at(j), constraint->upperBounds().at(j)); */
     /* } */
@@ -311,10 +312,16 @@ std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
 {
   std::queue<Eigen::VectorXd> output;
 
-  Eigen::VectorXd guess1(2), guess2(2), guess3(2);
-  guess1 << 0.5, 0.25;
-  guess2 << 0.75, 0.5;
-  guess3 << 1.0, 0.75;
+  Eigen::VectorXd guess1(size_), guess2(size_), guess3(size_);
+
+  auto guess1_vec = sampleUniformState();
+  auto guess2_vec = sampleUniformState();
+  auto guess3_vec = sampleUniformState();
+  for (size_t i = 0; i < size_; ++i) {
+    guess1[i] = guess1_vec.at(i);
+    guess2[i] = guess2_vec.at(i);
+    guess3[i] = guess3_vec.at(i);
+  }
 
   output.push(guess1);
   output.push(guess2);
@@ -379,28 +386,43 @@ std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
 //   return output;
 // }
 
+void UnchainedScrews::addScrewAxis(const ScrewStamped & axis, double start_theta, double end_theta)
+{
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
+  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+}
+
 void UnchainedScrews::addScrewAxis(
-  const ScrewStamped & axis, double lower_bound, double upper_bound)
+  const ScrewStamped & axis, double start_theta, double end_theta, double lower_bound,
+  double upper_bound)
 {
-  ScrewConstraint::addScrewAxis(axis, lower_bound, upper_bound);
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta, lower_bound, upper_bound);
   phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
-void UnchainedScrews::addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound)
+void UnchainedScrews::addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta)
 {
-  ScrewConstraint::addScrewAxis(axis, lower_bound, upper_bound);
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
   phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
-std::vector<ScrewStamped> UnchainedScrews::getVisualScrews() const
+void UnchainedScrews::addScrewAxis(
+  const ScrewAxis & axis, double start_theta, double end_theta, double lower_bound,
+  double upper_bound)
 {
-  std::vector<ScrewStamped> output;
-
-  for (const auto & axis : axes_) {
-    output.push_back(axis.toMsg());
-  }
-
-  return output;
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta, lower_bound, upper_bound);
+  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
 }
+
+// std::vector<ScrewStamped> UnchainedScrews::getVisualScrews() const
+// {
+//   std::vector<ScrewStamped> output;
+
+//   for (const auto & axis : axes_) {
+//     output.push_back(axis.toMsg());
+//   }
+
+//   return output;
+// }
 
 }  // namespace affordance_primitives

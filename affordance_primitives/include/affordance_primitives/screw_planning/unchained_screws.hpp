@@ -76,17 +76,15 @@ public:
   /**
   * @brief Adds a screw axis. Pushes back to the vectors
   */
-  virtual void addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound);
-  virtual void addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound);
-
-  /**
-  * @brief Get the screw set for visualizing
-  * 
-  * Each screw is w.r.t. the affordance (map) frame
-  * 
-  * @return A vector of screws, all defined in the affordance frame
-  */
-  std::vector<ScrewStamped> getVisualScrews() const;
+  virtual void addScrewAxis(
+    const ScrewStamped & axis, double start_theta, double end_theta) override;
+  virtual void addScrewAxis(
+    const ScrewStamped & axis, double start_theta, double end_theta, double lower_bound,
+    double upper_bound) override;
+  virtual void addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta) override;
+  virtual void addScrewAxis(
+    const ScrewAxis & axis, double start_theta, double end_theta, double lower_bound,
+    double upper_bound) override;
 
 protected:
   std::queue<Eigen::VectorXd> getGradStarts(
