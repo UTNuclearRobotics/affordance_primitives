@@ -94,12 +94,15 @@ protected:
     double max_dist = 0.5 * M_PI);
 };
 
+/* bool recursiveSearch( */
+/*   const UnchainedScrews * constraint, const Eigen::Isometry3d & tf_m_to_q, std::queue<Eigen::VectorXd> & phi_starts, */
+/*   ScrewConstraintSolution & sol); */
 bool recursiveSearch(
-  const UnchainedScrews * constraint, const Eigen::Isometry3d & tf_m_to_q, std::queue<Eigen::VectorXd> & phi_starts,
-  ScrewConstraintSolution & sol);
+  const UnchainedScrews * constraint, const Eigen::Isometry3d & tf_m_to_q,
+  std::queue<Eigen::VectorXd> & phi_starts, ScrewConstraintSolution & sol);
 
 Eigen::Isometry3d productOfExponentials(
-    const std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, size_t start, size_t end);
+  const std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, size_t start, size_t end);
 
 Eigen::VectorXd errorDerivative(
   const Eigen::Isometry3d & tf_q_to_m, const Eigen::Isometry3d & tf_m_to_s,

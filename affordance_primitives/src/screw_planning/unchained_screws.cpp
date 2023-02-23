@@ -13,9 +13,9 @@ bool recursiveSearch(
   }
 
   //Gradient descent parameters
-  const double gamma = 0.1;       //learning parameter
-  const size_t nmax = 100;        //max steps
-  const double epsilon = 0.0001;  //converge limit
+  const double gamma = 0.1;        //learning parameter
+  const size_t nmax = 100;         //max steps
+  const double epsilon = 0.00001;  //converge limit
 
   //Helper parameters
   const Eigen::Isometry3d tf_q_to_m = tf_m_to_q.inverse();
@@ -23,6 +23,10 @@ bool recursiveSearch(
   //Retrieve bounds
   // const Eigen::VectorXd & phi_min = phi_bounds.first;
   // const Eigen::VectorXd & phi_max = phi_bounds.second;
+
+  Eigen::VectorXd phi_min_e(2), phi_max_e(2);
+  phi_min_e << 0.5, 0.25;
+  phi_max_e << 1.0, 0.75;
 
   //Compute tf_q_to_p
   Eigen::Isometry3d pOE = productOfExponentials(constraint->axes(), phi, 0, constraint->size() - 1);
@@ -32,17 +36,18 @@ bool recursiveSearch(
   double alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
 
   //Initialize iterating parameters
-  double delta = std::numeric_limits<double>::max();
+  /* double delta = std::numeric_limits<double>::max(); */
+  double delta = epsilon;
   size_t i = 0;
 
-  //To clamp phi in the loop
-  // auto eigen_clamp = [&phi](
-  //                      const std::vector<double> & phi_min, const std::vector<double> & phi_max) {
-  //   for (int i = 0; i < phi_min.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
-  //   return phi;
-  // };
+  /* To clamp phi in the loop */
+  auto eigen_clamp = [&phi](const Eigen::VectorXd & phi_min, const Eigen::VectorXd & phi_max) {
+    for (int i = 0; i < phi_min.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
+    return phi;
+  };
 
   while (i < nmax && fabs(delta) >= epsilon) {
+    /* while (i < nmax) { */
     //Compute phi
     std::cout << "i = " << i << "\nphi before = " << phi.transpose();
     const auto deriv =
@@ -50,12 +55,15 @@ bool recursiveSearch(
     phi = phi -
           gamma * errorDerivative(tf_q_to_m, constraint->referenceFrame(), phi, constraint->axes());
 
-    std::cout << "\nphi mid = " << phi.transpose();
-    // eigen_clamp(constraint->lowerBounds(), constraint->upperBounds());
-    for (size_t j = 0; j < phi.size(); j++) {
-      phi[j] = std::clamp(phi[j], constraint->lowerBounds().at(j), constraint->upperBounds().at(j));
-    }
-    std::cout << "\nderivative = " << deriv.transpose() << "\nphi after = " << phi.transpose()
+    std::cout << "\nphi mid = " << phi.transpose() << std::endl;
+    std::cout << "Clamping between: " << phi_min_e[0] << " and " << phi_max_e[0] << std::endl;
+    std::cout << "Clamping between: " << phi_min_e[1] << " and " << phi_max_e[1] << std::endl;
+    /* eigen_clamp(constraint->lowerBounds(), constraint->upperBounds()); */
+    eigen_clamp(phi_min_e, phi_max_e);
+    /* for (size_t j = 0; j < phi.size(); j++) { */
+    /*   phi[j] = std::clamp(phi[j], constraint->lowerBounds().at(j), constraint->upperBounds().at(j)); */
+    /* } */
+    std::cout << "derivative = " << deriv.transpose() << "\nphi after = " << phi.transpose()
               << "\n";
 
     //Compute tf_q_to_p
@@ -70,6 +78,7 @@ bool recursiveSearch(
     alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
     std::cout << "delta after = " << delta << "\n";
     std::cout << "alpha = " << alpha << "\n";
+    std::cout << "Error inside loop: " << calculateEta(tf_q_to_p).norm() << std::endl;
 
     //Increment iteration
     i++;
@@ -101,7 +110,7 @@ Eigen::Isometry3d productOfExponentials(
   const std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, size_t start, size_t end)
 {
   //recursively compute product of exponentials until the POE size is reduced to 1
-  if (start < end)
+  if (start <= end)
     return screws[start].getTF(phi[start]) * productOfExponentials(screws, phi, start + 1, end);
 
   //when size is 1 return identity
@@ -303,9 +312,9 @@ std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
   std::queue<Eigen::VectorXd> output;
 
   Eigen::VectorXd guess1(2), guess2(2), guess3(2);
-  guess1 << 0.5, 0.5;
-  guess2 << 0.75, 0.25;
-  guess3 << 1.0, 0.5;
+  guess1 << 0.5, 0.25;
+  guess2 << 0.75, 0.5;
+  guess3 << 1.0, 0.75;
 
   output.push(guess1);
   output.push(guess2);
