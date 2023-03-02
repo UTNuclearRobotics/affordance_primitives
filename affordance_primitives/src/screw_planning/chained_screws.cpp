@@ -178,6 +178,16 @@ void ChainedScrews::addScrewAxis(
   addScrewAxis(axis, start_theta, end_theta);
 }
 
+double ChainedScrews::percentComplete(const std::vector<double> & state) const
+{
+  // Input checking
+  if (state.size() != size_) {
+    return 0;
+  }
+
+  return getLambda(state) / lambda_max_;
+}
+
 std::vector<double> ChainedScrews::sampleUniformState() const
 {
   // Draw a sample along the path

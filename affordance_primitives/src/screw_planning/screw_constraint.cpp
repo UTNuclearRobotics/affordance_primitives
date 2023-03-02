@@ -166,6 +166,23 @@ void ScrewConstraint::addScrewAxis(
   size_ = axes_.size();
 }
 
+double ScrewConstraint::percentComplete(const std::vector<double> & state) const
+{
+  // Input checking
+  if (state.size() != size_) {
+    return 0;
+  }
+
+  double sum = 0;
+  double error = 0;
+  for (size_t i = 0; i < size_; ++i) {
+    error += fabs(goal_phi_[i] - state[i]);
+    sum += fabs(goal_phi_[i] - start_phi_[i]);
+  }
+
+  return error / sum;
+}
+
 std::vector<double> ScrewConstraint::sampleUniformState() const
 {
   std::vector<double> output;

@@ -146,6 +146,13 @@ public:
     double upper_bound);
 
   /**
+  * @brief Returns the % complete [0, 1] a state is
+  * 
+  * Values of 1 indicate the passed state is at the goal
+  */
+  virtual double percentComplete(const std::vector<double> & state) const;
+
+  /**
   * @brief Samples a random valid screw state
   */
   virtual std::vector<double> sampleUniformState() const;

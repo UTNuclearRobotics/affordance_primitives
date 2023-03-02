@@ -312,38 +312,48 @@ std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
 {
   std::queue<Eigen::VectorXd> output;
 
-  Eigen::VectorXd guess1(size_), guess2(size_), guess3(size_);
+  // Eigen::VectorXd guess1(size_), guess2(size_), guess3(size_);
 
-  auto guess1_vec = sampleUniformState();
-  auto guess2_vec = sampleUniformState();
-  auto guess3_vec = sampleUniformState();
-  for (size_t i = 0; i < size_; ++i) {
-    guess1[i] = guess1_vec.at(i);
-    guess2[i] = guess2_vec.at(i);
-    guess3[i] = guess3_vec.at(i);
-  }
-
-  output.push(guess1);
-  output.push(guess2);
-  output.push(guess3);
-
-  // const Eigen::VectorXd span = (phi_bounds.second - phi_bounds.first).cwiseAbs();
-  // const size_t num_starts =
-  //   ceil(span.maxCoeff() / max_dist) + 1;  //use the max span to determine number of starts
-  // const Eigen::VectorXd real_step = span / num_starts;
-
-  // Eigen::MatrixXd cond_grad_starts(
-  //   size_,
-  //   num_starts + 1);  //grad descent starts in condensed form with no regard to series constraint
-  // Eigen::MatrixXd dist_grad_starts(
-  //   size_,
-  //   size_ * (num_starts) +
-  //     1);  //grad descent starts in distributed form accounting for series constraint
-
-  // for (size_t i = 0; i <= num_starts; ++i) {
-  //   cond_grad_starts.col(i) = phi_bounds.first + i * real_step;
+  // auto guess1_vec = sampleUniformState();
+  // auto guess2_vec = sampleUniformState();
+  // auto guess3_vec = sampleUniformState();
+  // for (size_t i = 0; i < size_; ++i) {
+  //   guess1[i] = guess1_vec.at(i);
+  //   guess2[i] = guess2_vec.at(i);
+  //   guess3[i] = guess3_vec.at(i);
   // }
 
+  // output.push(guess1);
+  // output.push(guess2);
+  // output.push(guess3);
+
+  Eigen::VectorXd bounds_high(upper_bounds.size());
+  Eigen::VectorXd bounds_low(lower_bounds.size());
+  for (size_t i = 0; i < upper_bounds.size(); ++i) {
+    bounds_high(i) = upper_bounds.at(i);
+    bounds_low(i) = lower_bounds.at(i);
+  }
+
+  const Eigen::VectorXd span = (bounds_high - bounds_low).cwiseAbs();
+  const size_t num_starts =
+    ceil(span.maxCoeff() / max_dist) + 1;  //use the max span to determine number of starts
+  const Eigen::VectorXd real_step = span / num_starts;
+
+  Eigen::MatrixXd cond_grad_starts(
+    size_,
+    num_starts + 1);  //grad descent starts in condensed form with no regard to series constraint
+  Eigen::MatrixXd dist_grad_starts(
+    size_,
+    size_ * (num_starts) +
+      1);  //grad descent starts in distributed form accounting for series constraint
+
+  for (size_t i = 0; i <= num_starts; ++i) {
+    cond_grad_starts.col(i) = bounds_low + i * real_step;
+  }
+
+  for (int i = 0; i < cond_grad_starts.row(0).size(); i++) {
+    output.push(cond_grad_starts.col(i));
+  }
   // bool chained = false;
 
   // if (chained) {  //temporary conditional for testing
@@ -367,24 +377,6 @@ std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
 
   return output;
 }
-
-// // TODO, This function is unused at the moment
-// Eigen::Isometry3d UnchainedScrews::getPose(const std::vector<double> & phi) const
-// {
-//   Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
-
-//   // Check input
-//   if (phi.size() != size_) {
-//     return output;
-//   }
-
-//   // Step through each axis and calculate
-//   for (size_t i = 0; i < size_; ++i) {
-//     output = output * axes_.at(i).getTF(phi[i]);
-//   }
-//   output = output * tf_m_to_s_;
-//   return output;
-// }
 
 void UnchainedScrews::addScrewAxis(const ScrewStamped & axis, double start_theta, double end_theta)
 {
@@ -413,16 +405,5 @@ void UnchainedScrews::addScrewAxis(
   ScrewConstraint::addScrewAxis(axis, start_theta, end_theta, lower_bound, upper_bound);
   phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
 }
-
-// std::vector<ScrewStamped> UnchainedScrews::getVisualScrews() const
-// {
-//   std::vector<ScrewStamped> output;
-
-//   for (const auto & axis : axes_) {
-//     output.push_back(axis.toMsg());
-//   }
-
-//   return output;
-// }
 
 }  // namespace affordance_primitives
