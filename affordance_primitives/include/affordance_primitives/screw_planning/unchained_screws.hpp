@@ -45,11 +45,6 @@ namespace affordance_primitives
 class UnchainedScrews : public ScrewConstraint
 {
 public:
-  //Variables
-  std::pair<Eigen::VectorXd, Eigen::VectorXd> phi_bounds;
-  std::queue<Eigen::VectorXd> phi_starts;
-  // const std::vector<ScrewAxis> & screws;
-
   //Constructor
   UnchainedScrews();
   UnchainedScrews(
@@ -87,6 +82,7 @@ public:
     double upper_bound) override;
 
 protected:
+  std::queue<Eigen::VectorXd> phi_starts_;
   std::queue<Eigen::VectorXd> getGradStarts(
     const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds,
     double max_dist = 0.5 * M_PI);

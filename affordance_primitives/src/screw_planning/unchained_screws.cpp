@@ -3,9 +3,9 @@ namespace affordance_primitives
 {
 bool recursiveSearch(
   const UnchainedScrews * constraint, const Eigen::Isometry3d & tf_m_to_q,
-  std::queue<Eigen::VectorXd> & phi_starts, ScrewConstraintSolution & sol)
+  std::queue<Eigen::VectorXd> & phi_starts_, ScrewConstraintSolution & sol)
 {
-  Eigen::VectorXd phi = phi_starts.front();
+  Eigen::VectorXd phi = phi_starts_.front();
 
   //Check if sizes are valid
   if ((phi.size() != constraint->size())) {
@@ -50,48 +50,35 @@ bool recursiveSearch(
   while (i < nmax && fabs(delta) >= epsilon) {
     /* while (i < nmax) { */
     //Compute phi
-    std::cout << "i = " << i << "\nphi before = " << phi.transpose();
     const auto deriv =
       errorDerivative(tf_q_to_m, constraint->referenceFrame(), phi, constraint->axes());
     phi = phi -
           gamma * errorDerivative(tf_q_to_m, constraint->referenceFrame(), phi, constraint->axes());
 
-    std::cout << "\nphi mid = " << phi.transpose() << std::endl;
-    std::cout << "Clamping between: " << phi_min_e[0] << " and " << phi_max_e[0] << std::endl;
-    std::cout << "Clamping between: " << phi_min_e[1] << " and " << phi_max_e[1] << std::endl;
     /* eigen_clamp(constraint->lowerBounds(), constraint->upperBounds()); */
     eigen_clamp(constraint->lowerBounds(), constraint->upperBounds());
     /* for (size_t j = 0; j < phi.size(); j++) { */
     /*   phi[j] = std::clamp(phi[j], constraint->lowerBounds().at(j), constraint->upperBounds().at(j)); */
     /* } */
-    std::cout << "derivative = " << deriv.transpose() << "\nphi after = " << phi.transpose()
-              << "\n";
 
     //Compute tf_q_to_p
     pOE = productOfExponentials(constraint->axes(), phi, 0, constraint->size() - 1);
     tf_q_to_p = tf_q_to_m * pOE * constraint->referenceFrame();
 
     //Compute new delta
-    std::cout << "delta_before = " << delta << "\n";
     delta = alpha - 0.5 * calculateEta(tf_q_to_p).squaredNorm();
 
     //Store last squared norm as alpha
     alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
-    std::cout << "delta after = " << delta << "\n";
-    std::cout << "alpha = " << alpha << "\n";
-    std::cout << "Error inside loop: " << calculateEta(tf_q_to_p).norm() << std::endl;
 
     //Increment iteration
     i++;
   }
 
-  std::cout << "Solution found after steps: " << i << " (max was " << nmax << ")\n";
-
   //Compute error and update best_error and corresponding solved_phi
   const auto current_error = calculateEta(tf_q_to_p);
 
   if (current_error.norm() < sol.error) {
-    std::cout << "Updating best with error norm: " << current_error.norm() << "\n";
     sol.error_vector = current_error;
     sol.error = current_error.norm();
     std::vector<double> solved_phi_svec(phi.data(), phi.data() + phi.size());  // Temporary, TODO
@@ -99,9 +86,9 @@ bool recursiveSearch(
   }
 
   //Pop last phi guess and recursively call this function with a new guess until all guesses are exhausted
-  phi_starts.pop();
-  if (!phi_starts.empty()) {
-    return recursiveSearch(constraint, tf_m_to_q, phi_starts, sol);
+  phi_starts_.pop();
+  if (!phi_starts_.empty()) {
+    return recursiveSearch(constraint, tf_m_to_q, phi_starts_, sol);
   } else {
     return true;
   }
@@ -172,7 +159,7 @@ UnchainedScrews::UnchainedScrews(
   // Eigen::VectorXd phi_high = Eigen::VectorXd::Map(upper_bounds.data(), upper_bounds.size());
   // phi_bounds = {phi_low, phi_high};
 
-  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+  phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
 UnchainedScrews::UnchainedScrews(
@@ -185,7 +172,7 @@ UnchainedScrews::UnchainedScrews(
   // Eigen::VectorXd phi_high = Eigen::VectorXd::Map(upper_bounds.data(), upper_bounds.size());
   // phi_bounds = {phi_low, phi_high};
 
-  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+  phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
 bool UnchainedScrews::constraintFn(
@@ -197,7 +184,7 @@ bool UnchainedScrews::constraintFn(
 
   sol.reset();
 
-  auto starts = phi_starts;
+  auto starts = phi_starts_;
 
   return recursiveSearch(this, tf_m_to_q, starts, sol);
 }
@@ -206,19 +193,31 @@ bool UnchainedScrews::constraintFn(
   const Eigen::Isometry3d & tf_m_to_q, const std::vector<double> & phi_0,
   ScrewConstraintSolution & sol)
 {
-  if (size_ < 1) {
+  if (size_ < 1 || phi_0.size() != size_) {
     return false;
   }
 
   sol.reset();
-  auto starts = phi_starts;
+
+  // Add the passed state to phi_starts
+  Eigen::VectorXd this_start(size_);
+  for (size_t i = 0; i < size_; ++i) {
+    this_start(i) = phi_0.at(i);
+  }
+  auto saved_starts = phi_starts_;
+  std::queue<Eigen::VectorXd> starts;
+  starts.push(this_start);
+  while (!saved_starts.empty()) {
+    starts.push(saved_starts.front());
+    saved_starts.pop();
+  }
 
   return recursiveSearch(this, tf_m_to_q, starts, sol);
 }
 
 // bool UnchainedScrews::constraintFn(ScrewConstraintInfo & sol)
 // {
-//   Eigen::VectorXd & phi = phi_starts.front();
+//   Eigen::VectorXd & phi = phi_starts_.front();
 
 //   //Check if sizes are valid, TODO: Might not need to implement this. Base class has it?
 //   if ((screws.size() != phi.size()) || (screws.size() <= 0)) {
@@ -286,8 +285,8 @@ bool UnchainedScrews::constraintFn(
 //   }
 
 //   //Pop last phi guess and recursively call this function with a new guess until all guesses are exhausted
-//   phi_starts.pop();
-//   if (!phi_starts.empty()) {
+//   phi_starts_.pop();
+//   if (!phi_starts_.empty()) {
 //     return constraintFn(sol);
 //   } else {
 //     return true;
@@ -381,7 +380,7 @@ std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
 void UnchainedScrews::addScrewAxis(const ScrewStamped & axis, double start_theta, double end_theta)
 {
   ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
-  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+  phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
 void UnchainedScrews::addScrewAxis(
@@ -389,13 +388,13 @@ void UnchainedScrews::addScrewAxis(
   double upper_bound)
 {
   ScrewConstraint::addScrewAxis(axis, start_theta, end_theta, lower_bound, upper_bound);
-  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+  phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
 void UnchainedScrews::addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta)
 {
   ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
-  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+  phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
 void UnchainedScrews::addScrewAxis(
@@ -403,7 +402,7 @@ void UnchainedScrews::addScrewAxis(
   double upper_bound)
 {
   ScrewConstraint::addScrewAxis(axis, start_theta, end_theta, lower_bound, upper_bound);
-  phi_starts = getGradStarts(lower_bounds_, upper_bounds_);
+  phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
 }  // namespace affordance_primitives
