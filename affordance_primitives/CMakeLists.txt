@@ -95,8 +95,8 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
   target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
 
-  catkin_add_gtest(test_screw_constraints test/test_screw_constraints.cpp)
-  target_link_libraries(test_screw_constraints ${catkin_LIBRARIES} ${PROJECT_NAME})
+  catkin_add_gtest(test_chained_constraints test/test_chained_constraints.cpp)
+  target_link_libraries(test_chained_constraints ${catkin_LIBRARIES} ${PROJECT_NAME})
 
   # TODO: fix this test and enable it
   # add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)

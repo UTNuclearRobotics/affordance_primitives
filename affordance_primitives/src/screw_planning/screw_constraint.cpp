@@ -37,20 +37,16 @@ ScrewConstraint::ScrewConstraint(
 
   // Add all info
   setReferenceFrame(tf_m_to_s);
-  for (size_t i = 0; i < m; ++i) {
-    addScrewAxis(screws.at(i), start_phi.at(i), upper_bounds.at(i));
-  }
 
-  // Check and set bounds accordingly
+  // Check bounds and add axes accordingly
   if (m == lower_bounds.size() && m == upper_bounds.size()) {
-    lower_bounds_ = lower_bounds;
-    upper_bounds_ = upper_bounds;
-  } else {
-    lower_bounds_.reserve(m);
-    upper_bounds_.reserve(m);
     for (size_t i = 0; i < m; ++i) {
-      lower_bounds_.push_back(std::min(start_phi.at(i), goal_phi.at(i)));
-      upper_bounds_.push_back(std::max(start_phi.at(i), goal_phi.at(i)));
+      addScrewAxis(
+        screws.at(i), start_phi.at(i), goal_phi.at(i), lower_bounds.at(i), upper_bounds.at(i));
+    }
+  } else {
+    for (size_t i = 0; i < m; ++i) {
+      addScrewAxis(screws.at(i), start_phi.at(i), goal_phi.at(i));
     }
   }
 }
@@ -70,20 +66,16 @@ ScrewConstraint::ScrewConstraint(
 
   // Add all info
   setReferenceFrame(tf_m_to_s);
-  for (size_t i = 0; i < m; ++i) {
-    addScrewAxis(screws.at(i), start_phi.at(i), goal_phi.at(i));
-  }
 
-  // Check and set bounds accordingly
+  // Check bounds and add axes accordingly
   if (m == lower_bounds.size() && m == upper_bounds.size()) {
-    lower_bounds_ = lower_bounds;
-    upper_bounds_ = upper_bounds;
-  } else {
-    lower_bounds_.reserve(m);
-    upper_bounds_.reserve(m);
     for (size_t i = 0; i < m; ++i) {
-      lower_bounds_.push_back(std::min(start_phi.at(i), goal_phi.at(i)));
-      upper_bounds_.push_back(std::max(start_phi.at(i), goal_phi.at(i)));
+      addScrewAxis(
+        screws.at(i), start_phi.at(i), goal_phi.at(i), lower_bounds.at(i), upper_bounds.at(i));
+    }
+  } else {
+    for (size_t i = 0; i < m; ++i) {
+      addScrewAxis(screws.at(i), start_phi.at(i), goal_phi.at(i));
     }
   }
 }
