@@ -172,7 +172,7 @@ double ScrewConstraint::percentComplete(const std::vector<double> & state) const
     sum += fabs(goal_phi_[i] - start_phi_[i]);
   }
 
-  return error / sum;
+  return 1 - (error / sum);
 }
 
 std::vector<double> ScrewConstraint::sampleUniformState() const
