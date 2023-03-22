@@ -20,14 +20,6 @@ bool recursiveSearch(
   //Helper parameters
   const Eigen::Isometry3d tf_q_to_m = tf_m_to_q.inverse();
 
-  //Retrieve bounds
-  // const Eigen::VectorXd & phi_min = phi_bounds.first;
-  // const Eigen::VectorXd & phi_max = phi_bounds.second;
-
-  Eigen::VectorXd phi_min_e(2), phi_max_e(2);
-  phi_min_e << 0.5, 0.25;
-  phi_max_e << 1.0, 0.75;
-
   //Compute tf_q_to_p
   Eigen::Isometry3d pOE = productOfExponentials(constraint->axes(), phi, 0, constraint->size() - 1);
   Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * constraint->referenceFrame();
@@ -36,7 +28,6 @@ bool recursiveSearch(
   double alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
 
   //Initialize iterating parameters
-  /* double delta = std::numeric_limits<double>::max(); */
   double delta = epsilon;
   size_t i = 0;
 
@@ -48,18 +39,13 @@ bool recursiveSearch(
   };
 
   while (i < nmax && fabs(delta) >= epsilon) {
-    /* while (i < nmax) { */
     //Compute phi
     const auto deriv =
       errorDerivative(tf_q_to_m, constraint->referenceFrame(), phi, constraint->axes());
     phi = phi -
           gamma * errorDerivative(tf_q_to_m, constraint->referenceFrame(), phi, constraint->axes());
 
-    /* eigen_clamp(constraint->lowerBounds(), constraint->upperBounds()); */
     eigen_clamp(constraint->lowerBounds(), constraint->upperBounds());
-    /* for (size_t j = 0; j < phi.size(); j++) { */
-    /*   phi[j] = std::clamp(phi[j], constraint->lowerBounds().at(j), constraint->upperBounds().at(j)); */
-    /* } */
 
     //Compute tf_q_to_p
     pOE = productOfExponentials(constraint->axes(), phi, 0, constraint->size() - 1);
@@ -154,11 +140,6 @@ UnchainedScrews::UnchainedScrews(
   const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
 : ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
 {
-  //Temporary, TODO
-  // Eigen::VectorXd phi_low = Eigen::VectorXd::Map(lower_bounds.data(), lower_bounds.size());
-  // Eigen::VectorXd phi_high = Eigen::VectorXd::Map(upper_bounds.data(), upper_bounds.size());
-  // phi_bounds = {phi_low, phi_high};
-
   phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
@@ -167,11 +148,6 @@ UnchainedScrews::UnchainedScrews(
   const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
 : ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
 {
-  //Temporary, TODO
-  // Eigen::VectorXd phi_low = Eigen::VectorXd::Map(lower_bounds.data(), lower_bounds.size());
-  // Eigen::VectorXd phi_high = Eigen::VectorXd::Map(upper_bounds.data(), upper_bounds.size());
-  // phi_bounds = {phi_low, phi_high};
-
   phi_starts_ = getGradStarts(lower_bounds_, upper_bounds_);
 }
 
@@ -215,116 +191,11 @@ bool UnchainedScrews::constraintFn(
   return recursiveSearch(this, tf_m_to_q, starts, sol);
 }
 
-// bool UnchainedScrews::constraintFn(ScrewConstraintInfo & sol)
-// {
-//   Eigen::VectorXd & phi = phi_starts_.front();
-
-//   //Check if sizes are valid, TODO: Might not need to implement this. Base class has it?
-//   if ((screws.size() != phi.size()) || (screws.size() <= 0)) {
-//     return false;
-//   }
-
-//   //Gradient descent parameters
-//   const double gamma = 0.05;     //learning parameter
-//   const size_t nmax = 100;       //max steps
-//   const double epsilon = 0.001;  //converge limit
-
-//   //Helper parameters
-//   const Eigen::Isometry3d & tf_q_to_m = tf_m_to_q.inverse();
-
-//   //Retrieve bounds
-//   const Eigen::VectorXd & phi_min = phi_bounds.first;
-//   const Eigen::VectorXd & phi_max = phi_bounds.second;
-
-//   //Compute tf_q_to_p
-//   const int m = screws.size();  //TODO
-//   Eigen::Isometry3d pOE = productOfExponentials(screws, phi, 0, m - 1);
-//   Eigen::Isometry3d tf_q_to_p = tf_q_to_m * pOE * tf_m_to_s;
-
-//   //Compute alpha, the 1/2 squared norm we want to minimize
-//   double alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
-
-//   //Initialize iterating parameters
-//   double delta = epsilon;
-//   size_t i = 0;
-
-//   //To clamp phi in the loop
-//   auto eigen_clamp = [&phi](const Eigen::VectorXd & phi_min, const Eigen::VectorXd & phi_max) {
-//     for (int i = 0; i < phi.size(); i++) phi[i] = std::clamp(phi[i], phi_min[i], phi_max[i]);
-//     return phi;
-//   };
-
-//   while (i < nmax && fabs(delta) >= epsilon) {
-//     //Compute phi
-//     phi = phi - gamma * errorDerivative(tf_q_to_m, tf_m_to_s, phi, screws);
-
-//     eigen_clamp(phi_min, phi_max);
-
-//     //Compute tf_q_to_p
-//     pOE = productOfExponentials(screws, phi, 0, m - 1);
-//     tf_q_to_p = tf_q_to_m * pOE * tf_m_to_s;
-
-//     //Compute new delta
-//     delta = alpha - 0.5 * calculateEta(tf_q_to_p).squaredNorm();
-
-//     //Store last squared norm as alpha
-//     alpha = 0.5 * calculateEta(tf_q_to_p).squaredNorm();
-
-//     //Increment iteration
-//     i++;
-//   }
-
-//   //Compute error and update best_error and corresponding solved_phi
-//   current_error = calculateEta(tf_q_to_p);
-
-//   if (current_error.norm() < sol.error) {
-//     sol.error_vector = current_error;
-//     sol.error = current_error.norm();
-//     std::vector<double> solved_phi_svec(phi.data(), phi.data() + phi.size());  // Temporary, TODO
-//     sol.solved_phi = solved_phi_svec;
-//   }
-
-//   //Pop last phi guess and recursively call this function with a new guess until all guesses are exhausted
-//   phi_starts_.pop();
-//   if (!phi_starts_.empty()) {
-//     return constraintFn(sol);
-//   } else {
-//     return true;
-//   }
-// }
-
-// Eigen::Isometry3d UnchainedScrews::productOfExponentials(
-//   std::vector<ScrewAxis> & screws, const Eigen::VectorXd & phi, int start, int end)
-// {
-//   //recursively compute product of exponentials until the POE size is reduced to 1
-//   if (start < end)
-//     return screws[start].getTF(phi[start]) * productOfExponentials(screws, phi, start + 1, end);
-
-//   //when size is 1 return identity
-//   else
-//     return screws[0].getTF(0.0);
-// }
-
 std::queue<Eigen::VectorXd> UnchainedScrews::getGradStarts(
   const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds,
   double max_dist)
 {
   std::queue<Eigen::VectorXd> output;
-
-  // Eigen::VectorXd guess1(size_), guess2(size_), guess3(size_);
-
-  // auto guess1_vec = sampleUniformState();
-  // auto guess2_vec = sampleUniformState();
-  // auto guess3_vec = sampleUniformState();
-  // for (size_t i = 0; i < size_; ++i) {
-  //   guess1[i] = guess1_vec.at(i);
-  //   guess2[i] = guess2_vec.at(i);
-  //   guess3[i] = guess3_vec.at(i);
-  // }
-
-  // output.push(guess1);
-  // output.push(guess2);
-  // output.push(guess3);
 
   Eigen::VectorXd bounds_high(upper_bounds.size());
   Eigen::VectorXd bounds_low(lower_bounds.size());
