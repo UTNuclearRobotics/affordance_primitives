@@ -135,31 +135,57 @@ double computeDerivativeForIndex(
 ChainedScrews::ChainedScrews() : ScrewConstraint(), lambda_max_{0} {};
 
 ChainedScrews::ChainedScrews(
-  const std::vector<ScrewStamped> & screws, const std::vector<double> & lower_bounds,
-  const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
-: ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
+  const std::vector<ScrewStamped> & screws, const std::vector<double> & start_phi,
+  const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+  const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds)
+: ScrewConstraint(screws, start_phi, goal_phi, tf_m_to_s, lower_bounds, upper_bounds)
 {
-  lambda_max_ = getLambda(upper_bounds);
+  lambda_max_ = getLambda(goal_phi);
 }
 
 ChainedScrews::ChainedScrews(
-  const std::vector<ScrewAxis> & screws, const std::vector<double> & lower_bounds,
-  const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s)
-: ScrewConstraint(screws, lower_bounds, upper_bounds, tf_m_to_s)
+  const std::vector<ScrewAxis> & screws, const std::vector<double> & start_phi,
+  const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+  const std::vector<double> & lower_bounds, const std::vector<double> & upper_bounds)
+: ScrewConstraint(screws, start_phi, goal_phi, tf_m_to_s, lower_bounds, upper_bounds)
 {
-  lambda_max_ = getLambda(upper_bounds);
+  lambda_max_ = getLambda(goal_phi);
 }
 
-void ChainedScrews::addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound)
+void ChainedScrews::addScrewAxis(const ScrewStamped & axis, double start_theta, double end_theta)
 {
-  ScrewConstraint::addScrewAxis(axis, lower_bound, upper_bound);
-  lambda_max_ = getLambda(upper_bounds_);
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
+  lambda_max_ = getLambda(goal_phi_);
 }
 
-void ChainedScrews::addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound)
+void ChainedScrews::addScrewAxis(
+  const ScrewStamped & axis, double start_theta, double end_theta, double lower_bound,
+  double upper_bound)
 {
-  ScrewConstraint::addScrewAxis(axis, lower_bound, upper_bound);
-  lambda_max_ = getLambda(upper_bounds_);
+  addScrewAxis(axis, start_theta, end_theta);
+}
+
+void ChainedScrews::addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta)
+{
+  ScrewConstraint::addScrewAxis(axis, start_theta, end_theta);
+  lambda_max_ = getLambda(goal_phi_);
+}
+
+void ChainedScrews::addScrewAxis(
+  const ScrewAxis & axis, double start_theta, double end_theta, double lower_bound,
+  double upper_bound)
+{
+  addScrewAxis(axis, start_theta, end_theta);
+}
+
+double ChainedScrews::percentComplete(const std::vector<double> & state) const
+{
+  // Input checking
+  if (state.size() != size_) {
+    return 0;
+  }
+
+  return getLambda(state) / lambda_max_;
 }
 
 std::vector<double> ChainedScrews::sampleUniformState() const
@@ -205,19 +231,7 @@ std::vector<double> ChainedScrews::sampleGaussianStateNear(
 
 Eigen::Isometry3d ChainedScrews::getPose(const std::vector<double> & phi) const
 {
-  Eigen::Isometry3d output = Eigen::Isometry3d::Identity();
-
-  // Check input
-  if (phi.size() != size_) {
-    return output;
-  }
-
-  // Step through each axis and calculate
-  for (size_t i = 0; i < size_; ++i) {
-    output = output * axes_.at(i).getTF(phi[i]);
-  }
-  output = output * tf_m_to_s_;
-  return output;
+  return ScrewConstraint::getPose(phi);
 }
 
 Eigen::Isometry3d ChainedScrews::getPose(double lambda) const
@@ -333,6 +347,10 @@ std::vector<ScrewStamped> ChainedScrews::getVisualScrews() const
 
 bool ChainedScrews::constraintFn(const Eigen::Isometry3d & tf_m_to_q, ScrewConstraintSolution & sol)
 {
+  if (size_ < 1) {
+    return false;
+  }
+
   sol.reset();
 
   // Create a list of gradient descent starts
@@ -347,6 +365,10 @@ bool ChainedScrews::constraintFn(
   const Eigen::Isometry3d & tf_m_to_q, const std::vector<double> & phi_0,
   ScrewConstraintSolution & sol)
 {
+  if (size_ < 1) {
+    return false;
+  }
+
   sol.reset();
 
   // Make sure the guess goes first in the gradient descent starts

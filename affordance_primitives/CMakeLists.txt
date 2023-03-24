@@ -49,6 +49,7 @@ add_library(${PROJECT_NAME} SHARED
   include/${PROJECT_NAME}/screw_model/screw_axis.hpp
   include/${PROJECT_NAME}/screw_model/screw_execution.hpp
   include/${PROJECT_NAME}/screw_planning/chained_screws.hpp
+  include/${PROJECT_NAME}/screw_planning/unchained_screws.hpp
   include/${PROJECT_NAME}/screw_planning/screw_constraint.hpp
   include/${PROJECT_NAME}/task_estimator/kinematic_task_estimator.hpp
   include/${PROJECT_NAME}/task_estimator/task_estimator.hpp
@@ -59,6 +60,7 @@ add_library(${PROJECT_NAME} SHARED
   src/screw_model/screw_axis.cpp
   src/screw_model/screw_execution.cpp
   src/screw_planning/chained_screws.cpp
+  src/screw_planning/unchained_screws.cpp
   src/screw_planning/screw_constraint.cpp
   src/task_estimator/kinematic_task_estimator.cpp
   src/task_monitor/task_monitor.cpp
@@ -93,8 +95,8 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(test_screw_axis test/test_screw_axis.cpp)
   target_link_libraries(test_screw_axis ${catkin_LIBRARIES} ${PROJECT_NAME})
 
-  catkin_add_gtest(test_screw_constraints test/test_screw_constraints.cpp)
-  target_link_libraries(test_screw_constraints ${catkin_LIBRARIES} ${PROJECT_NAME})
+  catkin_add_gtest(test_chained_constraints test/test_chained_constraints.cpp)
+  target_link_libraries(test_chained_constraints ${catkin_LIBRARIES} ${PROJECT_NAME})
 
   # TODO: fix this test and enable it
   # add_rostest_gtest(test_screw_execution test/test_screw_execution.test test/test_screw_execution.cpp)

@@ -54,11 +54,15 @@ public:
   * @param tf_m_to_s The TF from the affordance (eg map) frame to the path reference frame
   */
   ChainedScrews(
-    const std::vector<ScrewStamped> & screws, const std::vector<double> & lower_bounds,
-    const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s);
+    const std::vector<ScrewStamped> & screws, const std::vector<double> & start_phi,
+    const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+    const std::vector<double> & lower_bounds = std::vector<double>(),
+    const std::vector<double> & upper_bounds = std::vector<double>());
   ChainedScrews(
-    const std::vector<ScrewAxis> & screws, const std::vector<double> & lower_bounds,
-    const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s);
+    const std::vector<ScrewAxis> & screws, const std::vector<double> & start_phi,
+    const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+    const std::vector<double> & lower_bounds = std::vector<double>(),
+    const std::vector<double> & upper_bounds = std::vector<double>());
 
   /**
   * @brief Calculates the constraint function
@@ -89,9 +93,21 @@ public:
   * @brief Adds a screw axis, to the end of the chain
   */
   virtual void addScrewAxis(
-    const ScrewStamped & axis, double lower_bound, double upper_bound) override;
+    const ScrewStamped & axis, double start_theta, double end_theta) override;
   virtual void addScrewAxis(
-    const ScrewAxis & axis, double lower_bound, double upper_bound) override;
+    const ScrewStamped & axis, double start_theta, double end_theta, double lower_bound,
+    double upper_bound) override;
+  virtual void addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta) override;
+  virtual void addScrewAxis(
+    const ScrewAxis & axis, double start_theta, double end_theta, double lower_bound,
+    double upper_bound) override;
+
+  /**
+  * @brief Returns the % complete [0, 1] a state is
+  * 
+  * Values of 1 indicate the passed state is at the goal
+  */
+  virtual double percentComplete(const std::vector<double> & state) const override;
 
   /**
   * @brief Samples a random valid screw state

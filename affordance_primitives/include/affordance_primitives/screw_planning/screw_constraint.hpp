@@ -38,6 +38,7 @@
 #include <affordance_primitives/screw_model/screw_axis.hpp>
 #include <limits>
 #include <random>
+#include <utility>
 #include <vector>
 
 namespace affordance_primitives
@@ -85,16 +86,22 @@ public:
   * @brief Constructors
   *
   * @param screws The vector of screw axes
+  * @param start_phi Start screw state, size must match screws size
+  * @param goal_phi Goal screw state, size must match screws size
+  * @param tf_m_to_s The TF from the affordance (eg map) frame to the path reference frame
   * @param lower_bounds Lower bounds for screws, size must match screws size
   * @param upper_bounds Upper bounds for screws, size must match screws size
-  * @param tf_m_to_s The TF from the affordance (eg map) frame to the path reference frame
   */
   ScrewConstraint(
-    const std::vector<ScrewStamped> & screws, const std::vector<double> & lower_bounds,
-    const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s);
+    const std::vector<ScrewStamped> & screws, const std::vector<double> & start_phi,
+    const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+    const std::vector<double> & lower_bounds = std::vector<double>(),
+    const std::vector<double> & upper_bounds = std::vector<double>());
   ScrewConstraint(
-    const std::vector<ScrewAxis> & screws, const std::vector<double> & lower_bounds,
-    const std::vector<double> & upper_bounds, const Eigen::Isometry3d & tf_m_to_s);
+    const std::vector<ScrewAxis> & screws, const std::vector<double> & start_phi,
+    const std::vector<double> & goal_phi, const Eigen::Isometry3d & tf_m_to_s,
+    const std::vector<double> & lower_bounds = std::vector<double>(),
+    const std::vector<double> & upper_bounds = std::vector<double>());
 
   /**
   * @brief Calculates the constraint function
@@ -119,7 +126,7 @@ public:
   * @param phi State vector
   * @return The pose in the affordance frame at state phi
   */
-  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const = 0;
+  virtual Eigen::Isometry3d getPose(const std::vector<double> & phi) const;
 
   /**
   * @brief Sets the path reference frame tf_m_to_s
@@ -129,8 +136,21 @@ public:
   /**
   * @brief Adds a screw axis. Pushes back to the vectors
   */
-  virtual void addScrewAxis(const ScrewStamped & axis, double lower_bound, double upper_bound);
-  virtual void addScrewAxis(const ScrewAxis & axis, double lower_bound, double upper_bound);
+  virtual void addScrewAxis(const ScrewStamped & axis, double start_theta, double end_theta);
+  virtual void addScrewAxis(
+    const ScrewStamped & axis, double start_theta, double end_theta, double lower_bound,
+    double upper_bound);
+  virtual void addScrewAxis(const ScrewAxis & axis, double start_theta, double end_theta);
+  virtual void addScrewAxis(
+    const ScrewAxis & axis, double start_theta, double end_theta, double lower_bound,
+    double upper_bound);
+
+  /**
+  * @brief Returns the % complete [0, 1] a state is
+  * 
+  * Values of 1 indicate the passed state is at the goal
+  */
+  virtual double percentComplete(const std::vector<double> & state) const;
 
   /**
   * @brief Samples a random valid screw state
@@ -155,9 +175,20 @@ public:
   virtual std::vector<double> sampleGaussianStateNear(
     const std::vector<double> & mean, double stdDev) const;
 
+  /**
+  * @brief Get the screw set for visualizing
+  * 
+  * Each screw is w.r.t. the affordance (map) frame
+  * 
+  * @return A vector of screws, all defined in the affordance frame
+  */
+  virtual std::vector<ScrewStamped> getVisualScrews() const;
+
   // Getters
   const std::vector<ScrewAxis> & axes() const { return axes_; }
   const Eigen::Isometry3d & referenceFrame() const { return tf_m_to_s_; }
+  const std::vector<double> & startPhi() const { return start_phi_; }
+  const std::vector<double> & goalPhi() const { return goal_phi_; }
   const std::vector<double> & lowerBounds() const { return lower_bounds_; }
   const std::vector<double> & upperBounds() const { return upper_bounds_; }
   const size_t size() const { return size_; }
@@ -166,6 +197,8 @@ public:
 
 protected:
   std::vector<ScrewAxis> axes_;
+  std::vector<double> start_phi_;
+  std::vector<double> goal_phi_;
   std::vector<double> lower_bounds_;
   std::vector<double> upper_bounds_;
   Eigen::Isometry3d tf_m_to_s_;

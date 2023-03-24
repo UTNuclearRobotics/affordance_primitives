@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : screw_constraint.hpp
+//      Title     : test_chained_constraints.cpp
 //      Project   : affordance_primitives
 //      Created   : 02/05/2023
 //      Author    : Adam Pettinger
@@ -105,6 +105,8 @@ TEST(ScrewConstraints, basicConstructor)
   affordance_primitives::ChainedScrews chain1;
   EXPECT_EQ(chain1.size(), 0);
   EXPECT_EQ(chain1.axes().size(), 0);
+  EXPECT_EQ(chain1.startPhi().size(), 0);
+  EXPECT_EQ(chain1.goalPhi().size(), 0);
   EXPECT_EQ(chain1.lowerBounds().size(), 0);
   EXPECT_EQ(chain1.upperBounds().size(), 0);
   EXPECT_EQ(chain1.referenceFrame().translation(), Eigen::Vector3d::Zero());
@@ -126,6 +128,8 @@ TEST(ScrewConstraints, basicConstructor)
   // Check everything went smoothly
   EXPECT_EQ(chain1.size(), 2);
   EXPECT_EQ(chain1.axes().size(), 2);
+  EXPECT_EQ(chain1.startPhi().size(), 2);
+  EXPECT_EQ(chain1.goalPhi().size(), 2);
   EXPECT_EQ(chain1.lowerBounds().size(), 2);
   EXPECT_EQ(chain1.upperBounds().size(), 2);
   EXPECT_NEAR(chain1.axes()[1].getAxis().x(), 1.0, EPSILON);
@@ -158,6 +162,13 @@ TEST(ScrewConstraints, complexConstructor)
   // Run some basic constructor tests
   affordance_primitives::ChainedScrews chain1(axes, lower, upper, tf_m_to_s);
   EXPECT_EQ(chain1.size(), 2);
+  EXPECT_EQ(chain1.axes().size(), 2);
+  EXPECT_EQ(chain1.startPhi().size(), 2);
+  EXPECT_EQ(chain1.goalPhi().size(), 2);
+  EXPECT_EQ(chain1.lowerBounds().size(), 2);
+  EXPECT_EQ(chain1.upperBounds().size(), 2);
+  EXPECT_NEAR(chain1.startPhi().at(0), chain1.lowerBounds().at(0), EPSILON);
+  EXPECT_NEAR(chain1.goalPhi().at(0), chain1.upperBounds().at(0), EPSILON);
   EXPECT_NEAR(chain1.referenceFrame().translation().x(), 0.4, EPSILON);
   EXPECT_NEAR(chain1.lambdaMax(), 3.3, EPSILON);
 }
